@@ -23,11 +23,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.tools.Stubs.stubMessagesControllerComponents
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.SpecHelper
+import uk.gov.hmrc.soletraderidentificationfrontend.views.html.hello_world
 
 class HelloWorldControllerSpec extends SpecHelper with GuiceOneAppPerSuite {
   private val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/hello-world")
 
-  object TestController extends HelloWorldController(stubMessagesControllerComponents())
+  private val testView = app.injector.instanceOf[hello_world]
+
+  object TestController extends HelloWorldController(stubMessagesControllerComponents(), testView)
 
   "GET /hello-world" should {
     "return 200" in {
