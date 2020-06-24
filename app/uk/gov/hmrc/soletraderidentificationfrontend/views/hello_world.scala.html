@@ -15,8 +15,11 @@
  *@
 
 @import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+
+@this(layout: govuk_template)
+
 @()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = "Hello from sole-trader-identification-frontend", bodyClasses = None) {
+@layout(title = "Hello from sole-trader-identification-frontend") {
     <h1>Hello from sole-trader-identification-frontend !</h1>
 }

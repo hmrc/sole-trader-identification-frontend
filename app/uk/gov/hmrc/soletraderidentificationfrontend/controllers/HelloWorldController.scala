@@ -17,7 +17,6 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
@@ -26,12 +25,14 @@ import uk.gov.hmrc.soletraderidentificationfrontend.views.html.hello_world
 import scala.concurrent.Future
 
 @Singleton
-class HelloWorldController @Inject()(mcc: MessagesControllerComponents)
-                                    (implicit appConfig: AppConfig) extends FrontendController(mcc) {
+class HelloWorldController @Inject()(mcc: MessagesControllerComponents,
+                                     view: hello_world)
+                                    (implicit val config: AppConfig)
+                                    extends FrontendController(mcc) {
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
-      Future.successful(Ok(hello_world()))
+      Future.successful(Ok(view()))
   }
 
 }
