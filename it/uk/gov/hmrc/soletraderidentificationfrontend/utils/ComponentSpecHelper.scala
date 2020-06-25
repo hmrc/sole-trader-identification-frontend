@@ -18,14 +18,14 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import org.scalatestplus.play.{MixedPlaySpec, PortNumber}
+import org.scalatestplus.play.{PlaySpec, PortNumber}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 
-trait ComponentSpecHelper extends MixedPlaySpec with CustomMatchers with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach {
+trait ComponentSpecHelper extends PlaySpec with CustomMatchers with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GuiceOneServerPerSuite {
 
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
@@ -41,14 +41,12 @@ trait ComponentSpecHelper extends MixedPlaySpec with CustomMatchers with Wiremoc
     "microservice.services.des.url" -> mockUrl
   )
 
-  def app(extraConfig: Map[String, String]): Application = new GuiceApplicationBuilder()
+  override lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
-    .configure(config ++ extraConfig)
+    .configure(config)
     .build
 
-  def defaultApp: Application = app(Map.empty)
-
-  implicit def ws(implicit app: Application): WSClient = app.injector.instanceOf[WSClient]
+  implicit val ws: WSClient = app.injector.instanceOf[WSClient]
 
   override def beforeAll(): Unit = {
     startWiremock()
@@ -65,8 +63,8 @@ trait ComponentSpecHelper extends MixedPlaySpec with CustomMatchers with Wiremoc
     super.beforeEach()
   }
 
-  def get[T](uri: String)(implicit ws: WSClient, portNumber: PortNumber): WSResponse = {
-    await(buildClient(uri).get)
+  def get[T](uri: String): WSResponse = {
+    await(buildClient(uri).withHttpHeaders().get)
   }
 
   def post[T](uri: String)(body: T)(implicit writes: Writes[T], ws: WSClient, portNumber: PortNumber): WSResponse = {
@@ -87,7 +85,7 @@ trait ComponentSpecHelper extends MixedPlaySpec with CustomMatchers with Wiremoc
 
   val baseUrl: String = "/sole-trader-identification"
 
-  private def buildClient(path: String)(implicit ws: WSClient, portNumber: PortNumber): WSRequest =
-    ws.url(s"http://localhost:${portNumber.value}$baseUrl$path").withFollowRedirects(false)
+  private def buildClient(path: String): WSRequest =
+    ws.url(s"http://localhost:$port$baseUrl$path").withFollowRedirects(false)
 
 }

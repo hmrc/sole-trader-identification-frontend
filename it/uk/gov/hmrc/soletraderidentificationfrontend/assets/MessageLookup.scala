@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.soletraderidentificationfrontend.controllers
+package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
-import play.api.libs.ws.WSResponse
-import play.api.test.Helpers.OK
-import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
+object MessageLookup {
 
-class HelloWorldControllerISpec extends ComponentSpecHelper {
+  val suffix = " - Use software to send Income Tax updates - GOV.UK"
 
-  "GET /hello-world" should {
-    "return OK" in {
-
-      val result: WSResponse = get("/hello-world")
-
-      result must have(httpStatus(OK))
-    }
+  object Base {
+    val continue = "Continue"
+    val yes = "Yes"
+    val no = "No"
+    val acceptAndContinue = "Accept and continue"
   }
 
+  object PersonalDetails {
+    val title = "Enter your details"
+    val heading = "Who do you want to register for VAT?"
+  }
 
 }

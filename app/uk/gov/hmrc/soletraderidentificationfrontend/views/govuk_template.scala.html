@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.FooterItem
-@import uk.gov.hmrc.soletraderidentificationfrontend.views.FooterLinks
+@import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.FooterLinks
 @import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 
 @this(govukLayout: GovukLayout,
@@ -44,12 +44,6 @@
 @content = {
     <div class="govuk-!-margin-bottom-6">
         @contentBlock
-    </div>
-
-    <div class="govuk-body">
-        <a lang="en" hreflang="en" class="govuk-link " target="_blank" href="@{appConfig.reportAProblemNonJSUrl}">
-            @messages("getpagehelp.linkText")
-        </a>
     </div>
 }
 

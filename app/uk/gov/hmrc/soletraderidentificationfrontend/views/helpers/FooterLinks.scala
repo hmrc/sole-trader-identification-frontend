@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.soletraderidentificationfrontend.views
+package uk.gov.hmrc.soletraderidentificationfrontend.views.helpers
 
 import javax.inject.Inject
 import play.api.i18n.Messages

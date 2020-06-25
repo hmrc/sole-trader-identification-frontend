@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.soletraderidentificationfrontend.controllers
+@(alternativeText: Option[String] = None, gaEventString: Option[String] = None)(implicit messages: Messages)
 
-import play.api.libs.ws.WSResponse
-import play.api.test.Helpers.OK
-import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
-
-class HelloWorldControllerISpec extends ComponentSpecHelper {
-
-  "GET /hello-world" should {
-    "return OK" in {
-
-      val result: WSResponse = get("/hello-world")
-
-      result must have(httpStatus(OK))
-    }
-  }
-
-
+@gaEventString match {
+ case Some(eventString) => {
+   <input id="continue-button" class="button" type="submit" value="@alternativeText.getOrElse(Messages("base.continue"))" data-journey-click="@eventString" data-journey-target>
+ }
+ case _ => {
+   <input id="continue-button" class="button" type="submit" value="@alternativeText.getOrElse(Messages("base.continue"))">
+ }
 }
