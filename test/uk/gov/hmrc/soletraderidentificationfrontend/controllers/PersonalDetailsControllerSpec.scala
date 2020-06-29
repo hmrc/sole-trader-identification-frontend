@@ -34,13 +34,13 @@ class PersonalDetailsControllerSpec extends SpecHelper with GuiceOneAppPerSuite 
   object TestController extends PersonalDetailsController(stubMessagesControllerComponents(), testView)
 
   "GET /personal-details-page" should {
+    val result = TestController.show(fakeRequest)
+
     "return 200" in {
-      val result = TestController.show(fakeRequest)
       status(result) mustBe Status.OK
     }
 
     "return HTML" in {
-      val result = TestController.show(fakeRequest)
       contentType(result) mustBe Some("text/html")
       charset(result) mustBe Some("utf-8")
     }

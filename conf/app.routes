@@ -6,4 +6,6 @@ GET        /hello-world           uk.gov.hmrc.soletraderidentificationfrontend.c
 
 GET        /personal-details-page uk.gov.hmrc.soletraderidentificationfrontend.controllers.PersonalDetailsController.show
 
+POST       /personal-details-page uk.gov.hmrc.soletraderidentificationfrontend.controllers.PersonalDetailsController.submit
+
 ->         /govuk-frontend        govuk.Routes

@@ -37,8 +37,26 @@ class PersonalDetailsControllerISpec extends ComponentSpecHelper with ViewSpec {
     }
 
     "have a view with the correct heading" in {
-      println(doc)
-      doc.getH1Element.text mustBe messages.heading
+      doc.getH1Elements.text mustBe messages.heading
+    }
+
+    "have a view with the correct first line" in {
+      doc.getParagraphs.text() mustBe messages.line_1
+    }
+
+    "have a view with correct labels in the form" in {
+      doc.getLabelElement.get(0).text() mustBe messages.form_field_1
+      doc.getLabelElement.get(1).text() mustBe messages.form_field_2
+      doc.getLegendElement.get(1).text() mustBe messages.form_field_3
+      doc.getSpan("date-of-birth-hint").text() mustBe messages.form_field_3_hint
+    }
+  }
+
+  "POST /personal-details-page" should {
+    lazy val result = post("/personal-details-page")("")
+
+    "return NotImplemented" in {
+      result must have(httpStatus(NOT_IMPLEMENTED))
     }
   }
 }

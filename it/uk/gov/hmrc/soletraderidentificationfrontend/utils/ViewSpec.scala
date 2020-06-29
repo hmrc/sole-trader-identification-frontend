@@ -26,25 +26,29 @@ trait ViewSpec {
 
   implicit class ElementTest(element: Element) {
 
-    val content: Element = element.getElementsByTag("article").head
+    lazy val content: Element = element.getElementsByTag("article").head
 
-    val getParagraphs: Elements = element.getElementsByTag("p")
+    lazy val getParagraphs: Elements = element.getElementsByTag("p")
 
-    val getBulletPoints: Elements = element.getElementsByTag("li")
+    lazy val getBulletPoints: Elements = element.getElementsByTag("li")
 
-    val getH1Element: Elements = element.getElementsByTag("h1")
+    lazy val getH1Elements: Elements = element.getElementsByTag("h1")
 
-    val getH2Elements: Elements = element.getElementsByTag("h2")
+    lazy val getH2Elements: Elements = element.getElementsByTag("h2")
 
-    val getFormElements: Elements = element.getElementsByClass("form-field-group")
+    lazy val getFormElements: Elements = element.getElementsByClass("form-field-group")
 
-    val getErrorSummaryMessage: Elements = element.select("#error-summary-display ul")
+    lazy val getLabelElement: Elements = element.getElementsByTag("label")
 
-    val getSubmitButton: Elements = element.select("button[type=submit]")
+    lazy val getLegendElement: Elements = element.getElementsByTag("legend")
 
-    val getHintText: String = element.select(s"""span[class=form-hint]""").text()
+    lazy val getErrorSummaryMessage: Elements = element.select("#error-summary-display ul")
 
-    val getForm: Elements = element.select("form")
+    lazy val getSubmitButton: Elements = element.select("button[type=submit]")
+
+    lazy val getHintText: String = element.select(s"""span[class=form-hint]""").text()
+
+    lazy val getForm: Elements = element.select("form")
 
     def getSpan(id: String): Elements = element.select(s"""span[id=$id]""")
 

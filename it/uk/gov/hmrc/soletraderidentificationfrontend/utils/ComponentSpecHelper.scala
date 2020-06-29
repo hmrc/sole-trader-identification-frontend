@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.utils
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{PlaySpec, PortNumber}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -26,6 +26,11 @@ import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 
 trait ComponentSpecHelper extends PlaySpec with CustomMatchers with WiremockHelper with BeforeAndAfterAll with BeforeAndAfterEach with GuiceOneServerPerSuite {
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .in(Environment.simple(mode = Mode.Dev))
+    .configure(config)
+    .build
 
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
@@ -40,11 +45,6 @@ trait ComponentSpecHelper extends PlaySpec with CustomMatchers with WiremockHelp
     "microservice.services.base.port" -> mockPort,
     "microservice.services.des.url" -> mockUrl
   )
-
-  override lazy val app: Application = new GuiceApplicationBuilder()
-    .in(Environment.simple(mode = Mode.Dev))
-    .configure(config)
-    .build
 
   implicit val ws: WSClient = app.injector.instanceOf[WSClient]
 

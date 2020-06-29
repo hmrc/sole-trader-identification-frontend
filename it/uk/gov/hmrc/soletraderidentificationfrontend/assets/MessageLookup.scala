@@ -30,6 +30,11 @@ object MessageLookup {
   object PersonalDetails {
     val title = "Enter your details"
     val heading = "Who do you want to register for VAT?"
+    val line_1 = "We will attempt to match these details with the information we already have."
+    val form_field_1 = "First name"
+    val form_field_2 = "Last name"
+    val form_field_3 = "Date of birth"
+    val form_field_3_hint = "For example, 27 3 2007"
   }
 
 }

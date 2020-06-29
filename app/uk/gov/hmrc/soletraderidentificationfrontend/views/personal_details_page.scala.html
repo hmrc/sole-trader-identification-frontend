@@ -14,9 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 
 @this(layout: govuk_template,
       govUkHeader: GovukHeader,
@@ -25,7 +24,7 @@
       govukDateInput : GovukDateInput,
       govukButton : GovukButton)
 
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(formAction: Action[AnyContent])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(title = messages("personal-details.title")) {
 
