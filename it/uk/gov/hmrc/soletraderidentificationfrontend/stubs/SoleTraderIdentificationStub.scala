@@ -44,7 +44,7 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
     )
 
 
-  def stubRetrieveSoleTraderIdentification(journeyId: String)(status: Int, body: JsObject = Json.obj()): StubMapping =
+  def stubRetrieveSoleTraderDetails(journeyId: String)(status: Int, body: JsObject = Json.obj()): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/$journeyId"
     ).thenReturn(

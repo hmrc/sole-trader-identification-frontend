@@ -20,8 +20,10 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, CheckYourAnswers => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.checkYourAnswersFormat
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
 import scala.collection.JavaConverters._
@@ -52,7 +54,7 @@ trait CheckYourAnswersViewTests {
         val firstNameRow = summaryListRows.head
 
         firstNameRow.getSummaryListQuestion mustBe messages.firstName
-        firstNameRow.getSummaryListAnswer mustBe "John"
+        firstNameRow.getSummaryListAnswer mustBe testFirstName
         firstNameRow.getSummaryListChangeLink mustBe routes.CaptureFullNameController.show(journeyId).url
         firstNameRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.firstName}"
       }
@@ -61,7 +63,7 @@ trait CheckYourAnswersViewTests {
         val lastNameRow = summaryListRows(1)
 
         lastNameRow.getSummaryListQuestion mustBe messages.lastName
-        lastNameRow.getSummaryListAnswer mustBe "Smith"
+        lastNameRow.getSummaryListAnswer mustBe testLastName
         lastNameRow.getSummaryListChangeLink mustBe routes.CaptureFullNameController.show(journeyId).url
         lastNameRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.lastName}"
       }
@@ -70,7 +72,7 @@ trait CheckYourAnswersViewTests {
         val dateOfBirthRow = summaryListRows(2)
 
         dateOfBirthRow.getSummaryListQuestion mustBe messages.dob
-        dateOfBirthRow.getSummaryListAnswer mustBe "5 January 1978"
+        dateOfBirthRow.getSummaryListAnswer mustBe testDateOfBirth.format(checkYourAnswersFormat)
         dateOfBirthRow.getSummaryListChangeLink mustBe routes.CaptureDateOfBirthController.show(journeyId).url
         dateOfBirthRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.dob}"
       }
@@ -79,7 +81,7 @@ trait CheckYourAnswersViewTests {
         val ninoRow = summaryListRows(3)
 
         ninoRow.getSummaryListQuestion mustBe messages.nino
-        ninoRow.getSummaryListAnswer mustBe "AA 11 11 11 A"
+        ninoRow.getSummaryListAnswer mustBe testNino.grouped(2).mkString(" ")
         ninoRow.getSummaryListChangeLink mustBe routes.CaptureNinoController.show(journeyId).url
         ninoRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.nino}"
       }
@@ -88,7 +90,7 @@ trait CheckYourAnswersViewTests {
         val sautrRow = summaryListRows.last
 
         sautrRow.getSummaryListQuestion mustBe messages.sautr
-        sautrRow.getSummaryListAnswer mustBe "1234567890"
+        sautrRow.getSummaryListAnswer mustBe testSautr
         sautrRow.getSummaryListChangeLink mustBe routes.CaptureSautrController.show(journeyId).url
         sautrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.sautr}"
       }

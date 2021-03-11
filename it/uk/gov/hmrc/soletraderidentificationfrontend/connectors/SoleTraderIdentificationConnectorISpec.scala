@@ -28,7 +28,7 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
   s"retrieveSoleTraderIdentification($testJourneyId)" should {
     "return Sole Trader Identification" when {
       "there is Sole Trader Identification stored against the journeyId" in {
-        stubRetrieveSoleTraderIdentification(testJourneyId)(
+        stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
           body = Json.toJsObject(
             SoleTraderDetailsModel(
@@ -55,7 +55,7 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
     }
     "return None" when {
       "there is no Sole Trader Identification stored against the journeyId" in {
-        stubRetrieveSoleTraderIdentification(testJourneyId)(
+        stubRetrieveSoleTraderDetails(testJourneyId)(
           status = NOT_FOUND
         )
 

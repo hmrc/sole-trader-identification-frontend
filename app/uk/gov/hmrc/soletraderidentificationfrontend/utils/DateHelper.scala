@@ -19,5 +19,5 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 import java.time.format.{DateTimeFormatter, ResolverStyle}
 
 object DateHelper {
-  val checkYourAnswersFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu").withResolverStyle(ResolverStyle.STRICT)
+  val checkYourAnswersFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy").withResolverStyle(ResolverStyle.STRICT)
 }

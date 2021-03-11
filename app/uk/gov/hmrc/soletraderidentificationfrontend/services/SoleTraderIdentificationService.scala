@@ -62,7 +62,7 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def retrieveSautr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderIdentification[String](journeyId, sautrKey)
 
-  def retrieveAll(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[SoleTraderDetailsModel]] =
+  def retrieveSoleTraderDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[SoleTraderDetailsModel]] =
     connector.retrieveSoleTraderIdentification(journeyId)
 }
 

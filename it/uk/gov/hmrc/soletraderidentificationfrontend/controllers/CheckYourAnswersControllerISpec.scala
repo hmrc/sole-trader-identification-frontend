@@ -19,40 +19,20 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
-import reactivemongo.play.json.JsObjectDocumentWriter
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsModel
-import uk.gov.hmrc.soletraderidentificationfrontend.repositories.SoleTraderDetailsRepository
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.soletraderidentificationfrontend.stubs.SoleTraderIdentificationStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CheckYourAnswersViewTests
 
-import java.time.LocalDate
-import java.util.UUID
-import scala.concurrent.ExecutionContext.Implicits.global
 
-
-class CheckYourAnswersControllerISpec extends ComponentSpecHelper with CheckYourAnswersViewTests {
+class CheckYourAnswersControllerISpec extends ComponentSpecHelper with CheckYourAnswersViewTests with SoleTraderIdentificationStub {
 
   "GET /check-your-answers-business" should {
-    val testJourneyId = UUID.randomUUID().toString
-    val testFirstName = "John"
-    val testLastName = "Smith"
-    val testSautr = "1234567890"
-    val testNino = "AA111111A"
+    lazy val result: WSResponse = {
+      stubRetrieveSoleTraderDetails(testJourneyId)(status = OK, body = Json.toJsObject(testSoleTraderDetails))
 
-    val testSoleTraderDetails = SoleTraderDetailsModel(testFirstName, testLastName, LocalDate.parse("1978-01-05"), testNino, Some(testSautr))
-    await(app.injector.instanceOf[SoleTraderDetailsRepository].collection.insert(true).one(
-      Json.obj(
-        "_id" -> testJourneyId,
-        "fullName" ->
-          Json.obj(
-            "firstName" -> testFirstName,
-            "lastName" -> testLastName
-          ),
-        "dateOfBirth" -> Json.toJson(LocalDate.parse("1978-01-05")),
-        "nino" -> testNino,
-        "sautr" -> testSautr
-      )))
-    lazy val result: WSResponse = get(s"/check-your-answers-business/$testJourneyId")
+      get(s"/check-your-answers-business/$testJourneyId")
+    }
 
     "return OK" in {
       result.status mustBe OK
