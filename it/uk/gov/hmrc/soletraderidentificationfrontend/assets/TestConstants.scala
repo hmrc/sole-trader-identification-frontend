@@ -17,7 +17,8 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{AuthenticatorDetails, BusinessVerificationPass, BusinessVerificationUnchallenged, FullName, Registered, RegistrationNotCalled, SoleTraderDetails}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{Individual, SoleTrader}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{AuthenticatorDetails, BusinessVerificationPass, BusinessVerificationUnchallenged, FullName, JourneyConfig, PageConfig, Registered, RegistrationNotCalled, SoleTraderDetails}
 
 import java.time.LocalDate
 import java.util.UUID
@@ -34,6 +35,17 @@ object TestConstants {
   val testContinueUrl = "/test-continue-url"
   val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"
   val testSafeId: String = UUID.randomUUID().toString
+  val testCredentialId: String = UUID.randomUUID().toString
+  val testGGProviderId: String = UUID.randomUUID().toString
+  val testGroupId: String = UUID.randomUUID().toString
+  val testInternalId: String = UUID.randomUUID().toString
+
+  val testDeskProServiceId: String = "vrs"
+  val testSignOutUrl: String = "/sign-out"
+
+  val testSoleTraderJourneyConfig: JourneyConfig = JourneyConfig(testContinueUrl, PageConfig(None, testDeskProServiceId, testSignOutUrl), SoleTrader)
+  val testSoleTraderJourneyConfigSautrEnabled: JourneyConfig = JourneyConfig(testContinueUrl, PageConfig(None, testDeskProServiceId, testSignOutUrl, true), SoleTrader)
+  val testIndividualJourneyConfig: JourneyConfig = JourneyConfig(testContinueUrl, PageConfig(None, testDeskProServiceId, testSignOutUrl), Individual)
 
   val testSoleTraderDetails: SoleTraderDetails =
     SoleTraderDetails(
@@ -126,13 +138,5 @@ object TestConstants {
       "nino" -> testNino
     )
   }
-
-  val testCredentialId: String = UUID.randomUUID().toString
-  val testGGProviderId: String = UUID.randomUUID().toString
-  val testGroupId: String = UUID.randomUUID().toString
-  val testInternalId: String = UUID.randomUUID().toString
-
-  val testDeskProServiceId: String = "vrs"
-  val testSignOutUrl: String = "/sign-out"
 
 }

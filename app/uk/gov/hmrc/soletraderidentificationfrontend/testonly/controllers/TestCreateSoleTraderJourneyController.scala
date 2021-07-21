@@ -16,25 +16,26 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.SoleTrader
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.form
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.views.html.test_create_journey
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                            testCreateJourneyConnector: TestCreateJourneyConnector,
-                                            view: test_create_journey,
-                                            val authConnector: AuthConnector
-                                           )(implicit ec: ExecutionContext,
-                                             appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                                      testCreateJourneyConnector: TestCreateJourneyConnector,
+                                                      view: test_create_journey,
+                                                      val authConnector: AuthConnector
+                                                     )(implicit ec: ExecutionContext,
+                                                       appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
 
   private val defaultPageConfig = PageConfig(
@@ -45,14 +46,15 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
-    pageConfig = defaultPageConfig
+    pageConfig = defaultPageConfig,
+    entityType = SoleTrader
   )
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, form.fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit()))
+          Ok(view(defaultPageConfig, form(SoleTrader).fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit()))
         )
       }
   }
@@ -60,13 +62,13 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        form.bindFromRequest().fold(
+        form(SoleTrader).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateJourneyController.submit()))
+              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateSoleTraderJourneyController.submit()))
             ),
           journeyConfig =>
-            testCreateJourneyConnector.createJourney(journeyConfig).map {
+            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map {
               journeyUrl => SeeOther(journeyUrl)
             }
         )

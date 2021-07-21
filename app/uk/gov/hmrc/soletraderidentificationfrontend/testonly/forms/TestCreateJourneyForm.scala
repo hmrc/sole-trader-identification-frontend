@@ -21,7 +21,9 @@ import play.api.data.Forms.{mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
+import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.EntityType
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.enableSautrCheck
 
 object TestCreateJourneyForm {
 
@@ -53,15 +55,15 @@ object TestCreateJourneyForm {
     )
   )
 
-  val form: Form[JourneyConfig] = {
+  def form(entityType: EntityType): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       serviceName -> optText,
       deskProServiceId -> text.verifying(deskProServiceIdEmpty),
       signOutUrl -> text.verifying(signOutUrlEmpty),
       enableSautrCheck -> optText.toBoolean
-    )((continueUrl, serviceName, deskProServiceId, signOutUrl,enableSautrCheck) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck))
+    )((continueUrl, serviceName, deskProServiceId, signOutUrl, enableSautrCheck) =>
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck), entityType)
     )(journeyConfig =>
       Some(journeyConfig.continueUrl, journeyConfig.pageConfig.optServiceName,
         journeyConfig.pageConfig.deskProServiceId, journeyConfig.pageConfig.signOutUrl,

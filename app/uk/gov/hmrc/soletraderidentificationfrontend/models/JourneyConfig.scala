@@ -17,31 +17,32 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 import play.api.libs.json._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.EntityType
 
-case class JourneyConfig(continueUrl: String, pageConfig: PageConfig)
+case class JourneyConfig(continueUrl: String, pageConfig: PageConfig, entityType: EntityType)
 
-object JourneyConfig {
-  private val continueUrlKey = "continueUrl"
-  private val optServiceNameKey = "optServiceName"
-  private val deskProServiceIdKey = "deskProServiceId"
-  private val signOutUrlKey = "signOutUrl"
-  private val enableSautrCheckKey = "enableSautrCheck"
-
-  implicit val format: OFormat[JourneyConfig] = new OFormat[JourneyConfig] {
-    override def reads(json: JsValue): JsResult[JourneyConfig] = for {
-      continueUrl <- (json \ continueUrlKey).validate[String]
-      optServiceName <- (json \ optServiceNameKey).validateOpt[String]
-      deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
-      signOutUrl <- (json \ signOutUrlKey).validate[String]
-      enableSautrCheck <- (json \ enableSautrCheckKey).validateOpt[Boolean]
-    } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)))
-
-    override def writes(journeyConfig: JourneyConfig): JsObject = Json.obj(
-      continueUrlKey -> journeyConfig.continueUrl,
-      optServiceNameKey -> journeyConfig.pageConfig.optServiceName,
-      deskProServiceIdKey -> journeyConfig.pageConfig.deskProServiceId,
-      signOutUrlKey -> journeyConfig.pageConfig.signOutUrl,
-      enableSautrCheckKey -> journeyConfig.pageConfig.enableSautrCheck
-    )
-  }
-}
+//object JourneyConfig {
+//  private val continueUrlKey = "continueUrl"
+//  private val optServiceNameKey = "optServiceName"
+//  private val deskProServiceIdKey = "deskProServiceId"
+//  private val signOutUrlKey = "signOutUrl"
+//  private val enableSautrCheckKey = "enableSautrCheck"
+//
+//  implicit val format: OFormat[JourneyConfig] = new OFormat[JourneyConfig] {
+//    override def reads(json: JsValue): JsResult[JourneyConfig] = for {
+//      continueUrl <- (json \ continueUrlKey).validate[String]
+//      optServiceName <- (json \ optServiceNameKey).validateOpt[String]
+//      deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
+//      signOutUrl <- (json \ signOutUrlKey).validate[String]
+//      enableSautrCheck <- (json \ enableSautrCheckKey).validateOpt[Boolean]
+//    } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)))
+//
+//    override def writes(journeyConfig: JourneyConfig): JsObject = Json.obj(
+//      continueUrlKey -> journeyConfig.continueUrl,
+//      optServiceNameKey -> journeyConfig.pageConfig.optServiceName,
+//      deskProServiceIdKey -> journeyConfig.pageConfig.deskProServiceId,
+//      signOutUrlKey -> journeyConfig.pageConfig.signOutUrl,
+//      enableSautrCheckKey -> journeyConfig.pageConfig.enableSautrCheck
+//    )
+//  }
+//}

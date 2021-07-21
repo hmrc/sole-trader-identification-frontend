@@ -17,10 +17,13 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors
 
 import play.api.http.Status._
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.{continueUrlKey, deskProServiceIdKey, optServiceNameKey, signOutUrlKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.{routes => apiRoutes}
+import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector.journeyConfigWriter
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,12 +33,29 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
                                            appConfig: AppConfig
                                           )(implicit ec: ExecutionContext) {
 
-  def createJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
-    val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createJourney().url
+  def createSoleTraderJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
+    val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createSoleTraderJourney().url
 
-    httpClient.POST(url, journeyConfig).map{
-      case response @ HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
+    httpClient.POST(url, journeyConfig).map {
+      case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
     }
   }
 
+  def createIndividualJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
+    val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createIndividualJourney().url
+
+    httpClient.POST(url, journeyConfig).map {
+      case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
+    }
+  }
+
+}
+
+object TestCreateJourneyConnector {
+  implicit val journeyConfigWriter: Writes[JourneyConfig] = (journeyConfig: JourneyConfig) => Json.obj(
+    continueUrlKey -> journeyConfig.continueUrl,
+    optServiceNameKey -> journeyConfig.pageConfig.optServiceName,
+    deskProServiceIdKey -> journeyConfig.pageConfig.deskProServiceId,
+    signOutUrlKey -> journeyConfig.pageConfig.signOutUrl
+  )
 }

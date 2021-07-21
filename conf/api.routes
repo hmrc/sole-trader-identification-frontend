@@ -1,5 +1,10 @@
 # microservice specific routes
 
 + nocsrf
-POST       /journey                                         uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.createJourney()
+POST       /journey                                         uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.createSoleTraderJourney()
++ nocsrf
+POST       /sole-trader-journey                             uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.createSoleTraderJourney()
++ nocsrf
+POST       /individual-journey                              uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.createIndividualJourney()
+
 GET        /journey/:journeyId                              uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController.retrieveJourneyData(journeyId: String)

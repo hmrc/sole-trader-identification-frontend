@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import reactivemongo.api.commands.WriteResult
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{FeatureSwitching, FeatureSwitchingModule}
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.models.FeatureSwitch
+import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.SoleTrader
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository
 
@@ -133,6 +134,6 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
                           signOutUrl: String,
                           enableSautrCheck: Boolean): Future[WriteResult] =
     journeyConfigRepository.insertJourneyConfig(
-      journeyId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck))
+      journeyId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck), SoleTrader)
     )
 }

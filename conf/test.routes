@@ -1,6 +1,11 @@
+GET        /create-journey                                                                  uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateSoleTraderJourneyController.show
+POST       /create-journey                                                                  uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateSoleTraderJourneyController.submit
 
-GET        /create-journey                                                                  uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateJourneyController.show
-POST       /create-journey                                                                  uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateJourneyController.submit
+GET        /create-sole-trader-journey                                                      uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateSoleTraderJourneyController.show
+POST       /create-sole-trader-journey                                                      uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateSoleTraderJourneyController.submit
+
+GET        /create-individual-journey                                                       uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateIndividualJourneyController.show
+POST       /create-individual-journey                                                       uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestCreateIndividualJourneyController.submit
 
 GET        /retrieve-journey/:journeyId                                                     uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveSoleTraderDetails(journeyId)
 GET        /retrieve-journey                                                                uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveSoleTraderDetails(journeyId)
