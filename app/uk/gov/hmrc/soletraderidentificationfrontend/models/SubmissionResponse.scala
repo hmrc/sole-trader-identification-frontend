@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-sealed trait OrchestrationResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.SoleTraderDetailsMatchFailure
 
-case object SautrMatched extends OrchestrationResponse
+sealed trait SubmissionResponse
 
-case object NoSautrProvided extends OrchestrationResponse
+case class StartBusinessVerification(url: String) extends SubmissionResponse
 
-case object DetailsMismatch extends OrchestrationResponse
+case class SoleTraderDetailsMismatch(mismatchReason: SoleTraderDetailsMatchFailure) extends SubmissionResponse
 
-case object DetailsNotFound extends OrchestrationResponse
+case class JourneyCompleted(continueUrl: String) extends SubmissionResponse
+

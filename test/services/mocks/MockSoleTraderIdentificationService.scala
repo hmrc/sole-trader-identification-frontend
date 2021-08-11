@@ -23,7 +23,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{AuthenticatorResponse, SoleTraderDetailsMatchFailure}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.SoleTraderDetailsMatchFailure
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationStatus, FullName, IndividualDetails, RegistrationStatus}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentificationService
 
@@ -78,6 +78,13 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
   def mockRetrieveAuthenticatorDetails(journeyId: String)
                                       (response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.retrieveAuthenticatorDetails(
+      ArgumentMatchers.eq(journeyId)
+    )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
+
+  def mockRetrieveIndividualDetails(journeyId: String)
+                                      (response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
+    when(mockSoleTraderIdentificationService.retrieveIndividualDetails(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)

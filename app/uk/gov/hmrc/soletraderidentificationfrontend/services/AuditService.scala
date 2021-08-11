@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{Individual, SoleTrader}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.IndividualDetails
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject()(auditConnector: AuditConnector,
-                             journeyService: JourneyService,
-                             soleTraderIdentificationService: SoleTraderIdentificationService) {
+class AuditService @Inject()(auditConnector: AuditConnector, soleTraderIdentificationService: SoleTraderIdentificationService) {
 
   def auditIndividualJourney(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     for {

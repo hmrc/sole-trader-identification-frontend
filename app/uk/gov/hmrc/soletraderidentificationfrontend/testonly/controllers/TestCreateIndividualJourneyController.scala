@@ -20,7 +20,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.Individual
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.form
@@ -41,21 +40,23 @@ class TestCreateIndividualJourneyController @Inject()(messagesControllerComponen
   private val defaultPageConfig = PageConfig(
     optServiceName = None,
     deskProServiceId = "vrs",
-    signOutUrl = appConfig.vatRegFeedbackUrl,
-    enableSautrCheck = false
+    signOutUrl = appConfig.vatRegFeedbackUrl
   )
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
-    pageConfig = defaultPageConfig,
-    entityType = Individual
+    pageConfig = defaultPageConfig
   )
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, form(Individual, enableSautrCheck = false).fill(defaultJourneyConfig), routes.TestCreateIndividualJourneyController.submit()))
+          Ok(view(
+            defaultPageConfig,
+            form(enableSautrCheck = false).fill(defaultJourneyConfig),
+            routes.TestCreateIndividualJourneyController.submit()
+          ))
         )
       }
   }
@@ -63,7 +64,7 @@ class TestCreateIndividualJourneyController @Inject()(messagesControllerComponen
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        form(Individual, enableSautrCheck = false).bindFromRequest().fold(
+        form(enableSautrCheck = false).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateIndividualJourneyController.submit()))

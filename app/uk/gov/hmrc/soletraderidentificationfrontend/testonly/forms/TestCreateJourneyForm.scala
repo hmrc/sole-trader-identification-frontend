@@ -21,7 +21,6 @@ import play.api.data.Forms.{mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.EntityType
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 object TestCreateJourneyForm {
@@ -54,21 +53,21 @@ object TestCreateJourneyForm {
     )
   )
 
-  def form(entityType: EntityType, enableSautrCheck: Boolean): Form[JourneyConfig] = {
+  def form(enableSautrCheck: Boolean): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       serviceName -> optText,
       deskProServiceId -> text.verifying(deskProServiceIdEmpty),
       signOutUrl -> text.verifying(signOutUrlEmpty)
     )((continueUrl, serviceName, deskProServiceId, signOutUrl) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck), entityType)
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck))
     )(journeyConfig =>
       Some(journeyConfig.continueUrl, journeyConfig.pageConfig.optServiceName,
         journeyConfig.pageConfig.deskProServiceId, journeyConfig.pageConfig.signOutUrl)
     ))
   }
 
-  def deprecatedForm(entityType: EntityType): Form[JourneyConfig] = {
+  def deprecatedForm(): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       serviceName -> optText,
@@ -76,7 +75,7 @@ object TestCreateJourneyForm {
       signOutUrl -> text.verifying(signOutUrlEmpty),
       enableSautrCheck -> optText.toBoolean
     )((continueUrl, serviceName, deskProServiceId, signOutUrl, enableSautrCheck) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck), entityType)
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, enableSautrCheck))
     )(journeyConfig =>
       Some(journeyConfig.continueUrl, journeyConfig.pageConfig.optServiceName,
         journeyConfig.pageConfig.deskProServiceId, journeyConfig.pageConfig.signOutUrl,

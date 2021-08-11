@@ -23,24 +23,22 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers._
 import services.mocks.{MockJourneyService, MockSoleTraderIdentificationService}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{Individual, SoleTrader}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.Mismatch
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, BusinessVerificationUnchallenged, Registered, RegistrationNotCalled}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.AuditService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector with MockJourneyService with MockSoleTraderIdentificationService {
+class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector with MockSoleTraderIdentificationService {
 
-  object TestService extends AuditService(mockAuditConnector, mockJourneyService, mockSoleTraderIdentificationService)
+  object TestService extends AuditService(mockAuditConnector, mockSoleTraderIdentificationService)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "auditIndividualJourney" should {
     "send an event" when {
       "the entity is an individual and identifiers match" in {
-        mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = Individual)))
         mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
         mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
         mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
@@ -56,12 +54,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
       }
 
       "the entity is an individual and identifiers do not match" in {
-        mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = Individual)))
         mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
         mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
         mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
-        mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(Mismatch.toString)))
+        mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
 
         val result: Unit = await(TestService.auditIndividualJourney(testJourneyId))
 
@@ -74,7 +71,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
     "throw an exception" when {
       "there is missing data for the audit" in {
-        mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = Individual)))
         mockRetrieveFullName(testJourneyId)(Future.failed(new InternalServerException("failed")))
 
         intercept[InternalServerException](
@@ -88,7 +84,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
     "send an event" when {
       "the entity is a Sole Trader and identifiers match" when {
         "there is an sautr" in {
-          mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = SoleTrader)))
           mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
           mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
@@ -106,7 +101,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson(identifiersMatch = true)
         }
         "there is not an sautr" in {
-          mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = SoleTrader)))
           mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
           mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
@@ -125,13 +119,12 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         }
       }
       "the entity is a Sole Trader and identifiers do not match" in {
-        mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = SoleTrader)))
         mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
         mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
         mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
         mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
-        mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(Mismatch.toString)))
+        mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
         mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationUnchallenged)))
         mockRetrieveRegistrationResponse(testJourneyId)(Future.successful(Some(RegistrationNotCalled)))
 
@@ -146,7 +139,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
     "throw an exception" when {
       "there is missing data for the audit" in {
-        mockGetJourneyConfig(testJourneyId)(Future.successful(testJourneyConfig(entityType = SoleTrader)))
         mockRetrieveFullName(testJourneyId)(Future.failed(new InternalServerException("failed")))
 
         intercept[InternalServerException](

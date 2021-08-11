@@ -22,30 +22,27 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.SoleTraderVerificationResult
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig}
-import uk.gov.hmrc.soletraderidentificationfrontend.services.AuthenticatorService
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.BusinessVerificationJourneyCreationResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.services.BusinessVerificationService
 
 import scala.concurrent.Future
 
-trait MockAuthenticatorService extends MockitoSugar with BeforeAndAfterEach {
+trait MockBusinessVerificationService extends MockitoSugar with BeforeAndAfterEach {
   self: Suite =>
 
-  val mockAuthenticatorService: AuthenticatorService = mock[AuthenticatorService]
+  val mockBusinessVerificationService: BusinessVerificationService = mock[BusinessVerificationService]
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockAuthenticatorService)
+    reset(mockBusinessVerificationService)
   }
 
-  def mockMatchSoleTraderDetails(journeyId: String,
-                                 individualDetails: IndividualDetails,
-                                 journeyConfig: JourneyConfig
-                                )(response: Future[SoleTraderVerificationResult]): OngoingStubbing[_] =
-    when(mockAuthenticatorService.matchSoleTraderDetails(
+  def mockCreateBusinessVerificationJourney(journeyId: String,
+                                            sautr: String
+                                           )(response: Future[BusinessVerificationJourneyCreationResponse]): OngoingStubbing[_] =
+    when(mockBusinessVerificationService.createBusinessVerificationJourney(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(individualDetails),
-      ArgumentMatchers.eq(journeyConfig),
+      ArgumentMatchers.eq(sautr)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

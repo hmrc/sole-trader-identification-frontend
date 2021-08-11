@@ -17,7 +17,6 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{Individual, SoleTrader}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -33,6 +32,7 @@ object TestConstants {
   val testNino: String = "AA111111A"
   val testSautr: String = "1234567890"
   val testContinueUrl = "/test-continue-url"
+  val testBusinessVerificationRedirectUrl = "/business-verification-start"
   val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"
   val testSafeId: String = UUID.randomUUID().toString
   val testCredentialId: String = UUID.randomUUID().toString
@@ -51,8 +51,7 @@ object TestConstants {
         deskProServiceId = testDeskProServiceId,
         signOutUrl = testSignOutUrl,
         enableSautrCheck = true
-      ),
-      entityType = SoleTrader
+      )
     )
 
   val testIndividualJourneyConfig: JourneyConfig =
@@ -62,8 +61,7 @@ object TestConstants {
         optServiceName = None,
         deskProServiceId = testDeskProServiceId,
         signOutUrl = testSignOutUrl
-      ),
-      entityType = Individual
+      )
     )
 
   def testSoleTraderDetails(identifiersMatch: Boolean = false): SoleTraderDetails =

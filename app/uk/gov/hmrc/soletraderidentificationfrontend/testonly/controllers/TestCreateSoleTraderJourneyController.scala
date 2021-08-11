@@ -20,10 +20,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.SoleTrader
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.form
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.views.html.test_create_sole_trader_journey
 
 import javax.inject.{Inject, Singleton}
@@ -47,15 +46,14 @@ class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponen
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
-    pageConfig = defaultPageConfig,
-    entityType = SoleTrader
+    pageConfig = defaultPageConfig
   )
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, form(SoleTrader, enableSautrCheck = true).fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(enableSautrCheck = true).fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit()))
         )
       }
   }
@@ -63,7 +61,7 @@ class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponen
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        form(SoleTrader, enableSautrCheck = true).bindFromRequest().fold(
+        TestCreateJourneyForm.form(enableSautrCheck = true).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateSoleTraderJourneyController.submit()))

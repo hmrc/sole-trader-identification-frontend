@@ -20,9 +20,8 @@ import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
 import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.BusinessVerificationHttpReads
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyCreated, JourneyCreationFailure, NotEnoughEvidence, UserLockedOut}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,7 +33,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
 
   def createBusinessVerificationJourney(journeyId: String,
                                         sautr: String
-                                       )(implicit hc: HeaderCarrier): Future[Either[JourneyCreationFailure, JourneyCreated]] = {
+                                       )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
     val jsonBody: JsObject =
       Json.obj(
@@ -47,7 +46,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
         "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
       )
 
-    http.POST[JsObject, Either[JourneyCreationFailure, JourneyCreated]](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
+    http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
       implicitly[Writes[JsObject]],
       BusinessVerificationHttpReads,
       hc,
@@ -59,13 +58,23 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
 
 object CreateBusinessVerificationJourneyConnector {
 
-  implicit object BusinessVerificationHttpReads extends HttpReads[Either[JourneyCreationFailure, JourneyCreated]] {
-    override def read(method: String, url: String, response: HttpResponse): Either[JourneyCreationFailure, JourneyCreated] = {
+  type BusinessVerificationJourneyCreationResponse = Either[BusinessVerificationJourneyCreationFailure, BusinessVerificationJourneyCreated]
+
+  case class BusinessVerificationJourneyCreated(redirectUri: String)
+
+  sealed trait BusinessVerificationJourneyCreationFailure
+
+  case object NotEnoughEvidence extends BusinessVerificationJourneyCreationFailure
+
+  case object UserLockedOut extends BusinessVerificationJourneyCreationFailure
+
+  implicit object BusinessVerificationHttpReads extends HttpReads[BusinessVerificationJourneyCreationResponse] {
+    override def read(method: String, url: String, response: HttpResponse): BusinessVerificationJourneyCreationResponse = {
       response.status match {
         case CREATED =>
           (response.json \ "redirectUri").asOpt[String] match {
             case Some(redirectUri) =>
-              Right(JourneyCreated(redirectUri))
+              Right(BusinessVerificationJourneyCreated(redirectUri))
             case _ =>
               throw new InternalServerException(s"Business Verification API returned malformed JSON")
           }
@@ -78,6 +87,5 @@ object CreateBusinessVerificationJourneyConnector {
       }
     }
   }
-
 
 }

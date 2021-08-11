@@ -17,18 +17,37 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import org.scalatest.BeforeAndAfterEach
-import play.api.libs.json.Json
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsBoolean, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationFail, BusinessVerificationPass, BusinessVerificationUnchallenged}
-import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, SoleTraderIdentificationStub}
-import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, FullName, Registered}
+import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, RegisterStub, SoleTraderIdentificationStub}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class BusinessVerificationControllerISpec extends ComponentSpecHelper with FeatureSwitching with AuthStub with BusinessVerificationStub
-  with SoleTraderIdentificationStub with BeforeAndAfterEach {
+class BusinessVerificationControllerISpec extends ComponentSpecHelper
+  with FeatureSwitching
+  with AuthStub
+  with BusinessVerificationStub
+  with RegisterStub
+  with SoleTraderIdentificationStub
+  with BeforeAndAfterEach
+  with WiremockHelper {
+
+  def extraConfig = Map(
+    "auditing.enabled" -> "true",
+    "auditing.consumer.baseUri.host" -> mockHost,
+    "auditing.consumer.baseUri.port" -> mockPort
+  )
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(config ++ extraConfig)
+    .build
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -38,7 +57,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper with Featu
 
   "GET /business-verification-result" when {
     s"the $BusinessVerificationStub feature switch is enabled" should {
-      "redirect to the registration controller if BV status is stored successfully" in {
+      "redirect to the continue url if BV status is stored successfully" in {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
@@ -52,13 +71,30 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper with Featu
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
         stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, Json.toJson(BusinessVerificationPass))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(OK, testSautr)
+        stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+        stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
+        stubAudit()
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(OK, testSautr)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+        stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, Json.toJson(BusinessVerificationPass))
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, Json.toJson(Registered(testSafeId)))
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri(routes.RegistrationController.register(testJourneyId).url))
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(testContinueUrl)
+        }
+
         verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
+        verifyAudit()
       }
 
       "throw an exception when the query string is missing" in {
@@ -74,15 +110,18 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper with Featu
           signOutUrl = testSignOutUrl,
           enableSautrCheck = true
         ))
+        stubAudit()
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result")
 
         result.status mustBe INTERNAL_SERVER_ERROR
+
+        verifyAudit()
       }
     }
 
     s"the $BusinessVerificationStub feature switch is disabled" should {
-      "redirect to the registration controller if BV status is stored successfully" in {
+      "redirect to the journey redirect controller if BV status is stored successfully" in {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
@@ -96,156 +135,44 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper with Featu
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveBusinessVerificationResult(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
         stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, Json.toJson(BusinessVerificationPass))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(OK, testSautr)
+        stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+        stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
+        stubAudit()
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(OK, testSautr)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+        stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, Json.toJson(BusinessVerificationPass))
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, Json.toJson(Registered(testSafeId)))
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri(routes.RegistrationController.register(testJourneyId).url))
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(testContinueUrl)
+        }
+
         verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
+        verifyAudit()
       }
 
       "throw an exception when the query string is missing" in {
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveBusinessVerificationResult(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
+        stubAudit()
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result")
 
         result.status mustBe INTERNAL_SERVER_ERROR
+
+        verifyAudit()
       }
     }
   }
 
-  "GET /:journeyId/start-business-verification" when {
-    s"the $BusinessVerificationStub feature switch is enabled" should {
-      "redirect to business verification redirectUri" when {
-        "business verification returns a journey to redirect to" in {
-          enable(BusinessVerificationStub)
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result.status mustBe SEE_OTHER
-          result.header(LOCATION) mustBe Some(testContinueUrl)
-        }
-      }
-
-      "store a verification state of UNCHALLENGED and redirect to the registration controller" when {
-        "business verification does not have enough information to create a verification journey" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            continueUrl = testContinueUrl,
-            optServiceName = None,
-            deskProServiceId = testDeskProServiceId,
-            signOutUrl = testSignOutUrl,
-            enableSautrCheck = true
-          ))
-          enable(BusinessVerificationStub)
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(NOT_FOUND)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result must have(
-            httpStatus(SEE_OTHER),
-            redirectUri(routes.RegistrationController.register(testJourneyId).url))
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
-        }
-      }
-      "store a verification state of FAIL and redirect to the registration controller" when {
-        "business verification reports the user is locked out" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            continueUrl = testContinueUrl,
-            optServiceName = None,
-            deskProServiceId = testDeskProServiceId,
-            signOutUrl = testSignOutUrl,
-            enableSautrCheck = true
-          ))
-          enable(BusinessVerificationStub)
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(FORBIDDEN)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)(OK)
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result must have(
-            httpStatus(SEE_OTHER),
-            redirectUri(routes.RegistrationController.register(testJourneyId).url))
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)
-        }
-      }
-    }
-
-    s"the $BusinessVerificationStub feature switch is disabled" should {
-      "redirect to business verification redirectUri" when {
-        "business verification returns a journey to redirect to" in {
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result.status mustBe SEE_OTHER
-          result.header(LOCATION) mustBe Some(testContinueUrl)
-        }
-      }
-
-      "store a verification state of UNCHALLENGED and redirect to the registration controller" when {
-        "business verification does not have enough information to create a verification journey" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            continueUrl = testContinueUrl,
-            optServiceName = None,
-            deskProServiceId = testDeskProServiceId,
-            signOutUrl = testSignOutUrl,
-            enableSautrCheck = true
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(NOT_FOUND)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result must have(
-            httpStatus(SEE_OTHER),
-            redirectUri(routes.RegistrationController.register(testJourneyId).url))
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
-        }
-      }
-      "store a verification state of FAIL and redirect to the registration controller" when {
-        "business verification reports the user is locked out" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            continueUrl = testContinueUrl,
-            optServiceName = None,
-            deskProServiceId = testDeskProServiceId,
-            signOutUrl = testSignOutUrl,
-            enableSautrCheck = true
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSautr(testJourneyId)(OK, testSautr)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(FORBIDDEN)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)(OK)
-
-          lazy val result = get(s"$baseUrl/$testJourneyId/start-business-verification")
-
-          result must have(
-            httpStatus(SEE_OTHER),
-            redirectUri(routes.RegistrationController.register(testJourneyId).url))
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)
-        }
-      }
-    }
-  }
 }

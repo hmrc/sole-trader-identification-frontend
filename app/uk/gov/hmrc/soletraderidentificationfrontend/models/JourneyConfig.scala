@@ -16,6 +16,4 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.EntityType
-
-case class JourneyConfig(continueUrl: String, pageConfig: PageConfig, entityType: EntityType)
+case class JourneyConfig(continueUrl: String, pageConfig: PageConfig)

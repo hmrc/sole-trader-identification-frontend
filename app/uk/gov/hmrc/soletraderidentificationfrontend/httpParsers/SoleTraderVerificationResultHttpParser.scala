@@ -51,14 +51,14 @@ object SoleTraderVerificationResultHttpParser {
             case JsError(errors) =>
               throw new InternalServerException(s"Invalid JSON returned from authenticator. Errors - $errors")
           }
-        case FAILED_DEPENDENCY => Left(Deceased)
+        case FAILED_DEPENDENCY => Left(DeceasedCitizensDetails)
         case UNAUTHORIZED =>
           val errors = (response.json \ "errors").toString
 
           if (errors.contains(notFoundError)) {
-            Left(NotFound)
+            Left(NinoNotFound)
           } else {
-            Left(Mismatch)
+            Left(DetailsMismatch)
           }
         case status =>
           throw new InternalServerException(s"Invalid status received from authenticator#match API: $status")

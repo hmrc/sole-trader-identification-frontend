@@ -67,7 +67,7 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
           nino =>
             soleTraderIdentificationService.storeNino(journeyId, nino) flatMap { _ =>
               journeyService.getJourneyConfig(journeyId).map {
-                case JourneyConfig(_, PageConfig(_, _, _, false), _) => Redirect(routes.CheckYourAnswersController.show(journeyId))
+                case JourneyConfig(_, PageConfig(_, _, _, false)) => Redirect(routes.CheckYourAnswersController.show(journeyId))
                 case _ => Redirect(routes.CaptureSautrController.show(journeyId))
               }
 

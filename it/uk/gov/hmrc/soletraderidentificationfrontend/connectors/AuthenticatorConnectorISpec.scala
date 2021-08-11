@@ -57,7 +57,7 @@ class AuthenticatorConnectorISpec extends ComponentSpecHelper with Authenticator
 
         val res = await(testConnector.matchSoleTraderDetails(testIndividualDetails))
 
-        res mustBe Left(SoleTraderDetailsMatching.Mismatch)
+        res mustBe Left(SoleTraderDetailsMatching.DetailsMismatch)
       }
     }
     "return details not found" when {
@@ -66,7 +66,7 @@ class AuthenticatorConnectorISpec extends ComponentSpecHelper with Authenticator
 
         val res = await(testConnector.matchSoleTraderDetails(testIndividualDetails))
 
-        res mustBe Left(SoleTraderDetailsMatching.NotFound)
+        res mustBe Left(SoleTraderDetailsMatching.NinoNotFound)
       }
     }
     "return user is deceased" when {
@@ -75,7 +75,7 @@ class AuthenticatorConnectorISpec extends ComponentSpecHelper with Authenticator
 
         val res = await(testConnector.matchSoleTraderDetails(testIndividualDetails))
 
-        res mustBe Left(SoleTraderDetailsMatching.Deceased)
+        res mustBe Left(SoleTraderDetailsMatching.DeceasedCitizensDetails)
       }
     }
     "throw an exception" when {

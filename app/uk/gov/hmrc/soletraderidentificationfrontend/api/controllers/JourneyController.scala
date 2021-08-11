@@ -25,7 +25,6 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{EntityType, Individual, SoleTrader}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 
@@ -40,18 +39,18 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
                                  )(implicit ec: ExecutionContext,
                                    appConfig: AppConfig) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
-  def createSoleTraderJourney: Action[JourneyConfig] = createJourney(enableSautrCheck = true, SoleTrader)
+  def createSoleTraderJourney: Action[JourneyConfig] = createJourney(enableSautrCheck = true)
 
-  def createIndividualJourney: Action[JourneyConfig] = createJourney(enableSautrCheck = false, Individual)
+  def createIndividualJourney: Action[JourneyConfig] = createJourney(enableSautrCheck = false)
 
-  def createJourney(enableSautrCheck: Boolean, entityType: EntityType): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
+  def createJourney(enableSautrCheck: Boolean): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
     json =>
       for {
         continueUrl <- (json \ continueUrlKey).validate[String]
         optServiceName <- (json \ optServiceNameKey).validateOpt[String]
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck), entityType)
+      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck))
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -75,7 +74,7 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
         enableSautrCheck <- (json \ enableSautrCheckKey).validateOpt[Boolean]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)), SoleTrader)
+      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)))
   }) {
     implicit req =>
       authorised().retrieve(internalId) {

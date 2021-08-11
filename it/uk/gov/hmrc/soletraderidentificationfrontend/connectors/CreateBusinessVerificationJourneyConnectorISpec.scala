@@ -21,8 +21,8 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testContinueUrl, testJourneyId, testSautr}
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.BusinessVerificationStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
@@ -41,14 +41,14 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 
-          result mustBe Right(JourneyCreated(testContinueUrl))
+          result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
 
       }
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(NOT_FOUND, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(NOT_FOUND, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 
@@ -56,7 +56,7 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(FORBIDDEN, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(FORBIDDEN, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 
@@ -72,14 +72,14 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 
-          result mustBe Right(JourneyCreated(testContinueUrl))
+          result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
 
       }
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(NOT_FOUND, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(NOT_FOUND, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 
@@ -87,7 +87,7 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(FORBIDDEN, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(FORBIDDEN, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
 

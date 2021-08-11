@@ -17,8 +17,10 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{CreateBusinessVerificationJourneyConnector, RetrieveBusinessVerificationStatusConnector}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
+
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,19 +31,22 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
                                             soleTraderIdentificationService: SoleTraderIdentificationService
                                            )(implicit val executionContext: ExecutionContext) {
 
-  def createBusinessVerificationJourney(journeyId: String, sautr: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+  def createBusinessVerificationJourney(journeyId: String,
+                                        sautr: String
+                                       )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] =
     createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr).flatMap {
-      case Right(JourneyCreated(redirectUrl)) => Future.successful(Option(redirectUrl))
-      case Left(failureReason) => {
-        val bvStatus = failureReason match {
-          case NotEnoughEvidence => BusinessVerificationUnchallenged
-          case UserLockedOut => BusinessVerificationFail
-          case _ => throw new InternalServerException(s"createBusinessVerificationJourney service failed with invalid BV status")
+      case success@Right(BusinessVerificationJourneyCreated(_)) =>
+        Future.successful(success)
+      case Left(NotEnoughEvidence) =>
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged).map {
+          _ => Left(NotEnoughEvidence)
         }
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, bvStatus).map {
-          _ => None
+      case Left(UserLockedOut) =>
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map {
+          _ => Left(UserLockedOut)
         }
-      }
+      case _ =>
+        throw new InternalServerException(s"createBusinessVerificationJourney service failed with invalid BV status")
     }
 
   def retrieveBusinessVerificationStatus(businessVerificationJourneyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =

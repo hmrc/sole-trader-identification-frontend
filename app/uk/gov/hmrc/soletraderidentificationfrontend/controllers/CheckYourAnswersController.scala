@@ -21,8 +21,9 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, NoSautrProvided, SautrMatched}
-import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, OrchestrationService, SoleTraderIdentificationService}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.NinoNotFound
+import uk.gov.hmrc.soletraderidentificationfrontend.models._
+import uk.gov.hmrc.soletraderidentificationfrontend.services.{AuditService, JourneyService, SoleTraderIdentificationService, SubmissionService}
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.check_your_answers_page
 
 import javax.inject.{Inject, Singleton}
@@ -33,7 +34,8 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
                                            view: check_your_answers_page,
                                            soleTraderIdentificationService: SoleTraderIdentificationService,
                                            journeyService: JourneyService,
-                                           orchestrationService: OrchestrationService,
+                                           submissionService: SubmissionService,
+                                           auditService: AuditService,
                                            val authConnector: AuthConnector
                                           )(implicit val config: AppConfig,
                                             executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
@@ -62,21 +64,26 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        soleTraderIdentificationService.retrieveIndividualDetails(journeyId).flatMap {
-          case Some(individualDetails) =>
-            orchestrationService.orchestrate(journeyId, individualDetails).map {
-              case SautrMatched =>
-                Redirect(routes.BusinessVerificationController.startBusinessVerificationJourney(journeyId))
-              case NoSautrProvided =>
-                Redirect(routes.JourneyRedirectController.redirectToContinueUrl(journeyId))
-              case DetailsMismatch =>
+        journeyService.getJourneyConfig(journeyId).flatMap {
+          journeyConfig =>
+            submissionService.submit(journeyId).map {
+              case StartBusinessVerification(businessVerificationUrl) =>
+                Redirect(businessVerificationUrl)
+              case JourneyCompleted(continueUrl) =>
+                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
+                else auditService.auditIndividualJourney(journeyId)
+                Redirect(continueUrl + s"?journeyId=$journeyId")
+              case SoleTraderDetailsMismatch(NinoNotFound) =>
+                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
+                else auditService.auditIndividualJourney(journeyId)
+                Redirect(routes.DetailsNotFoundController.show(journeyId))
+              case SoleTraderDetailsMismatch(_) =>
+                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
+                else auditService.auditIndividualJourney(journeyId)
                 Redirect(routes.PersonalInformationErrorController.show(journeyId))
-              case DetailsNotFound =>
-                Redirect(routes.DetailsNotFoundController.show(journeyId).url)
             }
-          case _ =>
-            throw new InternalServerException("Fail to retrieve data from database")
         }
       }
   }
+
 }

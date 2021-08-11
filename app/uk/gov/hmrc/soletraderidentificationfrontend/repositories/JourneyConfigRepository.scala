@@ -24,7 +24,6 @@ import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{EntityType, Individual, SoleTrader}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository._
 
@@ -82,16 +81,5 @@ object JourneyConfigRepository {
   val SoleTraderKey = "soleTrader"
   val IndividualKey = "individual"
 
-  implicit val partnershipTypeMongoFormat: Format[EntityType] = new Format[EntityType] {
-    override def reads(json: JsValue): JsResult[EntityType] = json.validate[String].collect(JsonValidationError("Invalid entity type")) {
-      case SoleTraderKey => SoleTrader
-      case IndividualKey => Individual
-    }
-
-    override def writes(entityType: EntityType): JsValue = entityType match {
-      case SoleTrader => JsString(SoleTraderKey)
-      case Individual => JsString(IndividualKey)
-    }
-  }
   implicit val journeyConfigMongoFormat: OFormat[JourneyConfig] = Json.format[JourneyConfig]
 }

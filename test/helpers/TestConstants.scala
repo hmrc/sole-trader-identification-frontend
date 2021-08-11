@@ -17,8 +17,7 @@
 package helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.{EntityType, SoleTrader}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.Mismatch
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -32,6 +31,7 @@ object TestConstants {
   val testInternalId: String = UUID.randomUUID().toString
   val testSautr: String = "1234567890"
   val testContinueUrl: String = "/test"
+  val testBusinessVerificationRedirectUrl: String = "/business-verification-start"
   val testSignOutUrl: String = "/sign-out"
   val testDateOfBirth: LocalDate = LocalDate.now().minusYears(17)
   val testFirstName: String = "John"
@@ -79,15 +79,14 @@ object TestConstants {
       optSautr = None
     )
 
-  def testJourneyConfig(enableSautrCheck: Boolean = false, entityType: EntityType = SoleTrader): JourneyConfig = JourneyConfig(
+  def testJourneyConfig(enableSautrCheck: Boolean = false): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
     pageConfig = PageConfig(
       optServiceName = None,
       deskProServiceId = "vrs",
       signOutUrl = testSignOutUrl,
       enableSautrCheck = enableSautrCheck
-    ),
-    entityType = entityType
+    )
   )
 
   val testIndividualSuccessfulAuditEventJson: JsObject = Json.obj(
@@ -130,7 +129,7 @@ object TestConstants {
     "lastName" -> testLastName,
     "nino" -> testNino,
     "dateOfBirth" -> testDateOfBirth,
-    "authenticatorResponse" -> Mismatch.toString,
+    "authenticatorResponse" -> DetailsMismatch.toString,
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> BusinessVerificationUnchallenged,
@@ -144,7 +143,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "nino" -> testNino,
     "identifiersMatch" -> false,
-    "authenticatorResponse" -> Mismatch.toString
+    "authenticatorResponse" -> DetailsMismatch.toString
   )
 
 

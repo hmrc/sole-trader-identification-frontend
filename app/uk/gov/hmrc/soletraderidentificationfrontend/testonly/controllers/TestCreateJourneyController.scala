@@ -20,10 +20,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.EntityType.SoleTrader
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.deprecatedForm
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.views.html.test_create_journey
 
 import javax.inject.{Inject, Singleton}
@@ -46,15 +45,14 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
-    pageConfig = defaultPageConfig,
-    entityType = SoleTrader
+    pageConfig = defaultPageConfig
   )
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, deprecatedForm(SoleTrader).fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.deprecatedForm().fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit()))
         )
       }
   }
@@ -62,7 +60,7 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        deprecatedForm(SoleTrader).bindFromRequest().fold(
+        TestCreateJourneyForm.deprecatedForm().bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateJourneyController.submit()))
