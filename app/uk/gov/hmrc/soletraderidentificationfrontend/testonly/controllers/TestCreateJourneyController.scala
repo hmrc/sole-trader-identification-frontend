@@ -45,6 +45,7 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
+    businessVerificationCheck = None,
     pageConfig = defaultPageConfig
   )
 

@@ -37,6 +37,15 @@ object MappingUtil {
       },
       x => Some(x.toString)
     )
+
+    def toOptionalBoolean: Mapping[Option[Boolean]] = mapping.transform(
+      {
+        case Some(s) if s.trim.toUpperCase == "FALSE" => Some(false)
+        case Some(s) if s.trim.toUpperCase == "TRUE" => Some(true)
+        case _ => None
+      },
+      x => Some(x.toString)
+    )
   }
 
 }

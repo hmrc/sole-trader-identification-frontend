@@ -84,6 +84,17 @@
             classes = "govuk-input--width-20"
         )
 
+       @inputText(
+            form = form,
+            id = "businessVerificationCheck",
+            name = "businessVerificationCheck",
+            label = "Business verification check",
+            hint = Some(Html("<div class=\"govuk-hint\">Enter true, false or leave undefined</div>")),
+            isPageHeading = false,
+            hasFieldTitle = true,
+            classes = "govuk-input--width-20"
+        )
+
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
             classes = "govuk-!-margin-right-1",

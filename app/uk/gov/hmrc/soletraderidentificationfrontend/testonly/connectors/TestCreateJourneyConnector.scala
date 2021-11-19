@@ -63,6 +63,7 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
 object TestCreateJourneyConnector {
   implicit val journeyConfigWriter: Writes[JourneyConfig] = (journeyConfig: JourneyConfig) => Json.obj(
     continueUrlKey -> journeyConfig.continueUrl,
+    businessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
     optServiceNameKey -> journeyConfig.pageConfig.optServiceName,
     deskProServiceIdKey -> journeyConfig.pageConfig.deskProServiceId,
     signOutUrlKey -> journeyConfig.pageConfig.signOutUrl,

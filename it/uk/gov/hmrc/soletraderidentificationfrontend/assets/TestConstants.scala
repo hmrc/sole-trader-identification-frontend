@@ -61,6 +61,7 @@ object TestConstants {
   val testSoleTraderJourneyConfig: JourneyConfig =
     JourneyConfig(
       continueUrl = testContinueUrl,
+      businessVerificationCheck = None,
       pageConfig = PageConfig(
         optServiceName = None,
         deskProServiceId = testDeskProServiceId,
@@ -72,6 +73,7 @@ object TestConstants {
   val testIndividualJourneyConfig: JourneyConfig =
     JourneyConfig(
       continueUrl = testContinueUrl,
+      businessVerificationCheck = None,
       pageConfig = PageConfig(
         optServiceName = None,
         deskProServiceId = testDeskProServiceId,

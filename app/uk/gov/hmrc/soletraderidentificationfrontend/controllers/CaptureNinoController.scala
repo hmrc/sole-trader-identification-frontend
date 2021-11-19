@@ -76,7 +76,7 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
               _ <- soleTraderIdentificationService.removeOverseasTaxIdentifiers(journeyId)
               journeyConfig <- journeyService.getJourneyConfig(journeyId)
             } yield journeyConfig match {
-              case JourneyConfig(_, PageConfig(_, _, _, false)) => Redirect(routes.CheckYourAnswersController.show(journeyId))
+              case JourneyConfig(_, _, PageConfig(_, _, _, false)) => Redirect(routes.CheckYourAnswersController.show(journeyId))
               case _ => Redirect(routes.CaptureSautrController.show(journeyId))
             }
         )

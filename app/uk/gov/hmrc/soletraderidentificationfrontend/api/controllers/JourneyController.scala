@@ -47,10 +47,11 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
     json =>
       for {
         continueUrl <- (json \ continueUrlKey).validate[String]
+        businessVerificationCheck <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
         optServiceName <- (json \ optServiceNameKey).validateOpt[String]
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck))
+      } yield JourneyConfig(continueUrl, businessVerificationCheck, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck))
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -70,11 +71,12 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
     json =>
       for {
         continueUrl <- (json \ continueUrlKey).validate[String]
+        businessVerificationCheck <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
         optServiceName <- (json \ optServiceNameKey).validateOpt[String]
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
         enableSautrCheck <- (json \ enableSautrCheckKey).validateOpt[Boolean]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)))
+      } yield JourneyConfig(continueUrl, businessVerificationCheck, PageConfig(optServiceName, deskProServiceId, signOutUrl, enableSautrCheck.getOrElse(false)))
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -113,6 +115,7 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
 
 object JourneyController {
   val continueUrlKey = "continueUrl"
+  val businessVerificationCheckKey = "businessVerificationCheck"
   val optServiceNameKey = "optServiceName"
   val deskProServiceIdKey = "deskProServiceId"
   val signOutUrlKey = "signOutUrl"
