@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureDateOfBirthViewTests
@@ -38,6 +40,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         journeyConfig = testIndividualJourneyConfig
       ))
       stubAuth(OK, successfulAuthResponse())
+      stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
       get(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")
     }
 
@@ -102,6 +105,8 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> "",
           "date-of-birth-month" -> "",
@@ -122,6 +127,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> "",
           "date-of-birth-month" -> "",
@@ -142,6 +148,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
@@ -162,6 +169,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> "31",
           "date-of-birth-month" -> "02",
@@ -182,6 +190,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
@@ -192,6 +201,48 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
       testCaptureDateOfBirthErrorMessageInvalidAge(result)
+    }
+
+    "there is a form error and customer full name exists" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "31",
+          "date-of-birth-month" -> "02",
+          "date-of-birth-year" -> "to simulate an error"
+        )
+      }
+      testTitleAndHeadingInTheErrorView(result)
+    }
+
+    "there is a form error and customer full name does NOT exist" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "31",
+          "date-of-birth-month" -> "02",
+          "date-of-birth-year" -> "to simulate an error"
+        )
+      }
+
+      "return an internal server error" in {
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+
+      testTitleAndHeadingGivenNoCustomerFullName(result)
     }
   }
 }

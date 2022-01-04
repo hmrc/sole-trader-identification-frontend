@@ -43,8 +43,8 @@ full-name.field_1                                           = First name
 full-name.field_2                                           = Last name
 
 ## Date of Birth Page
-date-of-birth.title                                         = What is your date of birth?
-date-of-birth.heading                                       = What is your date of birth?
+date-of-birth.title                                         = What is applicant’s date of birth?
+date-of-birth.heading                                       = What is {0}’s date of birth?
 date-of-birth.field_1                                       = Date of birth
 date-of-birth.field_1_hint                                  = For example, 27 3 2007
 

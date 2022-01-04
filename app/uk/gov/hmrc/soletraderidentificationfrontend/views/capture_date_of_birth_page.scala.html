@@ -28,7 +28,7 @@
         errorSummary: errorSummary
 )
 
-@(pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title(messages("date-of-birth.title"), form)) {
 
@@ -36,7 +36,7 @@
     @formWithCSRF(action = formAction) {
         @inputDate(
             form = form,
-            legendContent = "date-of-birth.heading",
+            legendContent = messages("date-of-birth.heading", firstName),
             id = "date-of-birth",
             hintText = Some("date-of-birth.field_1_hint"),
             attributesDay = Map("autocomplete" -> "bday-day"),

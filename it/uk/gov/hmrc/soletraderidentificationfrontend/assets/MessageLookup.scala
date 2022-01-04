@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testFirstName
+
 object MessageLookup {
 
   object Base {
@@ -27,6 +29,9 @@ object MessageLookup {
     val yes = "Yes"
     val no = "No"
     val back = "Back"
+
+    val technicalDifficultiesTitle = "Sorry, we are experiencing technical difficulties - 500"
+    val technicalDifficultiesHeading = "Sorry, we’re experiencing technical difficulties"
 
     object Error {
       val title = "There is a problem"
@@ -60,8 +65,8 @@ object MessageLookup {
   }
 
   object CaptureDateOfBirth {
-    val title = "What is your date of birth?"
-    val heading = "What is your date of birth?"
+    val title = s"What is applicant’s date of birth?"
+    val heading = s"What is $testFirstName’s date of birth?"
     val hint = "For example, 27 3 2007"
 
     object Error {
