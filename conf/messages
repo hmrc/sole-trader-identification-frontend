@@ -49,8 +49,8 @@ date-of-birth.field_1                                       = Date of birth
 date-of-birth.field_1_hint                                  = For example, 27 3 2007
 
 ## Nino Page
-enter-nino.title                                            = What is your National Insurance number?
-enter-nino.heading                                          = What is your National Insurance number?
+enter-nino.title                                            = What is applicant’s National Insurance number?
+enter-nino.heading                                          = What is {0}’s National Insurance number?
 enter-nino.line_1                                           = It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.
 enter-nino.invalid.format.error                             = Enter a National Insurance number in the correct format
 enter-nino.no.nino                                          = I do not have a National Insurance number

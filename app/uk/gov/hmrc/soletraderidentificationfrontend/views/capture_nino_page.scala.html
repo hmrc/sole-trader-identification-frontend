@@ -33,7 +33,7 @@
         inputText: inputText,
         errorSummary: errorSummary)
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String], noNinoJourneyEnabled: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String], noNinoJourneyEnabled: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title(messages("enter-nino.title"), form)) {
 
@@ -44,7 +44,7 @@
             form = form,
             id = "nino",
             name = "nino",
-            label = messages("enter-nino.heading"),
+            label = messages("enter-nino.heading", firstName),
             isPageHeading = true,
             hint = Some(Html(s"""<p class="govuk-body">${messages("enter-nino.line_1")}</p>""")),
             classes = "govuk-input--width-20"

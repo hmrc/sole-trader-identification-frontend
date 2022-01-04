@@ -79,8 +79,8 @@ object MessageLookup {
   }
 
   object CaptureNino {
-    val title = "What is your National Insurance number?"
-    val heading = "What is your National Insurance number?"
+    val title = s"What is applicant’s National Insurance number?"
+    val heading = s"What is $testFirstName’s National Insurance number?"
     val line_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
     val form_field_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
     val no_nino = "I do not have a National Insurance number"
