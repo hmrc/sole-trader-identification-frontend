@@ -32,7 +32,7 @@
         errorSummary: errorSummary
 )
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title(messages("sa-utr.title"), form)) {
 
@@ -43,7 +43,7 @@
             form = form,
             id = "sa-utr",
             name = "sa-utr",
-            label = messages("sa-utr.title"),
+            label = messages("sa-utr.heading", firstName),
             isPageHeading = true,
             hint = Some(Html(s"""<p class="govuk-body">${messages("sa-utr.line_1")}</p>""")),
             classes = "govuk-input--width-20"

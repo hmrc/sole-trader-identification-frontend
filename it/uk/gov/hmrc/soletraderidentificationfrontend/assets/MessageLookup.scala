@@ -115,8 +115,8 @@ object MessageLookup {
   }
 
   object CaptureSautr {
-    val title = "What is your Unique Taxpayer Reference?"
-    val heading = "What is your Unique Taxpayer Reference?"
+    val title = s"What is applicant’s Unique Taxpayer Reference?"
+    val heading = s"What is $testFirstName’s Unique Taxpayer Reference?"
     val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
     val line_2 = "I do not have a Unique Taxpayer Reference"
     val details_line_1 = "Your UTR helps us identify your business"
