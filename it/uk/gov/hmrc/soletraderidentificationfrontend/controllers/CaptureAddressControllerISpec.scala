@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.EnableNoNinoJourney
+import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureAddressViewTests
@@ -37,6 +39,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         journeyConfig = testSoleTraderJourneyConfig
       ))
       stubAuth(OK, successfulAuthResponse())
+      stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
       get(s"/identify-your-sole-trader-business/$testJourneyId/address")
     }
 
@@ -104,6 +108,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> "",
           "address2" -> testAddress2,
@@ -129,6 +135,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> testAddress1,
           "address2" -> "",
@@ -154,6 +162,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> "*&%^$",
           "address2" -> testAddress2,
@@ -179,6 +189,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> "thisisastringthatisoverthirtyfivecharcterslong",
           "address2" -> testAddress2,
@@ -204,6 +216,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> testAddress1,
           "address2" -> testAddress2,
@@ -229,6 +243,8 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
           "address1" -> testAddress1,
           "address2" -> testAddress2,
@@ -245,5 +261,58 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
       testCaptureAddressErrorMessageNoEntryCountry(result)
     }
 
+    "there is a form error and customer full name exists" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        enable(EnableNoNinoJourney)
+        stubAuth(OK, successfulAuthResponse())
+        stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
+          "address1" -> testAddress1,
+          "address2" -> testAddress2,
+          "address3" -> testAddress3,
+          "address4" -> testAddress4,
+          "address5" -> testAddress5,
+          "postcode" -> "to simulate an error",
+          "country" -> testCountry
+        )
+      }
+      testTitleAndHeadingInTheErrorView(result)
+    }
+
+    "there is a form error and customer full name does NOT exist" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        enable(EnableNoNinoJourney)
+        stubAuth(OK, successfulAuthResponse())
+        stubStoreAddress(testJourneyId, testAddress)(status = OK)
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
+          "address1" -> testAddress1,
+          "address2" -> testAddress2,
+          "address3" -> testAddress3,
+          "address4" -> testAddress4,
+          "address5" -> testAddress5,
+          "postcode" -> "to simulate an error",
+          "country" -> testCountry
+        )
+      }
+
+      "return an internal server error" in {
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+
+      testTitleAndHeadingGivenNoCustomerFullName(result)
+    }
   }
 }

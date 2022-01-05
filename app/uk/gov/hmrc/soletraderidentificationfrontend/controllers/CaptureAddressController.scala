@@ -39,15 +39,20 @@ class CaptureAddressController @Inject()(mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            Ok(view(
-              journeyId = journeyId,
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureAddressController.submit(journeyId),
-              form = CaptureAddressForm.apply(),
-              countries = config.orderedCountryList
-            ))
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId)
+          firstName <- soleTraderIdentificationService
+            .retrieveFullName(journeyId)
+            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          Ok(view(
+            firstName,
+            journeyId = journeyId,
+            pageConfig = journeyConfig.pageConfig,
+            formAction = routes.CaptureAddressController.submit(journeyId),
+            form = CaptureAddressForm.apply(),
+            countries = config.orderedCountryList
+          ))
         }
       }
   }
@@ -56,17 +61,23 @@ class CaptureAddressController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         CaptureAddressForm.apply().bindFromRequest().fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                BadRequest(view(
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureAddressController.submit(journeyId),
-                  form = formWithErrors,
-                  countries = config.orderedCountryList
-                ))
-            },
+          formWithErrors => {
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId)
+              firstName <- soleTraderIdentificationService
+                .retrieveFullName(journeyId)
+                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+            } yield {
+              BadRequest(view(
+                firstName,
+                journeyId = journeyId,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureAddressController.submit(journeyId),
+                form = formWithErrors,
+                countries = config.orderedCountryList
+              ))
+            }
+          },
           address =>
             soleTraderIdentificationService.storeAddress(journeyId, address).map {
               _ => Redirect(routes.CaptureSautrController.show(journeyId))

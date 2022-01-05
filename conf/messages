@@ -56,8 +56,8 @@ enter-nino.invalid.format.error                             = Enter a National I
 enter-nino.no.nino                                          = I do not have a National Insurance number
 
 ## Address Page
-enter-address.title                                         = Enter your home address
-enter-address.heading                                       = Enter your home address
+enter-address.title                                         = Enter applicant’s home address
+enter-address.heading                                       = Enter {0}’s home address
 enter-address.line_1                                        = Address line 1
 enter-address.line_2                                        = Address line 2
 enter-address.line_3                                        = Address line 3 (optional)

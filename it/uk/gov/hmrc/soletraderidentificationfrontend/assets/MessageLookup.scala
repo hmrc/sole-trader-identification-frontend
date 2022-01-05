@@ -92,8 +92,8 @@ object MessageLookup {
   }
 
   object CaptureAddress {
-    val title = "Enter your home address"
-    val heading = "Enter your home address"
+    val title = s"Enter applicant’s home address"
+    val heading = s"Enter $testFirstName’s home address"
     val line_1 = "Address line 1"
     val line_2 = "Address line 2"
     val line_3 = "Address line 3 (optional)"
