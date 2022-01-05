@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//hello
+
 package uk.gov.hmrc.soletraderidentificationfrontend.api.controllers
 
 import play.api.libs.json.Json
