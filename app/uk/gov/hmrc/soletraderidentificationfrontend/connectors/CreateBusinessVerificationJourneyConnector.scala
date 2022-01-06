@@ -35,6 +35,15 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                         sautr: String
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
+    val continueUri = routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+    // continueUrl is really a URI;
+    //   "continueUrl" : "/identify-your-sole-trader-business/a123b76a-98e7-43ee-99ab-71d851d0ac9d/business-verification-result
+    // So when BV tries to return on a localhost we end up on the wrong port:
+    // http://localhost:6743/business-verification-frontend/sa-single-payment ->
+    // http://localhost:6743/identify-your-sole-trader-business/a123b76a-98e7-43ee-99ab-71d851d0ac9d/business-verification-result
+
+    val continueUrl = "http://localhost:9717" + continueUri // So patch the URI to a full URL on localhosts
+
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
@@ -43,7 +52,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
           Json.obj(
             "saUtr" -> sautr
           )),
-        "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+        "continueUrl" -> continueUrl
       )
 
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(

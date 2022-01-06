@@ -69,7 +69,12 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
           journeyConfig =>
             submissionService.submit(journeyId, journeyConfig).map {
               case StartBusinessVerification(businessVerificationUrl) =>
-                Redirect(businessVerificationUrl)
+                // Redirect to a business-verification-frontend uri which has this format:
+                // /business-verification-frontend/journey/id?origin=vat
+                // This relative URL will not work in a localhost as it has not port number
+                val fullRedirectURL = "http://localhost:6743" + businessVerificationUrl
+                Redirect(fullRedirectURL)
+
               case JourneyCompleted(continueUrl) =>
                 if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
                 else auditService.auditIndividualJourney(journeyId)
