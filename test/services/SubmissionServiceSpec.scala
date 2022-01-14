@@ -308,6 +308,20 @@ class SubmissionServiceSpec
       }
     }
 
+    "for individual journey: the user's details do not match" should {
+      "return a failed submission response" in {
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
+        mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testIndividualJourneyConfig)(Future.successful(Left(DetailsMismatch)))
+
+        val result: SubmissionResponse = await(TestService.submit(testJourneyId, testIndividualJourneyConfig))
+
+        result mustBe SoleTraderDetailsMismatch(DetailsMismatch)
+
+        verifyStoreBusinessVerificationStatus(0)
+        verifyStoreRegistrationResponse(0)
+      }
+    }
+
   }
 
   override protected def beforeEach(): Unit = {

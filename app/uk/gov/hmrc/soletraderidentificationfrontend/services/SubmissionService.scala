@@ -152,18 +152,12 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
 
   private def handleIndividualJourney(journeyId: String,
                                       matchingResult: MatchingResult,
-                                      continueUrl: String)
-                                     (implicit hc: HeaderCarrier,
-                                      ec: ExecutionContext): Future[SubmissionResponse] = matchingResult match {
+                                      continueUrl: String): Future[SubmissionResponse] = matchingResult match {
     case Right(true | false) =>
       Future.successful(JourneyCompleted(continueUrl))
 
     case Left(failureReason) =>
-      for {
-        _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
-        _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
-      } yield
-        SoleTraderDetailsMismatch(failureReason)
+      Future.successful(SoleTraderDetailsMismatch(failureReason))
   }
 
   private def calculateMatchingResult(journeyId: String, journeyConfig: JourneyConfig, individualDetails: IndividualDetails)
