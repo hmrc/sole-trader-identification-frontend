@@ -90,4 +90,30 @@ trait CaptureSautrViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidSautrEntered
     }
   }
+
+  def testTitleAndHeadingInTheErrorView(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "have the correct heading" in {
+      doc.getH1Elements.get(0).text mustBe messages.heading
+    }
+
+  }
+
+  def testTitleAndHeadingGivenNoCustomerFullName(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.technicalDifficultiesTitle
+    }
+
+    "have the correct heading" in {
+      doc.getH1Elements.get(0).text mustBe Base.technicalDifficultiesHeading
+    }
+
+  }
 }

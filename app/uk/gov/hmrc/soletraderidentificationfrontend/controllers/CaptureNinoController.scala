@@ -40,15 +40,20 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            Ok(view(
-              journeyId = journeyId,
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureNinoController.submit(journeyId),
-              form = CaptureNinoForm.form,
-              noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
-            ))
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId)
+          firstName <- soleTraderIdentificationService
+            .retrieveFullName(journeyId)
+            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          Ok(view(
+            firstName,
+            journeyId = journeyId,
+            pageConfig = journeyConfig.pageConfig,
+            formAction = routes.CaptureNinoController.submit(journeyId),
+            form = CaptureNinoForm.form,
+            noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
+          ))
         }
       }
   }
@@ -57,17 +62,24 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         CaptureNinoForm.form.bindFromRequest().fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                BadRequest(view(
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureNinoController.submit(journeyId),
-                  form = formWithErrors,
-                  noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
-                ))
-            },
+          formWithErrors => {
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId)
+              firstName <- soleTraderIdentificationService
+                .retrieveFullName(journeyId)
+                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+            } yield {
+              BadRequest(view(
+                firstName,
+                journeyId = journeyId,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureNinoController.submit(journeyId),
+                form = formWithErrors,
+                noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
+              ))
+            }
+          }
+          ,
           nino =>
             for {
               _ <- soleTraderIdentificationService.storeNino(journeyId, nino)

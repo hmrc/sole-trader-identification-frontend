@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureSautrViewTests
@@ -36,6 +38,8 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
         journeyConfig = testIndividualJourneyConfig
       ))
       stubAuth(OK, successfulAuthResponse())
+      stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
       get(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")
     }
 
@@ -115,6 +119,8 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
           journeyConfig = testSoleTraderJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")("sa-utr" -> "")
       }
 
@@ -133,6 +139,8 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
           journeyConfig = testSoleTraderJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")("sa-utr" -> "123456789")
       }
 
@@ -141,6 +149,43 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
 
       testCaptureSautrErrorMessages(result)
+    }
+
+    "there is a form error and full name is defined" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")("sa-utr" -> "to simulate an error")
+      }
+
+      testTitleAndHeadingInTheErrorView(result)
+    }
+
+    "there is a form error and full name is NOT defined" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")("sa-utr" -> "to simulate an error")
+      }
+
+
+      "return an internal server error" in {
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+
+      testTitleAndHeadingGivenNoCustomerFullName(result)
+
     }
   }
 

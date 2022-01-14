@@ -43,21 +43,21 @@ full-name.field_1                                           = First name
 full-name.field_2                                           = Last name
 
 ## Date of Birth Page
-date-of-birth.title                                         = What is your date of birth?
-date-of-birth.heading                                       = What is your date of birth?
+date-of-birth.title                                         = What is applicant’s date of birth?
+date-of-birth.heading                                       = What is {0}’s date of birth?
 date-of-birth.field_1                                       = Date of birth
 date-of-birth.field_1_hint                                  = For example, 27 3 2007
 
 ## Nino Page
-enter-nino.title                                            = What is your National Insurance number?
-enter-nino.heading                                          = What is your National Insurance number?
+enter-nino.title                                            = What is applicant’s National Insurance number?
+enter-nino.heading                                          = What is {0}’s National Insurance number?
 enter-nino.line_1                                           = It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.
 enter-nino.invalid.format.error                             = Enter a National Insurance number in the correct format
 enter-nino.no.nino                                          = I do not have a National Insurance number
 
 ## Address Page
-enter-address.title                                         = Enter your home address
-enter-address.heading                                       = Enter your home address
+enter-address.title                                         = Enter applicant’s home address
+enter-address.heading                                       = Enter {0}’s home address
 enter-address.line_1                                        = Address line 1
 enter-address.line_2                                        = Address line 2
 enter-address.line_3                                        = Address line 3 (optional)
@@ -67,7 +67,8 @@ enter-address.postcode                                      = Postcode
 enter-address.country                                       = Country
 
 ## SA-UTR Page
-sa-utr.title                                                = What is your Unique Taxpayer Reference?
+sa-utr.title                                                = What is applicant’s Unique Taxpayer Reference?
+sa-utr.heading                                              = What is {0}’s Unique Taxpayer Reference?
 sa-utr.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 sa-utr.line_2                                               = I do not have a Unique Taxpayer Reference
 sa-utr.details.line_1                                       = Your UTR helps us identify your business

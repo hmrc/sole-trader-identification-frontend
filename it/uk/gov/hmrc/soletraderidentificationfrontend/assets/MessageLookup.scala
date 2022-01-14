@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testFirstName
+
 object MessageLookup {
 
   object Base {
@@ -27,6 +29,9 @@ object MessageLookup {
     val yes = "Yes"
     val no = "No"
     val back = "Back"
+
+    val technicalDifficultiesTitle = "Sorry, we are experiencing technical difficulties - 500"
+    val technicalDifficultiesHeading = "Sorry, we’re experiencing technical difficulties"
 
     object Error {
       val title = "There is a problem"
@@ -60,8 +65,8 @@ object MessageLookup {
   }
 
   object CaptureDateOfBirth {
-    val title = "What is your date of birth?"
-    val heading = "What is your date of birth?"
+    val title = s"What is applicant’s date of birth?"
+    val heading = s"What is $testFirstName’s date of birth?"
     val hint = "For example, 27 3 2007"
 
     object Error {
@@ -74,8 +79,8 @@ object MessageLookup {
   }
 
   object CaptureNino {
-    val title = "What is your National Insurance number?"
-    val heading = "What is your National Insurance number?"
+    val title = s"What is applicant’s National Insurance number?"
+    val heading = s"What is $testFirstName’s National Insurance number?"
     val line_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
     val form_field_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
     val no_nino = "I do not have a National Insurance number"
@@ -87,8 +92,8 @@ object MessageLookup {
   }
 
   object CaptureAddress {
-    val title = "Enter your home address"
-    val heading = "Enter your home address"
+    val title = s"Enter applicant’s home address"
+    val heading = s"Enter $testFirstName’s home address"
     val line_1 = "Address line 1"
     val line_2 = "Address line 2"
     val line_3 = "Address line 3 (optional)"
@@ -110,8 +115,8 @@ object MessageLookup {
   }
 
   object CaptureSautr {
-    val title = "What is your Unique Taxpayer Reference?"
-    val heading = "What is your Unique Taxpayer Reference?"
+    val title = s"What is applicant’s Unique Taxpayer Reference?"
+    val heading = s"What is $testFirstName’s Unique Taxpayer Reference?"
     val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
     val line_2 = "I do not have a Unique Taxpayer Reference"
     val details_line_1 = "Your UTR helps us identify your business"

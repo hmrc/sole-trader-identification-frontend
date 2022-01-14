@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.libs.json.Json
+import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
@@ -38,6 +40,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
       }
 
@@ -73,6 +76,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
       }
 
@@ -113,6 +117,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiers(testJourneyId)(NO_CONTENT)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> testNino)
 
@@ -131,6 +136,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiers(testJourneyId)(NO_CONTENT)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> testNino)
 
@@ -149,6 +155,8 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "")
       }
 
@@ -167,6 +175,8 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
         post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AAAAAAAAAA")
       }
 
@@ -176,6 +186,43 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
       testCaptureNinoErrorMessages(result)
     }
+
+    "there is a form error and full name is defined" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "to simulate an error")
+      }
+
+      testTitleAndHeadingInTheErrorView(result)
+    }
+
+    "there is a form error and full name is NOT defined" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "to simulate an error")
+      }
+
+      "return an internal server error" in {
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+
+      testTitleAndHeadingGivenNoCustomerFullName(result)
+
+    }
+
   }
 
   "GET /no-nino" should {

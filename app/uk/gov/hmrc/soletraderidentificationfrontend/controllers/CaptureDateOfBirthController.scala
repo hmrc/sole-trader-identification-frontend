@@ -41,13 +41,18 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-              form = captureDateOfBirthForm(timeMachine.now())
-            ))
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId)
+          firstName <- soleTraderIdentificationService
+            .retrieveFullName(journeyId)
+            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          Ok(view(
+            firstName,
+            pageConfig = journeyConfig.pageConfig,
+            formAction = routes.CaptureDateOfBirthController.submit(journeyId),
+            form = captureDateOfBirthForm(timeMachine.now())
+          ))
         }
       }
   }
@@ -56,14 +61,21 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         captureDateOfBirthForm(timeMachine.now()).bindFromRequest.fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                BadRequest(view(
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-                  form = formWithErrors))
-            },
+          formWithErrors => {
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId)
+              firstName <- soleTraderIdentificationService
+                .retrieveFullName(journeyId)
+                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+            } yield {
+              BadRequest(view(
+                firstName,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureDateOfBirthController.submit(journeyId),
+                form = formWithErrors))
+            }
+          }
+          ,
           dateOfBirth =>
             soleTraderIdentificationService.storeDateOfBirth(journeyId, dateOfBirth).map {
               _ => Redirect(routes.CaptureNinoController.show(journeyId))
@@ -73,3 +85,4 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
   }
 
 }
+
