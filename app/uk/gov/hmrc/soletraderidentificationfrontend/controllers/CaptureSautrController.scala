@@ -40,13 +40,11 @@ class CaptureSautrController @Inject()(mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        val eventualJourneyConfig = journeyService.getJourneyConfig(journeyId)
-        val eventualFirstName = soleTraderIdentificationService
-          .retrieveFullName(journeyId)
-          .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
         for {
-          journeyConfig <- eventualJourneyConfig
-          firstName <- eventualFirstName
+          journeyConfig <- journeyService.getJourneyConfig(journeyId)
+          firstName <- soleTraderIdentificationService
+            .retrieveFullName(journeyId)
+            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
         } yield {
           Ok(view(
             firstName,
@@ -64,13 +62,11 @@ class CaptureSautrController @Inject()(mcc: MessagesControllerComponents,
       authorised() {
         CaptureSautrForm.form.bindFromRequest().fold(
           formWithErrors => {
-            val eventualJourneyConfig = journeyService.getJourneyConfig(journeyId)
-            val eventualFirstName = soleTraderIdentificationService
-              .retrieveFullName(journeyId)
-              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
             for {
-              journeyConfig <- eventualJourneyConfig
-              firstName <- eventualFirstName
+              journeyConfig <- journeyService.getJourneyConfig(journeyId)
+              firstName <- soleTraderIdentificationService
+                .retrieveFullName(journeyId)
+                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
             } yield {
               BadRequest(view(
                 firstName,
