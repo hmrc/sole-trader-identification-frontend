@@ -207,10 +207,22 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
       ArgumentMatchers.eq(registrationStatus)
     )(ArgumentMatchers.any[HeaderCarrier])
 
+  def verifyStoreRegistrationResponse(count: Int): Unit =
+    verify(mockSoleTraderIdentificationService, times(count)).storeRegistrationStatus(
+      ArgumentMatchers.any[String],
+      ArgumentMatchers.any[RegistrationStatus]
+    )(ArgumentMatchers.any[HeaderCarrier])
+
   def verifyStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus): Unit =
     verify(mockSoleTraderIdentificationService).storeBusinessVerificationStatus(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(businessVerificationStatus)
+    )(ArgumentMatchers.any[HeaderCarrier])
+
+  def verifyStoreBusinessVerificationStatus(count: Int): Unit =
+    verify(mockSoleTraderIdentificationService, times(count)).storeBusinessVerificationStatus(
+      ArgumentMatchers.any[String],
+      ArgumentMatchers.any[BusinessVerificationStatus]
     )(ArgumentMatchers.any[HeaderCarrier])
 
   def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean): Unit =

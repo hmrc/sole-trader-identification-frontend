@@ -775,8 +775,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, mismatchErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
           stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
@@ -784,8 +782,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSautr(testJourneyId)(NOT_FOUND)
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DetailsMismatch")
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationUnchallengedJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
 
           val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
@@ -795,8 +791,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
           verifyAudit()
         }
@@ -812,8 +806,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubMatch(testIndividualDetailsNoSautr)(FAILED_DEPENDENCY, Json.obj())
           stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
           stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
@@ -821,8 +813,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSautr(testJourneyId)(NOT_FOUND)
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DeceasedCitizensDetails")
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationUnchallengedJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
 
           val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
@@ -832,8 +822,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
           verifyAudit()
         }
@@ -851,8 +839,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, notFoundErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
           stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
@@ -860,8 +846,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSautr(testJourneyId)(NOT_FOUND)
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "NinoNotFound")
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationUnchallengedJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
 
           val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
@@ -871,8 +855,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
           verifyAudit()
         }
