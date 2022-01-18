@@ -71,6 +71,12 @@ This is a test entry point which simulates a service by triggering the initial P
    - To customise title and H1 of the starting journey page
    - Currently, this is empty by default, so the default page title and H1 will be used
 
+8. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
+
 ### GET /test-only/create-individual-journey
 
 ---
@@ -104,6 +110,12 @@ This is a test entry point which simulates a service by triggering the initial P
 
    - To customise title and H1 of the starting journey page
    - Currently, this is empty by default, so the default page title and H1 will be used
+
+7. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
    
 
 ### GET /test-only/create-journey
@@ -146,6 +158,12 @@ This is a test entry point which simulates a service by triggering the initial P
 
    - To customise title and H1 of the starting journey page
    - Currently, this is empty by default, so the default page title and H1 will be used
+
+8. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
 
 ### GET test-only/retrieve-journey/:journeyId or test-only/retrieve-journey
 

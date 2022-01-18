@@ -60,6 +60,7 @@ object TestCreateJourneyConnector {
     signOutUrlKey -> journeyConfig.pageConfig.signOutUrl,
     enableSautrCheckKey -> journeyConfig.pageConfig.enableSautrCheck,
     accessibilityUrlKey -> journeyConfig.pageConfig.accessibilityUrl,
-    optFullNamePageLabelKey -> journeyConfig.pageConfig.optFullNamePageLabel
+    optFullNamePageLabelKey -> journeyConfig.pageConfig.optFullNamePageLabel,
+    regimeKey -> journeyConfig.regime
   )
 }

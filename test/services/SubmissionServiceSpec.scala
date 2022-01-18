@@ -57,7 +57,7 @@ class SubmissionServiceSpec
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, journeyConfigWithoutBV)(Future.successful(Right(true)))
-        mockRegisterWithoutBusinessVerification(testJourneyId, testIndividualDetails.optNino, testIndividualDetails.optSautr.get)(Future.successful(Registered(testSafeId)))
+        mockRegisterWithoutBusinessVerification(testJourneyId, testIndividualDetails.optNino, testIndividualDetails.optSautr.get, testRegime)(Future.successful(Registered(testSafeId)))
 
         val result = await(TestService.submit(testJourneyId, journeyConfigWithoutBV))
 

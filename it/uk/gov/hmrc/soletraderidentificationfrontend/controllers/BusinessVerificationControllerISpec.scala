@@ -74,7 +74,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
           stubRetrieveSautr(testJourneyId)(OK, testSautr)
           stubRetrieveTrn(testJourneyId)(NOT_FOUND)
-          stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+          stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
@@ -114,7 +114,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
           stubCreateTrn(testDateOfBirth, testFullName, testAddress)(CREATED, Json.obj("temporaryReferenceNumber" -> testTrn))
           stubStoreTrn(testJourneyId, testTrn)(OK)
-          stubRegisterWithTrn(testTrn, testSautr)(OK, Registered(testSafeId))
+          stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
@@ -132,7 +132,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          verifyRegisterWithTrn(testTrn, testSautr)
+          verifyRegisterWithTrn(testTrn, testSautr, testRegime)
           verifyAudit()
         }
       }
@@ -175,7 +175,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
           stubRetrieveSautr(testJourneyId)(OK, testSautr)
           stubRetrieveTrn(testJourneyId)(NOT_FOUND)
-          stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+          stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
@@ -216,7 +216,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
           stubCreateTrn(testDateOfBirth, testFullName, testAddress)(CREATED, Json.obj("temporaryReferenceNumber" -> testTrn))
           stubStoreTrn(testJourneyId, testTrn)(OK)
-          stubRegisterWithTrn(testTrn, testSautr)(OK, Registered(testSafeId))
+          stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
@@ -234,7 +234,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          verifyRegisterWithTrn(testTrn, testSautr)
+          verifyRegisterWithTrn(testTrn, testSautr, testRegime)
           verifyAudit()
         }
       }

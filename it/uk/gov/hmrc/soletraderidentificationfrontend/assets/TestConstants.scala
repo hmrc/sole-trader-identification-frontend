@@ -35,6 +35,7 @@ object TestConstants {
   val testNino: String = "AA111111A"
   val testSautr: String = "1234567890"
   val testContinueUrl = "/test-continue-url"
+  val testRegime: String = "VATC"
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
   val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"
   val testSafeId: String = UUID.randomUUID().toString
@@ -87,8 +88,21 @@ object TestConstants {
   val testIndividualJourneyConfig: JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
     businessVerificationCheck = false,
-    pageConfig = testIndividualPageConfig
+    pageConfig = testIndividualPageConfig,
+    testRegime
   )
+
+  val testIndividualJourneyConfigJsonNoRegime: JsObject =
+    Json.obj(
+      "continueUrl" -> testContinueUrl,
+      "pageConfig" -> Json.obj(
+        "enableSautrCheck" -> false,
+        "deskProServiceId" -> testDeskProServiceId,
+        "signOutUrl" -> testSignOutUrl,
+        "accessibilityUrl" -> testAccessibilityUrl
+      ),
+      "businessVerificationCheck" -> false
+    )
 
   val testSoleTraderJourneyConfig: JourneyConfig = testIndividualJourneyConfig
     .copy(businessVerificationCheck = true)

@@ -34,6 +34,7 @@ object TestCreateJourneyForm {
   val enableSautrCheck = "enableSautrCheck"
   val accessibilityUrl = "accessibilityUrl"
   val fullNamePageLabel = "fullNamePageLabel"
+  val regime = "regime"
 
   def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
     companyNumber => validate(
@@ -63,6 +64,13 @@ object TestCreateJourneyForm {
     )
   )
 
+  def regimeEmpty: Constraint[String] = Constraint("regime.not_entered")(
+    regime => validate(
+      constraint = regime.isEmpty,
+      errMsg = "Regime is not entered"
+    )
+  )
+
   def form(enableSautrCheck: Boolean): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
@@ -71,8 +79,9 @@ object TestCreateJourneyForm {
       deskProServiceId -> text.verifying(deskProServiceIdEmpty),
       signOutUrl -> text.verifying(signOutUrlEmpty),
       accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel) =>
+      fullNamePageLabel -> optText,
+      regime -> text.verifying(regimeEmpty)
+    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel, regime) =>
       JourneyConfig.apply(
         continueUrl,
         businessVerificationCheck,
@@ -83,7 +92,8 @@ object TestCreateJourneyForm {
           enableSautrCheck,
           accessibilityUrl,
           fullNamePageLabel
-        )
+        ),
+        regime
       )
     )(journeyConfig =>
       Some(
@@ -93,7 +103,8 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.deskProServiceId,
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel
+        journeyConfig.pageConfig.optFullNamePageLabel,
+        journeyConfig.regime
       )
     ))
   }
@@ -107,8 +118,9 @@ object TestCreateJourneyForm {
       signOutUrl -> text.verifying(signOutUrlEmpty),
       enableSautrCheck -> optText.toBoolean,
       accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel) =>
+      fullNamePageLabel -> optText,
+      regime -> text.verifying(regimeEmpty)
+    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel, regime) =>
       JourneyConfig.apply(
         continueUrl,
         businessVerificationCheck,
@@ -119,7 +131,8 @@ object TestCreateJourneyForm {
           enableSautrCheck,
           accessibilityUrl,
           fullNamePageLabel
-        )
+        ),
+        regime
       )
     )(journeyConfig =>
       Some(
@@ -130,7 +143,8 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.enableSautrCheck,
         journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel
+        journeyConfig.pageConfig.optFullNamePageLabel,
+        journeyConfig.regime
       )
     ))
   }

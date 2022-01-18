@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RegistrationConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, JourneyConfig, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,12 +30,12 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
                                                  auditService: AuditService
                                                 )(implicit ec: ExecutionContext) {
 
-  def register(journeyId: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
+  def register(journeyId: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
     registrationStatus <- soleTraderIdentificationService.retrieveBusinessVerificationStatus(journeyId).flatMap {
       case Some(BusinessVerificationPass) | Some(SaEnrolled) => for {
         optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
         sautr <- soleTraderIdentificationService.retrieveSautr(journeyId).map(_.getOrElse(noDataServerException(journeyId)))
-        registrationStatus <- register(journeyId, optNino, sautr)
+        registrationStatus <- register(journeyId, optNino, sautr, regime)
       } yield registrationStatus
       case Some(_) =>
         Future.successful(RegistrationNotCalled)
@@ -48,22 +48,22 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
     registrationStatus
   }
 
-  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String)
+  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String, regime: String)
                                          (implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
-    registrationStatus <- register(journeyId, optNino, saUtr)
+    registrationStatus <- register(journeyId, optNino, saUtr, regime)
     _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
   } yield {
     auditService.auditSoleTraderJourney(journeyId)
     registrationStatus
   }
 
-  private def register(journeyId: String, optNino: Option[String], saUtr: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
-    (optNino, saUtr) match {
-      case (Some(nino), sautr) =>
-        registrationConnector.registerWithNino(nino, sautr)
-      case (None, sautr) =>
+  private def register(journeyId: String, optNino: Option[String], saUtr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+    (optNino, saUtr, regime) match {
+      case (Some(nino), sautr, regime) =>
+        registrationConnector.registerWithNino(nino, sautr, regime)
+      case (None, sautr, regime) =>
         trnService.createTrn(journeyId) flatMap {
-          trn => registrationConnector.registerWithTrn(trn, sautr)
+          trn => registrationConnector.registerWithTrn(trn, sautr, regime)
         }
     }
 

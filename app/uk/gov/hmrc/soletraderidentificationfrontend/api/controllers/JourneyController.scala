@@ -53,6 +53,7 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
         signOutUrl <- (json \ signOutUrlKey).validate[String]
         accessibilityUrl <- (json \ accessibilityUrlKey).validate[String]
         optFullNamePageLabel <- (json \ optFullNamePageLabelKey).validateOpt[String]
+        regime <- (json \ regimeKey).validate[String]
       } yield JourneyConfig(
         continueUrl,
         businessVerificationCheck.getOrElse(true),
@@ -63,7 +64,8 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
           enableSautrCheck,
           accessibilityUrl,
           optFullNamePageLabel
-        )
+        ),
+        regime
       )
   }) {
     implicit req =>
@@ -91,6 +93,7 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
         enableSautrCheck <- (json \ enableSautrCheckKey).validateOpt[Boolean]
         accessibilityUrl <- (json \ accessibilityUrlKey).validate[String]
         optFullNamePageLabel <- (json \ optFullNamePageLabelKey).validateOpt[String]
+        regime <- (json \ regimeKey).validate[String]
       } yield JourneyConfig(
         continueUrl,
         businessVerificationCheck.getOrElse(true),
@@ -101,7 +104,8 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
           enableSautrCheck.getOrElse(false),
           accessibilityUrl,
           optFullNamePageLabel
-        )
+        ),
+        regime
       )
   }) {
     implicit req =>
@@ -138,4 +142,5 @@ object JourneyController {
   val enableSautrCheckKey = "enableSautrCheck"
   val accessibilityUrlKey = "accessibilityUrl"
   val optFullNamePageLabelKey = "optFullNamePageLabel"
+  val regimeKey = "regime"
 }

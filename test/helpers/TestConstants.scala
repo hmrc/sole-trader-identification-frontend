@@ -36,6 +36,7 @@ object TestConstants {
   val testBusinessVerificationRedirectUrl: String = "/business-verification-start"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
+  val testRegime: String = "VATC"
   val testDateOfBirth: LocalDate = LocalDate.now().minusYears(17)
   val testFirstName: String = "John"
   val testLastName: String = "Smith"
@@ -199,8 +200,9 @@ object TestConstants {
       signOutUrl = testSignOutUrl,
       enableSautrCheck = enableSautrCheck,
       accessibilityUrl = testAccessibilityUrl,
-      optFullNamePageLabel = None
-    )
+      optFullNamePageLabel = None,
+    ),
+    testRegime
   )
 
   def testSoleTraderAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(

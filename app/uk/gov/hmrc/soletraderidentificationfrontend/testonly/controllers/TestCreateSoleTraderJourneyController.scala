@@ -38,7 +38,7 @@ class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponen
 
   private val defaultPageConfig = Utils.defaultPageConfig(appConfig)
 
-  private val defaultJourneyConfig = Utils.defaultJourneyConfig(appConfig, defaultPageConfig)
+  private val defaultJourneyConfig = Utils.defaultJourneyConfig(appConfig, defaultPageConfig, regime = "VATC")
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
