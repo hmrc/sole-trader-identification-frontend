@@ -37,33 +37,37 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
     reset(mockRegistrationConnector)
   }
 
-  def mockRegister(nino: String, sautr: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
+  def mockRegister(nino: String, sautr: String, regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
     when(mockRegistrationConnector.registerWithNino(
       ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(sautr)
+      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
   }
 
-  def verifyRegistration(nino: String, sautr: String): Unit = {
+  def verifyRegistration(nino: String, sautr: String, regime: String): Unit = {
     verify(mockRegistrationConnector).registerWithNino(
       ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(sautr)
+      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
   }
 
-  def mockRegisterWithTrn(trn: String, sautr: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
+  def mockRegisterWithTrn(trn: String, sautr: String, regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
     when(mockRegistrationConnector.registerWithTrn(
       ArgumentMatchers.eq(trn),
-      ArgumentMatchers.eq(sautr)
+      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
   }
 
-  def verifyRegistrationWithTrn(trn: String, sautr: String): Unit = {
+  def verifyRegistrationWithTrn(trn: String, sautr: String, regime: String): Unit = {
     verify(mockRegistrationConnector).registerWithTrn(
       ArgumentMatchers.eq(trn),
-      ArgumentMatchers.eq(sautr)
+      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
   }
 

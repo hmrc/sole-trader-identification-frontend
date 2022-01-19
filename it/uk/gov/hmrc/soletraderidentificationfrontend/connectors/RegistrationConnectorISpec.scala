@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testNino, testSafeId, testSautr, testTrn}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testNino, testRegime, testSafeId, testSautr, testTrn}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{Registered, RegistrationFailed}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.RegisterStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -32,9 +32,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
   "registerWithNino" should {
     "return Registered" when {
       "the registration has been successful" in {
-        stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+        stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
 
-        val result = await(registrationConnector.registerWithNino(testNino, testSautr))
+        val result = await(registrationConnector.registerWithNino(testNino, testSautr, testRegime))
 
         result mustBe Registered(testSafeId)
       }
@@ -43,9 +43,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
     "capitalise the NINO" when {
       "it has been entered in lower case" in {
         val testLowerCaseNino = "aa111111a"
-        stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+        stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
 
-        val result = await(registrationConnector.registerWithNino(testLowerCaseNino, testSautr))
+        val result = await(registrationConnector.registerWithNino(testLowerCaseNino, testSautr, testRegime))
 
         result mustBe Registered(testSafeId)
       }
@@ -53,9 +53,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        stubRegister(testNino, testSautr)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+        stubRegister(testNino, testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
 
-        val result = await(registrationConnector.registerWithNino(testNino, testSautr))
+        val result = await(registrationConnector.registerWithNino(testNino, testSautr, testRegime))
 
         result mustBe RegistrationFailed
       }
@@ -65,9 +65,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
   "registerWithTrn" should {
     "return Registered" when {
       "the registration has been successful" in {
-        stubRegisterWithTrn(testTrn, testSautr)(OK, Registered(testSafeId))
+        stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, Registered(testSafeId))
 
-        val result = await(registrationConnector.registerWithTrn(testTrn, testSautr))
+        val result = await(registrationConnector.registerWithTrn(testTrn, testSautr, testRegime))
 
         result mustBe Registered(testSafeId)
       }
@@ -75,9 +75,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        stubRegisterWithTrn(testTrn, testSautr)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+        stubRegisterWithTrn(testTrn, testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
 
-        val result = await(registrationConnector.registerWithTrn(testTrn, testSautr))
+        val result = await(registrationConnector.registerWithTrn(testTrn, testSautr, testRegime))
 
         result mustBe RegistrationFailed
       }

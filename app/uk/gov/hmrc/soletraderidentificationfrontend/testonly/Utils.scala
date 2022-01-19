@@ -30,10 +30,11 @@ object Utils {
     optFullNamePageLabel = None
   )
 
-  def defaultJourneyConfig(appConfig: AppConfig, pageConfig: PageConfig):JourneyConfig = JourneyConfig(
+  def defaultJourneyConfig(appConfig: AppConfig, pageConfig: PageConfig, regime: String):JourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
     businessVerificationCheck = true,
-    pageConfig = pageConfig
+    pageConfig = pageConfig,
+    regime = regime
   )
 
 }

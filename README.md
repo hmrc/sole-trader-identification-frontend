@@ -38,7 +38,8 @@ continue to register where a successful match is found. By default "businessVeri
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
-    "optFullNamePageLabel" : "What is the name of the nominated partner?"
+    "optFullNamePageLabel" : "What is the name of the nominated partner?",
+    "regime" : "VATC"
 }
 ```
 
@@ -60,7 +61,8 @@ All other fields must be provided.
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
-    "optFullNamePageLabel" : "What is the name of the nominated partner?"
+    "optFullNamePageLabel" : "What is the name of the nominated partner?",
+    "regime" : "VATC"
 }
 ```
 
@@ -145,6 +147,7 @@ continue to register where a successful match is found. By default "businessVeri
     "signOutUrl" : "/sign-out",
     "enableSautrCheck" : "true",
     "optFullNamePageLabel" : "What is the name of the nominated partner?"
+    "regime" : "VATC"
 }
 ```
 

@@ -72,7 +72,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                           individualDetails: IndividualDetails)(implicit hc: HeaderCarrier,
                                                                                 ec: ExecutionContext): Future[SubmissionResponse] = businessScenario match {
     case SoleTraderJourneyWithoutBusinessVerification =>
-      handleSoleTraderJourneySkippingBVCheck(journeyId, matchingResult, journeyConfig.continueUrl, individualDetails.optSautr, individualDetails.optNino)
+      handleSoleTraderJourneySkippingBVCheck(journeyId, matchingResult, journeyConfig.continueUrl, individualDetails.optSautr, individualDetails.optNino, journeyConfig.regime)
     case SoleTraderJourneyWithBusinessVerification =>
       handleSoleTraderJourneyWithBVCheck(journeyId, matchingResult, journeyConfig, individualDetails)
     case IndividualJourney =>
@@ -83,13 +83,14 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                                      matchingResult: MatchingResult,
                                                      continueUrl: String,
                                                      optSaUtr: Option[String],
-                                                     optNino: Option[String]
+                                                     optNino: Option[String],
+                                                     regime: String
                                                     )
                                                     (implicit hc: HeaderCarrier,
                                                      ec: ExecutionContext): Future[SubmissionResponse] = matchingResult match {
     case Right(true) if optSaUtr.isDefined =>
       registrationOrchestrationService
-        .registerWithoutBusinessVerification(journeyId, optNino, optSaUtr.getOrElse(throwASaUtrNotDefinedException))
+        .registerWithoutBusinessVerification(journeyId, optNino, optSaUtr.getOrElse(throwASaUtrNotDefinedException), regime)
         .map(_ => JourneyCompleted(continueUrl))
 
     case Right(true | false) if optNino.isEmpty =>

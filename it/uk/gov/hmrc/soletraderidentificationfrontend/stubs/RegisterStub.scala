@@ -23,11 +23,13 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, Wire
 
 trait RegisterStub extends WireMockMethods {
 
-  def stubRegister(nino: String, sautr: String)(status: Int, body: RegistrationStatus): StubMapping = {
+  def stubRegister(nino: String, sautr: String, regime: String)(status: Int, body: RegistrationStatus): StubMapping = {
     val jsonBody = Json.obj("soleTrader" ->
       Json.obj(
         "nino" -> nino,
-        "sautr" -> sautr)
+        "sautr" -> sautr,
+        "regime" -> regime
+      )
     )
     when(method = POST, uri = "/sole-trader-identification/register", jsonBody)
       .thenReturn(
@@ -36,10 +38,11 @@ trait RegisterStub extends WireMockMethods {
       )
   }
 
-  def stubRegisterWithTrn(trn: String, sautr: String)(status: Int, body: RegistrationStatus): StubMapping = {
+  def stubRegisterWithTrn(trn: String, sautr: String, regime: String)(status: Int, body: RegistrationStatus): StubMapping = {
     val jsonBody = Json.obj(
       "trn" -> trn,
-      "sautr" -> sautr
+      "sautr" -> sautr,
+      "regime" -> regime
     )
 
     when(method = POST, uri = "/sole-trader-identification/register-trn", jsonBody)
@@ -49,20 +52,22 @@ trait RegisterStub extends WireMockMethods {
       )
   }
 
-  def verifyRegister(nino: String, sautr: String): Unit = {
+  def verifyRegister(nino: String, sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(
       "soleTrader" -> Json.obj(
         "nino" -> nino,
-        "sautr" -> sautr
+        "sautr" -> sautr,
+        "regime" -> regime
       )
     )
     WiremockHelper.verifyPost(uri = "/sole-trader-identification/register", optBody = Some(jsonBody.toString()))
   }
 
-  def verifyRegisterWithTrn(trn: String, sautr: String): Unit = {
+  def verifyRegisterWithTrn(trn: String, sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(
       "trn" -> trn,
-      "sautr" -> sautr
+      "sautr" -> sautr,
+      "regime" -> regime
     )
 
     WiremockHelper.verifyPost(uri = "/sole-trader-identification/register-trn", optBody = Some(jsonBody.toString()))

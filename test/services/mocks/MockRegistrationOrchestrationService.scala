@@ -32,12 +32,13 @@ trait MockRegistrationOrchestrationService extends MockitoSugar with BeforeAndAf
 
   val mockRegistrationOrchestrationService: RegistrationOrchestrationService = mock[RegistrationOrchestrationService]
 
-  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String)
+  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String, regime: String)
                                              (response: Future[RegistrationStatus]): OngoingStubbing[_] =
     when(mockRegistrationOrchestrationService.registerWithoutBusinessVerification(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(optNino),
       ArgumentMatchers.eq(saUtr),
+      ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

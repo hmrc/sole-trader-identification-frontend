@@ -35,7 +35,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
       "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
       "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
-      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl
+      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+      "regime" -> testSoleTraderJourneyConfig.regime
     )
 
     "returns json containing the url to Capture Full Name Controller" when {
@@ -91,7 +92,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       "businessVerificationCheck" -> false,
       "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
       "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl
+      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+      "regime" -> testSoleTraderJourneyConfig.regime
     )
 
     "returns json containing the url to Capture Full Name Controller" when {
@@ -148,7 +150,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       "businessVerificationCheck" -> false,
       "deskProServiceId" -> testIndividualJourneyConfig.pageConfig.deskProServiceId,
       "signOutUrl" -> testIndividualJourneyConfig.pageConfig.signOutUrl,
-      "accessibilityUrl" -> testIndividualJourneyConfig.pageConfig.accessibilityUrl
+      "accessibilityUrl" -> testIndividualJourneyConfig.pageConfig.accessibilityUrl,
+      "regime" -> testSoleTraderJourneyConfig.regime
     )
 
     "returns json containing the url to Capture Full Name Controller" when {

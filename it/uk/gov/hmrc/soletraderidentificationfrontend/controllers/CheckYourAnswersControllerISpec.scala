@@ -879,7 +879,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
 
-          stubRegister(testNino, testSautr)(OK, Registered(testSafeId))
+          stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
 
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
@@ -891,7 +891,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             redirectUri(testContinueUrl)
           }
 
-          verifyRegister(testNino, testSautr)
+          verifyRegister(testNino, testSautr, testRegime)
           verifyAudit()
         }
       }
