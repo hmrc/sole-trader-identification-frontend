@@ -44,7 +44,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "dateOfBirth" -> authenticatorDetails.dateOfBirth,
             "nino" -> authenticatorDetails.optNino
           ))
-        case "bv-test-1" =>
+        case "bv-test-a" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
@@ -52,7 +52,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "nino" -> authenticatorDetails.optNino,
             "saUtr" -> "1188662968"
           ))
-        case "bv-test-2" =>
+        case "bv-test-b" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
@@ -60,7 +60,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "nino" -> authenticatorDetails.optNino,
             "saUtr" -> "3550699947"
           ))
-        case "bv-test-3" =>
+        case "bv-test-c" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
@@ -68,7 +68,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "nino" -> authenticatorDetails.optNino,
             "saUtr" -> "8113878100"
           ))
-        case "bv-test-4" =>
+        case "bv-test-d" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
@@ -76,7 +76,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "nino" -> authenticatorDetails.optNino,
             "saUtr" -> "9083735242"
           ))
-        case "bv-test-5" =>
+        case "bv-test-e" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
@@ -84,7 +84,7 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
             "nino" -> authenticatorDetails.optNino,
             "saUtr" -> "1021150603"
           ))
-        case "e2e-test" =>
+        case "end-to-end-test" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
             "lastName" -> authenticatorDetails.lastName,
