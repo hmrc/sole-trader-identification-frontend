@@ -18,11 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.repositories
 
 import org.scalatest.concurrent.{AbstractPatienceConfiguration, Eventually}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testIndividualJourneyConfig, _}
-import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository.journeyConfigMongoFormat
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,13 +41,13 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPati
     await(repo.drop)
   }
 
-  "documents" should {
+  "JourneyConfigRepository" should {
     "successfully insert a new document" in {
       await(repo.insertJourneyConfig(testJourneyId, testInternalId, testIndividualJourneyConfig))
       await(repo.count) mustBe 1
     }
 
-    "successfully insert journeyConfig" in {
+    "successfully insert and find a journeyConfig" in {
       await(repo.insertJourneyConfig(testJourneyId, testInternalId, testIndividualJourneyConfig))
       await(repo.findJourneyConfig(testJourneyId, testInternalId)) must contain(testIndividualJourneyConfig)
     }
@@ -67,17 +65,6 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPati
       await(repo.count) mustBe 1
     }
 
-    "successfully find journey config" when {
-      "regime value is present" in {
-        await(repo.insertJourneyConfig(testJourneyId, testInternalId, testIndividualJourneyConfig))
-        await(repo.findJourneyConfig(testJourneyId, testInternalId)) must contain(testIndividualJourneyConfig)
-      }
-
-      "regime value is missing" in {
-        await(repo.insertJourneyConfig(testJourneyId, testInternalId, testIndividualJourneyConfig))
-        await(repo.findAndUpdate(Json.obj("_id" -> testJourneyId), Json.obj("$set" -> testIndividualJourneyConfigJsonNoRegime)))
-        await(repo.findJourneyConfig(testJourneyId, testInternalId)) must contain(testIndividualJourneyConfig)
-      }
-    }
   }
+
 }

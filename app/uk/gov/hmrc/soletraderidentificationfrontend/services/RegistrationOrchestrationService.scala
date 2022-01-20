@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RegistrationConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, JourneyConfig, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
