@@ -17,7 +17,7 @@
 package services.mocks
 
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.{reset, verify, when}
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,20 +32,27 @@ trait MockRegistrationOrchestrationService extends MockitoSugar with BeforeAndAf
 
   val mockRegistrationOrchestrationService: RegistrationOrchestrationService = mock[RegistrationOrchestrationService]
 
-  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String, regime: String)
+  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], regime: String)
                                              (response: Future[RegistrationStatus]): OngoingStubbing[_] =
     when(mockRegistrationOrchestrationService.registerWithoutBusinessVerification(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(optNino),
-      ArgumentMatchers.eq(saUtr),
+      ArgumentMatchers.eq(optSautr),
       ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
+
+  def verifyRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], regime: String): Unit =
+    verify(mockRegistrationOrchestrationService).registerWithoutBusinessVerification(
+      ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(optNino),
+      ArgumentMatchers.eq(optSautr),
+      ArgumentMatchers.eq(regime)
+    )(ArgumentMatchers.any[HeaderCarrier])
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(mockRegistrationOrchestrationService)
   }
-
 
 }

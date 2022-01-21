@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RegistrationConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, JourneyConfig, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, RegistrationNotCalled, RegistrationStatus, SaEnrolled}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,8 +34,8 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
     registrationStatus <- soleTraderIdentificationService.retrieveBusinessVerificationStatus(journeyId).flatMap {
       case Some(BusinessVerificationPass) | Some(SaEnrolled) => for {
         optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
-        sautr <- soleTraderIdentificationService.retrieveSautr(journeyId).map(_.getOrElse(noDataServerException(journeyId)))
-        registrationStatus <- register(journeyId, optNino, sautr, regime)
+        optSautr <- soleTraderIdentificationService.retrieveSautr(journeyId)
+        registrationStatus <- register(journeyId, optNino, optSautr, regime)
       } yield registrationStatus
       case Some(_) =>
         Future.successful(RegistrationNotCalled)
@@ -48,7 +48,7 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
     registrationStatus
   }
 
-  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: String, regime: String)
+  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: Option[String], regime: String)
                                          (implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
     registrationStatus <- register(journeyId, optNino, saUtr, regime)
     _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
@@ -57,16 +57,22 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
     registrationStatus
   }
 
-  private def register(journeyId: String, optNino: Option[String], saUtr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
-    (optNino, saUtr, regime) match {
-      case (Some(nino), sautr, regime) =>
-        registrationConnector.registerWithNino(nino, sautr, regime)
-      case (None, sautr, regime) =>
+  private def register(journeyId: String,
+                       optNino: Option[String],
+                       optSautr: Option[String],
+                       regime: String
+                      )(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+    (optNino, optSautr, regime) match {
+      case (Some(nino), optSautr, regime) =>
+        registrationConnector.registerWithNino(nino, optSautr, regime)
+      case (None, optSautr, regime) =>
         trnService.createTrn(journeyId) flatMap {
-          trn => registrationConnector.registerWithTrn(trn, sautr, regime)
+          trn =>
+            registrationConnector.registerWithTrn(
+              trn,
+              optSautr.getOrElse(throw new InternalServerException(s"Missing sautr required for Register call with TRN for $journeyId")),
+              regime
+            )
         }
     }
-
-  private def noDataServerException(journeyId: String): Nothing =
-    throw new InternalServerException(s"Missing required data for registration in database for $journeyId")
 }

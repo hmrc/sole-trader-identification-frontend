@@ -85,10 +85,10 @@ A valid journeyId must be sent in the URI
 #### Response:
 Status:
 
-| Expected Response                       | Reason
-|-----------------------------------------|------------------------------
-| ```OK(200)```                           |  ```JourneyId exists```
-| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+| Expected Response                       | Reason                         |
+|-----------------------------------------|--------------------------------|
+| ```OK(200)```                           | ```JourneyId exists```         |
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```  |
 
 Example response body for the Sole Trader Flow:
 ```

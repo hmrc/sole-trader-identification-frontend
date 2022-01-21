@@ -53,13 +53,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-          mockRegister(testNino, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
+          mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
           await(TestService.register(testJourneyId, testRegime)) mustBe {
             Registered(testSafeId)
           }
-          verifyRegistration(testNino, testSautr, testRegime)
+          verifyRegistration(testNino, Some(testSautr), testRegime)
           verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
         }
 
@@ -67,13 +67,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-          mockRegister(testNino, testSautr, testRegime)(Future.successful(RegistrationFailed))
+          mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
           await(TestService.register(testJourneyId, testRegime)) mustBe {
             RegistrationFailed
           }
-          verifyRegistration(testNino, testSautr, testRegime)
+          verifyRegistration(testNino, Some(testSautr), testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
         }
 
@@ -81,13 +81,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(SaEnrolled)))
-          mockRegister(testNino, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
+          mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
           await(TestService.register(testJourneyId, testRegime)) mustBe {
             Registered(testSafeId)
           }
-          verifyRegistration(testNino, testSautr, testRegime)
+          verifyRegistration(testNino, Some(testSautr), testRegime)
           verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
         }
       }
@@ -119,16 +119,6 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
       }
 
       "throw an Internal Server Exception" when {
-        "there is no sautr in the database" in {
-          mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
-          mockRetrieveSautr(testJourneyId)(Future.successful(None))
-          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-
-          intercept[InternalServerException](
-            await(TestService.register(testJourneyId, testRegime))
-          )
-        }
-
         "there is no business verification response in the database" in {
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
@@ -208,16 +198,6 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         }
       }
       "throw an Internal Server Exception" when {
-        "there is no sautr in the database" in {
-          mockRetrieveNino(testJourneyId)(Future.successful(None))
-          mockRetrieveSautr(testJourneyId)(Future.successful(None))
-          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-
-          intercept[InternalServerException](
-            await(TestService.register(testJourneyId, testRegime))
-          )
-        }
-
         "there is no business verification response in the database" in {
           mockRetrieveNino(testJourneyId)(Future.successful(None))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
@@ -235,18 +215,46 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
     "the user has a nino" should {
       "register and then store the registration response" in {
-        mockRegister(testNino, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
+        mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
         mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), testSautr, testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), Some(testSautr), testRegime)) mustBe {
           Registered(testSafeId)
         }
 
-        verifyRegistration(testNino, testSautr, testRegime)
+        verifyRegistration(testNino, Some(testSautr), testRegime)
         verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
         mockVerifyAuditSoleTraderJourney(testJourneyId)
       }
+    }
 
+    "the user has no nino and no sautr" should {
+      "store the registration response" when {
+        "the business entity is successfully registered" in {
+          mockRegister(testNino, None, testRegime)(Future.successful(Registered(testSafeId)))
+          mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
+
+          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)) mustBe {
+            Registered(testSafeId)
+          }
+
+          verifyRegistration(testNino, None, testRegime)
+          verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
+          mockVerifyAuditSoleTraderJourney(testJourneyId)
+        }
+        "the business entity is not successfully registered" in {
+          mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed))
+          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
+
+          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)) mustBe {
+            RegistrationFailed
+          }
+
+          verifyRegistration(testNino, None, testRegime)
+          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
+          mockVerifyAuditSoleTraderJourney(testJourneyId)
+        }
+      }
     }
 
     "the user does not have a nino" should {
@@ -255,7 +263,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
         mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = testSautr, testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testRegime)) mustBe {
           Registered(testSafeId)
         }
 
@@ -269,7 +277,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed))
         mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = testSautr, testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testRegime)) mustBe {
           RegistrationFailed
         }
 

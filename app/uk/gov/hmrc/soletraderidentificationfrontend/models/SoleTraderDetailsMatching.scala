@@ -18,9 +18,15 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 object SoleTraderDetailsMatching {
 
+  sealed trait SoleTraderDetailsMatchResult
+
   type AuthenticatorResponse = Either[SoleTraderDetailsMatchFailure, IndividualDetails]
 
-  sealed trait SoleTraderDetailsMatchFailure
+  sealed trait SoleTraderDetailsMatchFailure extends SoleTraderDetailsMatchResult
+
+  case object SuccessfulMatch extends SoleTraderDetailsMatchResult
+
+  case object NotEnoughInformationToMatch extends SoleTraderDetailsMatchResult
 
   case object DetailsMismatch extends SoleTraderDetailsMatchFailure
 

@@ -25,7 +25,7 @@ import services.mocks.MockSoleTraderIdentificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
 import uk.gov.hmrc.soletraderidentificationfrontend.models.KnownFactsResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DeceasedCitizensDetails, DetailsMismatch, NinoNotFound}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
 import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderMatchingService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,7 +43,7 @@ class SoleTraderMatchingServiceSpec
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "matchSoleTraderDetails" should {
-    "return Right(true)" when {
+    "return SuccessfulMatch" when {
       "the provided details match those from authenticator" when {
         "the enableSautrCheck is true and the sautr matches the returned one" in {
           mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Right(testIndividualDetails)))
@@ -52,7 +52,11 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
 
-          result mustBe Right(true)
+          result mustBe SuccessfulMatch
+
+          verifyMatchSoleTraderDetails(testIndividualDetails)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
+          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
         }
 
         "the enableSautrCheck is false and the sautr is not provided" in {
@@ -62,12 +66,16 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig()))
 
-          result mustBe Right(true)
+          result mustBe SuccessfulMatch
+
+          verifyMatchSoleTraderDetails(testIndividualDetailsNoSautr)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
+          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
         }
       }
     }
 
-    "return Left(Mismatch)" when {
+    "return DetailsMismatch" when {
       "the provided details do not match those from authenticator" when {
         "the enableSautrCheck is true and the sautr is provided" in {
           mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(DetailsMismatch)))
@@ -76,7 +84,11 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
 
-          result mustBe Left(DetailsMismatch)
+          result mustBe DetailsMismatch
+
+          verifyMatchSoleTraderDetails(testIndividualDetails)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoryAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
         }
 
         "the enableSautrCheck is false and the sautr is not provided" in {
@@ -86,7 +98,11 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig()))
 
-          result mustBe Left(DetailsMismatch)
+          result mustBe DetailsMismatch
+
+          verifyMatchSoleTraderDetails(testIndividualDetailsNoSautr)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoryAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
         }
 
         "the enableSautrCheck is false and the sautr is provided" in {
@@ -96,7 +112,11 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
-          result mustBe Left(DetailsMismatch)
+          result mustBe DetailsMismatch
+
+          verifyMatchSoleTraderDetails(testIndividualDetails)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoryAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
         }
       }
 
@@ -107,7 +127,11 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
 
-        result mustBe Left(DetailsMismatch)
+        result mustBe DetailsMismatch
+
+        verifyMatchSoleTraderDetails(testIndividualDetails)
+        verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+        verifyStoryAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
       }
 
       "the user has not provided an sautr but one is returned from authenticator" in {
@@ -117,11 +141,15 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig(enableSautrCheck = true)))
 
-        result mustBe Left(DetailsMismatch)
+        result mustBe DetailsMismatch
+
+        verifyMatchSoleTraderDetails(testIndividualDetailsNoSautr)
+        verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+        verifyStoryAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
       }
     }
 
-    "return Left(NotFound)" when {
+    "return NinoNotFound" when {
       "the users details are not found by authenticator" in {
         mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(NinoNotFound)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(Future.successful(SuccessfullyStored))
@@ -129,11 +157,15 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
-        result mustBe Left(NinoNotFound)
+        result mustBe NinoNotFound
+
+        verifyMatchSoleTraderDetails(testIndividualDetails)
+        verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+        verifyStoryAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
       }
     }
 
-    "return Left(Deceased)" when {
+    "return DeceasedCitizensDetails" when {
       "the users details are not found by authenticator" in {
         mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(DeceasedCitizensDetails)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(Future.successful(SuccessfullyStored))
@@ -141,13 +173,17 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
-        result mustBe Left(DeceasedCitizensDetails)
+        result mustBe DeceasedCitizensDetails
+
+        verifyMatchSoleTraderDetails(testIndividualDetails)
+        verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+        verifyStoryAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
       }
     }
   }
 
   "matchSoleTraderDetailsNoNino" should {
-    "return Right(true)" when {
+    "return SuccessfulMatch" when {
       "the user's postcode matches the postcode returned from ES20" when {
         "the postcode's are provided in the same format" in {
           mockRetrieveSaPostcode(testJourneyId)(Future.successful(Some(testSaPostcode)))
@@ -157,7 +193,7 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-          result mustBe Right(true)
+          result mustBe SuccessfulMatch
 
           verifyRetrieveKnownFacts(testSautr)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
@@ -171,7 +207,7 @@ class SoleTraderMatchingServiceSpec
 
           val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-          result mustBe Right(true)
+          result mustBe SuccessfulMatch
 
           verifyRetrieveKnownFacts(testSautr)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
@@ -185,25 +221,25 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-        result mustBe Right(true)
+        result mustBe SuccessfulMatch
 
         verifyRetrieveKnownFacts(testSautr)
         verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
       }
     }
-    "return Right(false)" when {
+    "return NotEnoughInformationToMatch" when {
       "the user does not have an sautr" in {
         mockRetrieveSaPostcode(testJourneyId)(Future.successful(Some(testSaPostcode)))
         mockStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(Future.successful(SuccessfullyStored))
 
         val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNinoNoSautr))
 
-        result mustBe Right(false)
+        result mustBe NotEnoughInformationToMatch
 
         verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
       }
     }
-    "return Left(DetailsMismatch}" when {
+    "return DetailsMismatch" when {
       "the user's postcode does not match the postcode returned from ES20" in {
         mockRetrieveSaPostcode(testJourneyId)(Future.successful(Some(testSaPostcode)))
         mockRetrieveKnownFacts(testSautr)(Future.successful(KnownFactsResponse(Some("TF4 3ER"), None, None)))
@@ -212,7 +248,7 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-        result mustBe Left(DetailsMismatch)
+        result mustBe DetailsMismatch
 
         verifyRetrieveKnownFacts(testSautr)
         verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
@@ -225,7 +261,7 @@ class SoleTraderMatchingServiceSpec
 
         val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-        result mustBe Left(DetailsMismatch)
+        result mustBe DetailsMismatch
 
         verifyRetrieveKnownFacts(testSautr)
         verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)

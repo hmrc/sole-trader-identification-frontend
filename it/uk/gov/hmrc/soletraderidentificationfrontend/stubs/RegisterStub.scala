@@ -23,14 +23,21 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, Wire
 
 trait RegisterStub extends WireMockMethods {
 
-  def stubRegister(nino: String, sautr: String, regime: String)(status: Int, body: RegistrationStatus): StubMapping = {
-    val jsonBody = Json.obj("soleTrader" ->
-      Json.obj(
-        "nino" -> nino,
-        "sautr" -> sautr,
-        "regime" -> regime
-      )
+  def stubRegister(nino: String, optSautr: Option[String], regime: String)(status: Int, body: RegistrationStatus): StubMapping = {
+    val detailsJson = Json.obj(
+      "nino" -> nino.toUpperCase,
+      "regime" -> regime
+    ) ++ {
+      optSautr match {
+        case Some(sautr) => Json.obj("sautr" -> sautr)
+        case _ => Json.obj()
+      }
+    }
+
+    val jsonBody = Json.obj(
+      "soleTrader" -> detailsJson
     )
+
     when(method = POST, uri = "/sole-trader-identification/register", jsonBody)
       .thenReturn(
         status = status,
@@ -52,14 +59,21 @@ trait RegisterStub extends WireMockMethods {
       )
   }
 
-  def verifyRegister(nino: String, sautr: String, regime: String): Unit = {
+  def verifyRegister(nino: String, optSautr: Option[String], regime: String): Unit = {
+    val detailsJson = Json.obj(
+      "nino" -> nino.toUpperCase,
+      "regime" -> regime
+    ) ++ {
+      optSautr match {
+        case Some(sautr) => Json.obj("sautr" -> sautr)
+        case _ => Json.obj()
+      }
+    }
+
     val jsonBody = Json.obj(
-      "soleTrader" -> Json.obj(
-        "nino" -> nino,
-        "sautr" -> sautr,
-        "regime" -> regime
-      )
+      "soleTrader" -> detailsJson
     )
+
     WiremockHelper.verifyPost(uri = "/sole-trader-identification/register", optBody = Some(jsonBody.toString()))
   }
 
