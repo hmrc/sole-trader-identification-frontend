@@ -37,7 +37,7 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
     reset(mockRegistrationConnector)
   }
 
-  def mockRegister(nino: String, sautr: String, regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
+  def mockRegister(nino: String, sautr: Option[String], regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
     when(mockRegistrationConnector.registerWithNino(
       ArgumentMatchers.eq(nino),
       ArgumentMatchers.eq(sautr),
@@ -46,7 +46,7 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
     ).thenReturn(response)
   }
 
-  def verifyRegistration(nino: String, sautr: String, regime: String): Unit = {
+  def verifyRegistration(nino: String, sautr: Option[String], regime: String): Unit = {
     verify(mockRegistrationConnector).registerWithNino(
       ArgumentMatchers.eq(nino),
       ArgumentMatchers.eq(sautr),

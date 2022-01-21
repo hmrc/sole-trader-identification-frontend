@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{AuthenticatorConnector, RetrieveKnownFactsConnector}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SoleTraderDetailsMatchFailure}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NotEnoughInformationToMatch, SoleTraderDetailsMatchResult, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig, KnownFactsResponse}
 
 import javax.inject.{Inject, Singleton}
@@ -32,7 +32,7 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
   def matchSoleTraderDetails(journeyId: String,
                              individualDetails: IndividualDetails,
                              journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier,
-                                                           ec: ExecutionContext): Future[Either[SoleTraderDetailsMatchFailure, Boolean]] =
+                                                           ec: ExecutionContext): Future[SoleTraderDetailsMatchResult] =
     for {
       authenticatorResponse <- authenticatorConnector.matchSoleTraderDetails(individualDetails).map {
         case Right(authenticatorDetails) if journeyConfig.pageConfig.enableSautrCheck =>
@@ -46,49 +46,57 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
       }
       matchingResponse <- authenticatorResponse match {
         case Right(details) =>
-          soleTraderIdentificationService.storeAuthenticatorDetails(journeyId, details).map {
-            _ => Right(true)
+          soleTraderIdentificationService.storeAuthenticatorDetails(journeyId, details).flatMap {
+            _ =>
+              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = true).map {
+                _ => SuccessfulMatch
+              }
           }
         case Left(failureResponse) =>
-          soleTraderIdentificationService.storeAuthenticatorFailureResponse(journeyId, failureResponse).map {
-            _ => Left(failureResponse)
+          soleTraderIdentificationService.storeAuthenticatorFailureResponse(journeyId, failureResponse).flatMap {
+            _ =>
+              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = false).map {
+                _ => failureResponse
+              }
           }
       }
-      identifiersMatch = if (matchingResponse.isRight) true else false
-      _ <- soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch)
     } yield
       matchingResponse
 
   def matchSoleTraderDetailsNoNino(journeyId: String,
                                    individualDetails: IndividualDetails
-                                  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[SoleTraderDetailsMatchFailure, Boolean]] = {
+                                  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SoleTraderDetailsMatchResult] = {
     for {
       optUserPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
       matchingResponse <-
-        (individualDetails.optSautr, optUserPostcode) match {
-          case (Some(sautr), _) =>
-            retrieveKnownFactsConnector.retrieveKnownFacts(sautr).flatMap {
-              case KnownFacts@KnownFactsResponse(Some(retrievePostcode), _, _) if optUserPostcode.exists(userPostcode => userPostcode filterNot (_.isWhitespace) equalsIgnoreCase (retrievePostcode filterNot (_.isWhitespace))) =>
-                soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
-                  _ => Right(true)
-                )
-              case KnownFacts@KnownFactsResponse(_, Some(true), _) if optUserPostcode.isEmpty =>
-                soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
-                  _ => Right(true)
-                )
-              case KnownFacts@KnownFactsResponse(_, _, _) =>
-                soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
-                  _ => Left(DetailsMismatch)
-                )
-            }
-          case (_, _) => Future.successful(Right(false))
+        if (individualDetails.optSautr.isEmpty) {
+          Future.successful(NotEnoughInformationToMatch)
         }
-      identifiersMatch = matchingResponse match {
-        case Right(true) => true
-        case _ => false
+        else {
+          retrieveKnownFactsConnector.retrieveKnownFacts(individualDetails.optSautr.get).flatMap {
+            case KnownFacts@KnownFactsResponse(Some(retrievePostcode), _, _)
+              if optUserPostcode.exists(userPostcode => userPostcode filterNot (_.isWhitespace) equalsIgnoreCase (retrievePostcode filterNot (_.isWhitespace))) =>
+              soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
+                _ => SuccessfulMatch
+              )
+            case KnownFacts@KnownFactsResponse(_, Some(true), _) if optUserPostcode.isEmpty =>
+              soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
+                _ => SuccessfulMatch
+              )
+            case KnownFacts@KnownFactsResponse(_, _, _) =>
+              soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
+                _ => DetailsMismatch
+              )
+          }
+        }
+      _
+        <- matchingResponse match {
+        case SuccessfulMatch => soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = true)
+        case _ => soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = false)
       }
-      _ <- soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch)
-    } yield {
+    }
+
+    yield {
       matchingResponse
     }
   }

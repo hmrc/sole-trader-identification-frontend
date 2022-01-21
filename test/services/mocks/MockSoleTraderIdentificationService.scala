@@ -132,14 +132,14 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     ).thenReturn(response)
 
   def mockRetrieveES20Response(journeyId: String)
-                            (response: Future[Option[KnownFactsResponse]]): OngoingStubbing[_] =
+                              (response: Future[Option[KnownFactsResponse]]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.retrieveES20Details(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def mockRetrieveTrn(journeyId: String)
-                              (response: Future[Option[String]]): OngoingStubbing[_] =
+                     (response: Future[Option[String]]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.retrieveTrn(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
@@ -207,22 +207,10 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
       ArgumentMatchers.eq(registrationStatus)
     )(ArgumentMatchers.any[HeaderCarrier])
 
-  def verifyStoreRegistrationResponse(count: Int): Unit =
-    verify(mockSoleTraderIdentificationService, times(count)).storeRegistrationStatus(
-      ArgumentMatchers.any[String],
-      ArgumentMatchers.any[RegistrationStatus]
-    )(ArgumentMatchers.any[HeaderCarrier])
-
   def verifyStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus): Unit =
     verify(mockSoleTraderIdentificationService).storeBusinessVerificationStatus(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(businessVerificationStatus)
-    )(ArgumentMatchers.any[HeaderCarrier])
-
-  def verifyStoreBusinessVerificationStatus(count: Int): Unit =
-    verify(mockSoleTraderIdentificationService, times(count)).storeBusinessVerificationStatus(
-      ArgumentMatchers.any[String],
-      ArgumentMatchers.any[BusinessVerificationStatus]
     )(ArgumentMatchers.any[HeaderCarrier])
 
   def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean): Unit =
@@ -235,6 +223,18 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     verify(mockSoleTraderIdentificationService).storeTrn(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(trn)
+    )(ArgumentMatchers.any[HeaderCarrier])
+
+  def verifyStoreAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails): Unit =
+    verify(mockSoleTraderIdentificationService).storeAuthenticatorDetails(
+      ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(authenticatorDetails)
+    )(ArgumentMatchers.any[HeaderCarrier])
+
+  def verifyStoryAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure): Unit =
+    verify(mockSoleTraderIdentificationService).storeAuthenticatorFailureResponse(
+      ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(authenticatorFailureResponse)
     )(ArgumentMatchers.any[HeaderCarrier])
 
 }

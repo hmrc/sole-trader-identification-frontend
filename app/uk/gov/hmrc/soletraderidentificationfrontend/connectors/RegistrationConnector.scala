@@ -31,14 +31,20 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
                                       appConfig: AppConfig
                                      )(implicit ec: ExecutionContext) {
 
-  def registerWithNino(nino: String, sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+  def registerWithNino(nino: String, optSautr: Option[String], regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+
+    val detailsJson = Json.obj(
+      "nino" -> nino.toUpperCase,
+      "regime" -> regime
+    ) ++ {
+      optSautr match {
+        case Some(sautr) => Json.obj("sautr" -> sautr)
+        case _ => Json.obj()
+      }
+    }
 
     val jsonBody = Json.obj(
-      "soleTrader" -> Json.obj(
-        "nino" -> nino.toUpperCase,
-        "sautr" -> sautr,
-        "regime" -> regime
-      )
+      "soleTrader" -> detailsJson
     )
 
     httpClient.POST[JsObject, RegistrationStatus](appConfig.registerUrl, jsonBody)(
@@ -49,13 +55,13 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
     )
   }
 
-  def registerWithTrn(temporaryReferenceNumber: String, sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] ={
+  def registerWithTrn(temporaryReferenceNumber: String, sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
 
-  val jsonBody = Json.obj(
+    val jsonBody = Json.obj(
       "trn" -> temporaryReferenceNumber,
       "sautr" -> sautr,
       "regime" -> regime
-  )
+    )
 
     httpClient.POST[JsObject, RegistrationStatus](appConfig.registerWithTrnUrl, jsonBody)(
       implicitly[Writes[JsObject]],

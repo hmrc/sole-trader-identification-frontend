@@ -21,7 +21,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.IndividualDetails
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{AuthenticatorResponse, DeceasedCitizensDetails, DetailsMismatch, NinoNotFound}
 
 import java.time.LocalDate
 

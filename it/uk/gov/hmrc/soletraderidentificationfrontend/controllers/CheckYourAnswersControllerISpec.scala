@@ -324,12 +324,13 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+          stubRegister(testNino, None, testRegime)(OK, Registered(testSafeId))
+          stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetailsNoSautr))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationUnchallengedJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
+          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
 
           val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
@@ -339,7 +340,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
           verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
           verifyAudit()
@@ -879,7 +880,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
 
-          stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
+          stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
 
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
@@ -891,7 +892,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             redirectUri(testContinueUrl)
           }
 
-          verifyRegister(testNino, testSautr, testRegime)
+          verifyRegister(testNino, Some(testSautr), testRegime)
           verifyAudit()
         }
       }

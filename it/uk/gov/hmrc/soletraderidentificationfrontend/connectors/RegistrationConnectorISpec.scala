@@ -31,21 +31,30 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
   "registerWithNino" should {
     "return Registered" when {
-      "the registration has been successful" in {
-        stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
+      "the registration has been successful" when {
+        "the user has a nino and a sautr" in {
+          stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
 
-        val result = await(registrationConnector.registerWithNino(testNino, testSautr, testRegime))
+          val result = await(registrationConnector.registerWithNino(testNino, Some(testSautr), testRegime))
 
-        result mustBe Registered(testSafeId)
+          result mustBe Registered(testSafeId)
+        }
+        "the user only has a nino" in {
+          stubRegister(testNino, None, testRegime)(OK, Registered(testSafeId))
+
+          val result = await(registrationConnector.registerWithNino(testNino, None, testRegime))
+
+          result mustBe Registered(testSafeId)
+        }
       }
     }
 
     "capitalise the NINO" when {
       "it has been entered in lower case" in {
         val testLowerCaseNino = "aa111111a"
-        stubRegister(testNino, testSautr, testRegime)(OK, Registered(testSafeId))
+        stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
 
-        val result = await(registrationConnector.registerWithNino(testLowerCaseNino, testSautr, testRegime))
+        val result = await(registrationConnector.registerWithNino(testLowerCaseNino, Some(testSautr), testRegime))
 
         result mustBe Registered(testSafeId)
       }
@@ -53,9 +62,9 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        stubRegister(testNino, testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+        stubRegister(testNino, Some(testSautr), testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
 
-        val result = await(registrationConnector.registerWithNino(testNino, testSautr, testRegime))
+        val result = await(registrationConnector.registerWithNino(testNino,  Some(testSautr), testRegime))
 
         result mustBe RegistrationFailed
       }

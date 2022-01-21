@@ -21,8 +21,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testIndividualJourneyConfig, _}
-import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository.journeyConfigMongoFormat
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
