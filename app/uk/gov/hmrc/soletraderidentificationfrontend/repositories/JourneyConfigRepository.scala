@@ -24,9 +24,8 @@ import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository._
-import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm.enableSautrCheck
 
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
@@ -54,11 +53,11 @@ class JourneyConfigRepository @Inject()(reactiveMongoComponent: ReactiveMongoCom
 
   def findJourneyConfig(journeyId: String, authInternalId: String): Future[Option[JourneyConfig]] =
     collection.find(
-      Json.obj(
+      selector = Json.obj(
         JourneyIdKey -> journeyId,
         AuthInternalIdKey -> authInternalId
       ),
-      Some(Json.obj(
+      projection = Some(Json.obj(
         JourneyIdKey -> 0,
         AuthInternalIdKey -> 0
       ))
@@ -90,35 +89,6 @@ object JourneyConfigRepository {
   val JourneyIdKey = "_id"
   val AuthInternalIdKey = "authInternalId"
   val CreationTimestampKey = "creationTimestamp"
-  val BusinessEntityKey = "businessEntity"
-  val SoleTraderKey = "soleTrader"
-  val IndividualKey = "individual"
-  val ContinueUrlKey = "continueUrl"
-  val PageConfigKey = "pageConfig"
-  val BusinessVerificationCheckKey = "businessVerificationCheck"
-  val RegimeKey = "regime"
 
-  implicit val journeyConfigMongoFormat: OFormat[JourneyConfig] = new OFormat[JourneyConfig] {
-    override def reads(json: JsValue): JsResult[JourneyConfig] =
-      for {
-        continueUrl <- (json \ ContinueUrlKey).validate[String]
-        pageConfig <- (json \ PageConfigKey).validate[PageConfig]
-        businessVerificationCheck <- (json \ BusinessVerificationCheckKey).validate[Boolean]
-        regime <- (json \ RegimeKey).validateOpt[String]
-      } yield {
-        JourneyConfig(
-          continueUrl,
-          businessVerificationCheck,
-          pageConfig,
-          regime.getOrElse("VATC"))
-      }
-
-    override def writes(journeyConfig: JourneyConfig): JsObject = Json.obj(
-      ContinueUrlKey -> journeyConfig.continueUrl,
-      PageConfigKey -> journeyConfig.pageConfig,
-      BusinessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
-      RegimeKey -> journeyConfig.regime
-    )
-
-  }
+  implicit val journeyConfigMongoFormat: OFormat[JourneyConfig] = Json.format[JourneyConfig]
 }
