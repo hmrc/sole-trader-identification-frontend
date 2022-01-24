@@ -32,15 +32,19 @@
 
     @h1(messages("details-not-found-page.heading"))
 
-    @p {@messages("details-not-found-page.line_1")
-        <a class='govuk-link' href="@appConfig.ninoTeamUrl" id="ninoTeam" target="_blank">
-        @messages("details-not-found-page.link_1")</a>.
+    @p {@messages("details-not-found-page.line_1")}
+
+    @p {@messages("details-not-found-page.line_2")
+        @link(redirectLocation.url, messages("details-not-found-page.link_2"), Some("TryAgain"))
     }
 
-    @p { @messages("details-not-found-page.line_2")
-    @link(redirectLocation.url,
-          messages("details-not-found-page.link_2"),
-          Some("TryAgain"))
+    @p {@messages("details-not-found-page.line_3")}
+
+    @p {@messages("details-not-found-page.line_4.1")
+        <a class='govuk-link' href="@appConfig.ninoTeamUrl" id="ninoTeam" target="_blank">@messages("details-not-found-page.link_4")</a>
+        @messages("details-not-found-page.line_4.2")
+        <strong>@messages("details-not-found-page.line_4.3")</strong>
+        @messages("details-not-found-page.line_4.4")
     }
 
 }
