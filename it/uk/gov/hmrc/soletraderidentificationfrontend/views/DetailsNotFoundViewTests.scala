@@ -1,3 +1,18 @@
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package uk.gov.hmrc.soletraderidentificationfrontend.views
 
 import org.jsoup.Jsoup
@@ -11,6 +26,8 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.Element
 
 trait DetailsNotFoundViewTests {
   this: ComponentSpecHelper =>
+
+  val four: Int = 4
 
   def testDetailsNotFoundView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
@@ -41,16 +58,24 @@ trait DetailsNotFoundViewTests {
       doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have the correct link for contacting Nino Team" in {
-      doc.getLink(id = "ninoTeam").text mustBe messages.link_1
-    }
-
     "have the correct second line" in {
       doc.getParagraphs.get(2).text mustBe messages.line_2
     }
 
-    "have the correct link to try again" in {
+    "have the correct link text to try again" in {
       doc.getLink(id = "TryAgain").text mustBe messages.link_2
+    }
+
+    "have the correct third line" in {
+      doc.getParagraphs.get(3).text mustBe messages.line_3
+    }
+
+    "have the correct fourth line" in {
+      doc.getParagraphs.get(four).text mustBe messages.line_4
+    }
+
+    "have the correct link text for contacting Nino Team" in {
+      doc.getLink(id = "ninoTeam").text mustBe messages.link_4
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,10 +171,12 @@ object MessageLookup {
   object DetailsNotFound {
     val title = "The details you entered did not match our records"
     val heading = "The details you entered did not match our records"
-    val line_1 = "You cannot continue to register using this service. You need to contact the National Insurance team (opens in a new tab)."
-    val link_1 = "contact the National Insurance team (opens in a new tab)"
-    val line_2 = "If you entered the wrong details, you can try again using different details."
+    val line_1 = "We could not match the details you entered with records held by HMRC."
+    val line_2 = "If you used the wrong details, you can try again using different details."
     val link_2 = "try again using different details."
+    val line_3 = "If you used the correct details, you cannot continue to register using this online service."
+    val line_4 = "You need to contact the National Insurance team (opens in a new tab) and tell them there is an issue with your National Insurance number, no matter what tax regime you’re using."
+    val link_4 = "contact the National Insurance team (opens in a new tab)"
   }
 
   object CannotConfirmBusiness {

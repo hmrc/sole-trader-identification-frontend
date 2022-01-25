@@ -111,10 +111,15 @@ check-your-answers.no_tax-identifiers                       = I do not want to p
 ## Details Not Found Page
 details-not-found-page.title                                = The details you entered did not match our records
 details-not-found-page.heading                              = The details you entered did not match our records
-details-not-found-page.line_1                               = You cannot continue to register using this service. You need to
-details-not-found-page.link_1                               = contact the National Insurance team (opens in a new tab)
-details-not-found-page.line_2                               = If you entered the wrong details, you can
+details-not-found-page.line_1                               = We could not match the details you entered with records held by HMRC.
+details-not-found-page.line_2                               = If you used the wrong details, you can
 details-not-found-page.link_2                               = try again using different details.
+details-not-found-page.line_3                               = If you used the correct details, you cannot continue to register using this online service.
+details-not-found-page.line_4.1                             = You need to
+details-not-found-page.link_4                               = contact the National Insurance team (opens in a new tab)
+details-not-found-page.line_4.2                             = and
+details-not-found-page.line_4.3                             = tell them there is an issue with your National Insurance number,
+details-not-found-page.line_4.4                             = no matter what tax regime you’re using.
 
 ## Cannot Confirm Business Error Page
 cannot-confirm-business.title                               = The details you provided do not match records held by HMRC
