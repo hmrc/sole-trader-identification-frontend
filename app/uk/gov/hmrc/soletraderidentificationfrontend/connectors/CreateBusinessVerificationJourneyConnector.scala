@@ -35,6 +35,9 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                         sautr: String
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
+    val continueUri = routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+    val continueUrl = appConfig.soleTraderIdentificationFrontendBaseUrl + continueUri
+
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
@@ -43,7 +46,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
           Json.obj(
             "saUtr" -> sautr
           )),
-        "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+        "continueUrl" -> continueUrl
       )
 
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(

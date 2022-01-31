@@ -51,6 +51,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environme
   def reportAProblemNonJSUrl(serviceIdentifier: String): String =
     s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
+  lazy val soleTraderIdentificationFrontendBaseUrl: String = servicesConfig.baseUrl("sole-trader-identification-frontend")
+
   def soleTraderIdentificationUrl(journeyId: String): String = s"$backendUrl/sole-trader-identification/journey/$journeyId"
 
   lazy val createJourneyUrl: String = s"$backendUrl/sole-trader-identification/journey"
@@ -67,6 +69,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environme
   def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
 
   lazy val defaultServiceName: String = servicesConfig.getString("defaultServiceName")
+
+  lazy val businessVerificationFrontendBaseUrl: String = servicesConfig.baseUrl("business-verification-frontend")
 
   private lazy val businessVerificationUrl = servicesConfig.getString("microservice.services.business-verification.url")
 
