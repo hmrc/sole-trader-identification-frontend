@@ -55,7 +55,7 @@ class SubmissionServiceSpec
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, journeyConfigWithoutBV)(Future.successful(SuccessfulMatch))
-        mockRegisterWithoutBusinessVerification(testJourneyId, testIndividualDetails.optNino, testIndividualDetails.optSautr, testRegime)(Future.successful(Registered(testSafeId)))
+        mockRegisterWithoutBusinessVerification(testJourneyId, testIndividualDetails.optNino, testIndividualDetails.optSautr, journeyConfigWithoutBV)(Future.successful(Registered(testSafeId)))
 
         val result = await(TestService.submit(testJourneyId, journeyConfigWithoutBV))
 
@@ -69,7 +69,7 @@ class SubmissionServiceSpec
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, journeyConfigWithoutBV)(Future.successful(SuccessfulMatch))
-        mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)(Future.successful(Registered(testSafeId)))
+        mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, journeyConfigWithoutBV)(Future.successful(Registered(testSafeId)))
 
         val result = await(TestService.submit(testJourneyId, journeyConfigWithoutBV))
 
@@ -155,7 +155,7 @@ class SubmissionServiceSpec
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
           mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
           mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(Future.successful(SuccessfullyStored))
-          mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)(Future.successful(Registered(testSafeId)))
+          mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)(Future.successful(Registered(testSafeId)))
 
           val result = await(TestService.submit(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -247,7 +247,7 @@ class SubmissionServiceSpec
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)(Future.successful(SuccessfullyStored))
-        mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)(Future.successful(Registered(testSafeId)))
+        mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)(Future.successful(Registered(testSafeId)))
 
         val result = await(TestService.submit(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -255,7 +255,7 @@ class SubmissionServiceSpec
 
         verifyMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testSoleTraderJourneyConfig)
         verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationUnchallenged)
-        verifyRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)
+        verifyRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)
       }
     }
 

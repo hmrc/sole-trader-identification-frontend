@@ -70,7 +70,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                                      ec: ExecutionContext): Future[SubmissionResponse] = matchingResult match {
     case SuccessfulMatch =>
       registrationOrchestrationService
-        .registerWithoutBusinessVerification(journeyId, individualDetails.optNino, individualDetails.optSautr, journeyConfig.regime)
+        .registerWithoutBusinessVerification(journeyId, individualDetails.optNino, individualDetails.optSautr, journeyConfig)
         .map(_ => JourneyCompleted(journeyConfig.continueUrl))
 
     case NotEnoughInformationToMatch =>
@@ -105,14 +105,14 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
 
     case SuccessfulMatch => for {
       _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
-      _ <- registrationOrchestrationService.registerWithoutBusinessVerification(journeyId, individualDetails.optNino, individualDetails.optSautr, journeyConfig.regime)
+      _ <- registrationOrchestrationService.registerWithoutBusinessVerification(journeyId, individualDetails.optNino, individualDetails.optSautr, journeyConfig)
     } yield
       JourneyCompleted(journeyConfig.continueUrl)
 
     case NotEnoughInformationToMatch => for {
       _ <-
         if (individualDetails.optNino.isEmpty) createTrnService.createTrn(journeyId)
-        else Future.successful()
+        else Future.successful((): Unit)
       _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
       _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
     } yield JourneyCompleted(journeyConfig.continueUrl)

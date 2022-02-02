@@ -16,9 +16,8 @@
 
 package helpers
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsNull, JsObject, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey, BusinessVerificationUnchallengedKey}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -49,6 +48,8 @@ object TestConstants {
   val testOverseasAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), None, "US")
   val testSaPostcode: String = "AA1 1AA"
   val testOverseasIdentifiers: Overseas = Overseas("134124532", "AL")
+  val testDefaultServiceName: String = "Entity Validation Service"
+  val testServiceName: String = "Test Service"
 
   val testPassedBusinessVerificationStatusJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
@@ -59,12 +60,9 @@ object TestConstants {
   val testUnchallengedBusinessVerificationStatusJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationUnchallengedKey)
 
-  val testRegistrationStatusJson: JsObject = Json.obj(
-    registrationStatusKey -> RegisteredKey,
-    registeredBusinessPartnerIdKey -> testSafeId
-  )
-
-  val testRegistrationNotCalledJson: JsObject = Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+  val testRegistrationSuccess: String = "success"
+  val testRegistrationFailed: String  = "fail"
+  val testRegistrationNotCalled: String = "not called"
 
   val testSoleTraderDetails: SoleTraderDetails =
     SoleTraderDetails(
@@ -126,6 +124,36 @@ object TestConstants {
       optOverseas = Some(testOverseasIdentifiers)
     )
 
+  val testSoleTraderWithoutBVCheckDetails: SoleTraderDetails =
+    SoleTraderDetails(
+      fullName = testFullName,
+      dateOfBirth = testDateOfBirth,
+      optNino = Some(testNino),
+      address = None,
+      optSaPostcode = None,
+      optSautr = Some(testSautr),
+      identifiersMatch = true,
+      businessVerification = None,
+      registrationStatus = Some(Registered(testSafeId)),
+      optTrn = None,
+      optOverseas = None
+    )
+
+  val testSoleTraderDetailsRegistrationFailed: SoleTraderDetails =
+    SoleTraderDetails(
+      fullName = testFullName,
+      dateOfBirth = testDateOfBirth,
+      optNino = Some(testNino),
+      address = None,
+      optSaPostcode = None,
+      optSautr = Some(testSautr),
+      identifiersMatch = true,
+      businessVerification = Some(BusinessVerificationPass),
+      registrationStatus = Some(RegistrationFailed),
+      optTrn = None,
+      optOverseas = None
+    )
+
   val testSoleTraderDetailsNoNinoAndOverseas: SoleTraderDetails = testSoleTraderDetailsNoNinoButUtr.copy(address = Some(testOverseasAddress))
 
   val testIndividualDetails: IndividualDetails =
@@ -180,9 +208,16 @@ object TestConstants {
 
   val testSoleTraderJourneyConfig: JourneyConfig = testJourneyConfig(enableSautrCheck = true)
 
+  val testSoleTraderJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(enableSautrCheck = true,  optServiceName = Some(testServiceName))
+
+  val testSoleTraderJourneyConfigWithBVCheckDisabled: JourneyConfig = testJourneyConfig(enableSautrCheck = true, businessVerificationCheck = false)
+
   val testIndividualJourneyConfig: JourneyConfig = testJourneyConfig()
 
+  val testIndividualJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(optServiceName = Some(testServiceName))
+
   val testIndividualSuccessfulAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
     "dateOfBirth" -> testDateOfBirth,
@@ -191,11 +226,17 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr)
   )
 
-  def testJourneyConfig(enableSautrCheck: Boolean = false): JourneyConfig = JourneyConfig(
+  val testIndividualSuccessfulWithCallingServiceAuditEventJson: JsObject =
+    testIndividualSuccessfulAuditEventJson ++ Json.obj("callingService" -> testServiceName)
+
+  def testJourneyConfig(
+                         enableSautrCheck: Boolean = false,
+                         optServiceName: Option[String] = None,
+                         businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
-    businessVerificationCheck = true,
+    businessVerificationCheck = businessVerificationCheck,
     pageConfig = PageConfig(
-      optServiceName = None,
+      optServiceName = optServiceName,
       deskProServiceId = "vrs",
       signOutUrl = testSignOutUrl,
       enableSautrCheck = enableSautrCheck,
@@ -206,6 +247,7 @@ object TestConstants {
   )
 
   def testSoleTraderAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
@@ -215,10 +257,14 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> testPassedBusinessVerificationStatusJson,
-    "RegisterApiStatus" -> testRegistrationStatusJson
+    "RegisterApiStatus" -> testRegistrationSuccess
   )
 
+  def testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch: Boolean = false): JsObject =
+    testSoleTraderAuditEventJson(identifiersMatch) ++ Json.obj("callingService" -> testServiceName)
+
   def testSoleTraderAuditEventJsonNoSautr(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
@@ -227,10 +273,11 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
-    "RegisterApiStatus" -> testRegistrationNotCalledJson
+    "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
   def testSoleTraderAuditEventJsonNoNino(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
@@ -239,7 +286,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
-    "RegisterApiStatus" -> testRegistrationNotCalledJson,
+    "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseUK,
     "SAPostcode" -> testSaPostcode,
@@ -248,6 +295,7 @@ object TestConstants {
   )
 
   def testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
@@ -256,7 +304,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
-    "RegisterApiStatus" -> testRegistrationNotCalledJson,
+    "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseOverseas,
     "SAPostcode" -> testSaPostcode,
@@ -265,6 +313,7 @@ object TestConstants {
   )
 
   def testSoleTraderFailureAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
@@ -274,10 +323,39 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
     "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
-    "RegisterApiStatus" -> testRegistrationNotCalledJson
+    "RegisterApiStatus" -> testRegistrationNotCalled
+  )
+
+  def testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Sole Trader",
+    "firstName" -> testFirstName,
+    "lastName" -> testLastName,
+    "nino" -> testNino,
+    "dateOfBirth" -> testDateOfBirth,
+    "authenticatorResponse" -> Json.toJson(testIndividualDetails),
+    "userSAUTR" -> testSautr,
+    "sautrMatch" -> identifiersMatch,
+    "VerificationStatus" -> JsNull,
+    "RegisterApiStatus" -> testRegistrationSuccess
+  )
+
+  def testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Sole Trader",
+    "firstName" -> testFirstName,
+    "lastName" -> testLastName,
+    "nino" -> testNino,
+    "dateOfBirth" -> testDateOfBirth,
+    "authenticatorResponse" -> Json.toJson(testIndividualDetails),
+    "userSAUTR" -> testSautr,
+    "sautrMatch" -> identifiersMatch,
+    "VerificationStatus" -> testPassedBusinessVerificationStatusJson,
+    "RegisterApiStatus" -> testRegistrationFailed
   )
 
   val testIndividualFailureAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
     "dateOfBirth" -> testDateOfBirth,

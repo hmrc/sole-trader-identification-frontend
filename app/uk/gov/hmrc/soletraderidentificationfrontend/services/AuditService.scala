@@ -16,73 +16,31 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, JsObject}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.IndividualDetails
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, Registered, RegistrationFailed, RegistrationNotCalled}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject()(auditConnector: AuditConnector, soleTraderIdentificationService: SoleTraderIdentificationService) {
+class AuditService @Inject()(appConfig: AppConfig,
+                             auditConnector: AuditConnector,
+                             soleTraderIdentificationService: SoleTraderIdentificationService) {
 
-  def auditIndividualJourney(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-    for {
-      optFullName <- soleTraderIdentificationService.retrieveFullName(journeyId)
-      optDateOfBirth <- soleTraderIdentificationService.retrieveDateOfBirth(journeyId)
-      optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
-      optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
-      optAuthenticatorResponse <-
-        optIdentifiersMatch match {
-          case Some(true) =>
-            soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
-          case Some(_) if optNino.isEmpty => Future.successful(None)
-          case _ =>
-            soleTraderIdentificationService.retrieveAuthenticatorFailureResponse(journeyId)
-        }
-    } yield {
-      (optFullName, optDateOfBirth, optNino, optIdentifiersMatch, optAuthenticatorResponse) match {
-        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), Some(authenticatorDetails: IndividualDetails)) =>
-          Json.obj(
-            "firstName" -> fullName.firstName,
-            "lastName" -> fullName.lastName,
-            "nino" -> nino,
-            "dateOfBirth" -> dateOfBirth,
-            "identifiersMatch" -> identifiersMatch,
-            "authenticatorResponse" -> Json.toJson(authenticatorDetails)
-          )
-        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), Some(authenticatorFailureResponse: String)) =>
-          Json.obj(
-            "firstName" -> fullName.firstName,
-            "lastName" -> fullName.lastName,
-            "nino" -> nino,
-            "dateOfBirth" -> dateOfBirth,
-            "identifiersMatch" -> identifiersMatch,
-            "authenticatorResponse" -> authenticatorFailureResponse
-          )
-        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), None) =>
-          Json.obj(
-            "firstName" -> fullName.firstName,
-            "lastName" -> fullName.lastName,
-            "nino" -> nino,
-            "dateOfBirth" -> dateOfBirth,
-            "identifiersMatch" -> identifiersMatch
-          )
-        case _ =>
-          throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
-      }
-    }
-  }.map {
-    auditJson =>
-      auditConnector.sendExplicitAudit(
-        auditType = "IndividualIdentification",
-        detail = auditJson
-      )
-  }
+  def auditJourney(journeyId: String, journeyConfig: JourneyConfig)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = if(journeyConfig.pageConfig.enableSautrCheck)
+    auditSoleTraderJourney(journeyId, journeyConfig)
+  else
+    auditIndividualJourney(journeyId, journeyConfig)
 
-  def auditSoleTraderJourney(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-    for {
+  private def auditSoleTraderJourney(journeyId: String, journeyConfig: JourneyConfig)
+                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+
+    val soleTraderAudit: Future[JsObject] = for {
       optSoleTraderRecord <- soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId)
       optES20Response <- soleTraderIdentificationService.retrieveES20Details(journeyId)
       optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
@@ -97,6 +55,19 @@ class AuditService @Inject()(auditConnector: AuditConnector, soleTraderIdentific
     } yield {
       (optSoleTraderRecord, optES20Response, optIdentifiersMatch, optAuthenticatorResponse) match {
         case (Some(optSoleTraderRecord), optES20Response, Some(identifiersMatch), optAuthenticatorResponse) =>
+
+          val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+
+          val registrationStatusBlock =
+            optSoleTraderRecord.registrationStatus match {
+              case Some(registrationStatus) => registrationStatus match {
+                case Registered(_) => Json.obj("RegisterApiStatus" -> "success")
+                case RegistrationFailed => Json.obj("RegisterApiStatus" -> "fail")
+                case RegistrationNotCalled => Json.obj("RegisterApiStatus" -> "not called")
+              }
+              case _ => Json.obj()
+            }
+
           val sautrBlock =
             optSoleTraderRecord.optSautr match {
               case Some(sautr) => Json.obj("userSAUTR" -> sautr)
@@ -149,23 +120,81 @@ class AuditService @Inject()(auditConnector: AuditConnector, soleTraderIdentific
             }
 
           Json.obj(
+            "callingService" -> callingService,
             "businessType" -> "Sole Trader",
             "firstName" -> optSoleTraderRecord.fullName.firstName,
             "lastName" -> optSoleTraderRecord.fullName.lastName,
             "dateOfBirth" -> optSoleTraderRecord.dateOfBirth,
             "sautrMatch" -> identifiersMatch,
-            "VerificationStatus" -> optSoleTraderRecord.businessVerification,
-            "RegisterApiStatus" -> optSoleTraderRecord.registrationStatus
-          ) ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
+            "VerificationStatus" -> optSoleTraderRecord.businessVerification
+          ) ++ registrationStatusBlock ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit sole trader journey for Journey ID $journeyId")
       }
     }
-  }.map {
-    auditJson =>
-      auditConnector.sendExplicitAudit(
-        auditType = "SoleTraderRegistration",
-        detail = auditJson
-      )
+
+    soleTraderAudit.map {
+      soleTraderAuditJson => auditConnector.sendExplicitAudit(auditType = "SoleTraderRegistration", detail = soleTraderAuditJson)
+    }
   }
+
+  private def auditIndividualJourney(journeyId: String, journeyConfig: JourneyConfig)
+                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+
+    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+
+    val individualAudit: Future[JsObject] = for {
+      optFullName <- soleTraderIdentificationService.retrieveFullName(journeyId)
+      optDateOfBirth <- soleTraderIdentificationService.retrieveDateOfBirth(journeyId)
+      optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
+      optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
+      optAuthenticatorResponse <-
+        optIdentifiersMatch match {
+          case Some(true) =>
+            soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
+          case Some(_) if optNino.isEmpty => Future.successful(None)
+          case _ =>
+            soleTraderIdentificationService.retrieveAuthenticatorFailureResponse(journeyId)
+        }
+    } yield {
+      (optFullName, optDateOfBirth, optNino, optIdentifiersMatch, optAuthenticatorResponse) match {
+        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), Some(authenticatorDetails: IndividualDetails)) =>
+          Json.obj(
+            "callingService" -> callingService,
+            "firstName" -> fullName.firstName,
+            "lastName" -> fullName.lastName,
+            "nino" -> nino,
+            "dateOfBirth" -> dateOfBirth,
+            "identifiersMatch" -> identifiersMatch,
+            "authenticatorResponse" -> Json.toJson(authenticatorDetails)
+          )
+        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), Some(authenticatorFailureResponse: String)) =>
+          Json.obj(
+            "callingService" -> callingService,
+            "firstName" -> fullName.firstName,
+            "lastName" -> fullName.lastName,
+            "nino" -> nino,
+            "dateOfBirth" -> dateOfBirth,
+            "identifiersMatch" -> identifiersMatch,
+            "authenticatorResponse" -> authenticatorFailureResponse
+          )
+        case (Some(fullName), Some(dateOfBirth), Some(nino), Some(identifiersMatch), None) =>
+          Json.obj(
+            "callingService" -> callingService,
+            "firstName" -> fullName.firstName,
+            "lastName" -> fullName.lastName,
+            "nino" -> nino,
+            "dateOfBirth" -> dateOfBirth,
+            "identifiersMatch" -> identifiersMatch
+          )
+        case _ =>
+          throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
+      }
+    }
+
+    individualAudit.map{
+      individualAuditJson => auditConnector.sendExplicitAudit(auditType = "IndividualIdentification", detail = individualAuditJson)
+    }
+  }
+
 }

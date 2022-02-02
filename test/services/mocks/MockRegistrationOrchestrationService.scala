@@ -22,7 +22,7 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, RegistrationStatus}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.RegistrationOrchestrationService
 
 import scala.concurrent.Future
@@ -32,22 +32,22 @@ trait MockRegistrationOrchestrationService extends MockitoSugar with BeforeAndAf
 
   val mockRegistrationOrchestrationService: RegistrationOrchestrationService = mock[RegistrationOrchestrationService]
 
-  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], regime: String)
+  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], journeyConfig: JourneyConfig)
                                              (response: Future[RegistrationStatus]): OngoingStubbing[_] =
     when(mockRegistrationOrchestrationService.registerWithoutBusinessVerification(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(optNino),
       ArgumentMatchers.eq(optSautr),
-      ArgumentMatchers.eq(regime)
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], regime: String): Unit =
+  def verifyRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], journeyConfig: JourneyConfig): Unit =
     verify(mockRegistrationOrchestrationService).registerWithoutBusinessVerification(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(optNino),
       ArgumentMatchers.eq(optSautr),
-      ArgumentMatchers.eq(regime)
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
 
   override protected def beforeEach(): Unit = {
