@@ -56,7 +56,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             Registered(testSafeId)
           }
           verifyRegistration(testNino, Some(testSautr), testRegime)
@@ -70,7 +70,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationFailed
           }
           verifyRegistration(testNino, Some(testSautr), testRegime)
@@ -84,7 +84,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             Registered(testSafeId)
           }
           verifyRegistration(testNino, Some(testSautr), testRegime)
@@ -99,7 +99,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationFail)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationNotCalled
           }
           verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
@@ -111,7 +111,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationUnchallenged)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationNotCalled
           }
           verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
@@ -125,7 +125,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(None))
 
           intercept[InternalServerException](
-            await(TestService.register(testJourneyId, testRegime))
+            await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
           )
         }
 
@@ -135,7 +135,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(None))
 
           intercept[InternalServerException](
-            await(TestService.register(testJourneyId, testRegime))
+            await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
           )
         }
       }
@@ -150,7 +150,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             Registered(testSafeId)
           }
           verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
@@ -165,7 +165,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationFailed
           }
           verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
@@ -179,7 +179,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationFail)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationNotCalled
           }
           verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
@@ -191,7 +191,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationUnchallenged)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
-          await(TestService.register(testJourneyId, testRegime)) mustBe {
+          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
             RegistrationNotCalled
           }
           verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
@@ -204,7 +204,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(None))
 
           intercept[InternalServerException](
-            await(TestService.register(testJourneyId, testRegime))
+            await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
           )
         }
       }
@@ -218,13 +218,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(Registered(testSafeId)))
         mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), Some(testSautr), testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), Some(testSautr), testSoleTraderJourneyConfig)) mustBe {
           Registered(testSafeId)
         }
 
         verifyRegistration(testNino, Some(testSautr), testRegime)
         verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-        mockVerifyAuditSoleTraderJourney(testJourneyId)
+        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
       }
     }
 
@@ -234,25 +234,25 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, None, testRegime)(Future.successful(Registered(testSafeId)))
           mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)) mustBe {
+          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)) mustBe {
             Registered(testSafeId)
           }
 
           verifyRegistration(testNino, None, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-          mockVerifyAuditSoleTraderJourney(testJourneyId)
+          mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
         }
         "the business entity is not successfully registered" in {
           mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
-          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testRegime)) mustBe {
+          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)) mustBe {
             RegistrationFailed
           }
 
           verifyRegistration(testNino, None, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
-          mockVerifyAuditSoleTraderJourney(testJourneyId)
+          mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
         }
       }
     }
@@ -263,13 +263,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
         mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)) mustBe {
           Registered(testSafeId)
         }
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
         verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-        mockVerifyAuditSoleTraderJourney(testJourneyId)
+        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
       }
 
       "return RegistrationFailed if fails to register with Trn" in {
@@ -277,13 +277,13 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed))
         mockStoreRegistrationResponse(testJourneyId, RegistrationFailed)(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testRegime)) mustBe {
+        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)) mustBe {
           RegistrationFailed
         }
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
         verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
-        mockVerifyAuditSoleTraderJourney(testJourneyId)
+        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
       }
     }
 

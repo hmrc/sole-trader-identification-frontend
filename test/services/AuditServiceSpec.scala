@@ -20,18 +20,22 @@ import connectors.mocks.MockAuditConnector
 import helpers.TestConstants._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Helpers._
 import services.mocks.MockSoleTraderIdentificationService
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
 import uk.gov.hmrc.soletraderidentificationfrontend.services.AuditService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector with MockSoleTraderIdentificationService {
+class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector with MockSoleTraderIdentificationService with GuiceOneAppPerSuite {
 
-  object TestService extends AuditService(mockAuditConnector, mockSoleTraderIdentificationService)
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+
+  object TestService extends AuditService(appConfig, mockAuditConnector, mockSoleTraderIdentificationService)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -44,12 +48,27 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
 
-        val result: Unit = await(TestService.auditIndividualJourney(testJourneyId))
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
 
-        result mustBe()
+        result mustBe a[Unit]
 
         verifySendExplicitAuditIndividuals()
         auditEventCaptor.getValue mustBe testIndividualSuccessfulAuditEventJson
+      }
+
+      "the entity is an individual, identifiers match and the journey config defines a calling service" in {
+        mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
+        mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
+        mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
+        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+        mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
+
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfigWithCallingService))
+
+        result mustBe a[Unit]
+
+        verifySendExplicitAuditIndividuals()
+        auditEventCaptor.getValue mustBe testIndividualSuccessfulWithCallingServiceAuditEventJson
       }
 
       "the entity is an individual and identifiers do not match" in {
@@ -59,9 +78,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
 
-        val result: Unit = await(TestService.auditIndividualJourney(testJourneyId))
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
 
-        result mustBe()
+        result mustBe a[Unit]
 
         verifySendExplicitAuditIndividuals()
         auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson
@@ -73,7 +92,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveFullName(testJourneyId)(Future.failed(new InternalServerException("failed")))
 
         intercept[InternalServerException](
-          await(TestService.auditIndividualJourney(testJourneyId))
+          await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
         )
       }
     }
@@ -89,12 +108,54 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
 
-          val result: Unit = await(TestService.auditSoleTraderJourney(testJourneyId))
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
-          result mustBe()
+          result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson(identifiersMatch = true)
+        }
+        "there is an sautr and the journey config defines a calling service" in {
+          mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails)))
+          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
+          mockRetrieveES20Response(testJourneyId)(Future.successful(None))
+
+
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfigWithCallingService))
+
+          result mustBe a[Unit]
+
+          verifySendExplicitAuditSoleTraders()
+          auditEventCaptor.getValue mustBe testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch = true)
+        }
+        "there is an sa utr and the journey config has disabled business verification" in {
+          mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderWithoutBVCheckDetails)))
+          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
+          mockRetrieveES20Response(testJourneyId)(Future.successful(None))
+
+
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfigWithBVCheckDisabled))
+
+          result mustBe a[Unit]
+
+          verifySendExplicitAuditSoleTraders()
+          auditEventCaptor.getValue mustBe testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch = true)
+        }
+        "there is an sautr but registration fails" in {
+          mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsRegistrationFailed)))
+          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
+          mockRetrieveES20Response(testJourneyId)(Future.successful(None))
+
+
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
+
+          result mustBe a[Unit]
+
+          verifySendExplicitAuditSoleTraders()
+          auditEventCaptor.getValue mustBe testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch = true)
         }
         "there is not an sautr" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoSautr)))
@@ -102,9 +163,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
-          val result: Unit = await(TestService.auditSoleTraderJourney(testJourneyId))
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
-          result mustBe()
+          result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoSautr(true)
@@ -115,9 +176,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(Some(testKnownFactsResponseUK)))
 
-          val result: Unit = await(TestService.auditSoleTraderJourney(testJourneyId))
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
-          result mustBe()
+          result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNino(identifiersMatch = true)
@@ -129,9 +190,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
         mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
-        val result: Unit = await(TestService.auditSoleTraderJourney(testJourneyId))
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
-        result mustBe()
+        result mustBe a[Unit]
 
         verifySendExplicitAuditSoleTraders()
         auditEventCaptor.getValue mustBe testSoleTraderFailureAuditEventJson()
@@ -143,9 +204,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveES20Response(testJourneyId)(Future.successful(Some(testKnownFactsResponseOverseas)))
 
 
-        val result: Unit = await(TestService.auditSoleTraderJourney(testJourneyId))
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
-        result mustBe()
+        result mustBe a[Unit]
 
         verifySendExplicitAuditSoleTraders()
         auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch = true)
@@ -157,7 +218,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveSoleTraderDetails(testJourneyId)(Future.failed(new InternalServerException("failed")))
 
         intercept[InternalServerException](
-          await(TestService.auditSoleTraderJourney(testJourneyId))
+          await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
         )
       }
     }

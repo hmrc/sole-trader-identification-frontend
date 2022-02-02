@@ -22,6 +22,7 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.services.AuditService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,15 +37,17 @@ trait MockAuditService extends MockitoSugar with BeforeAndAfterEach {
     reset(mockAuditService)
   }
 
-  def mockAuditIndividualJourney(journeyId: String): OngoingStubbing[_] =
-    when(mockAuditService.auditIndividualJourney(
-      ArgumentMatchers.eq(journeyId)
+  def mockAuditJourney(journeyId: String, journeyConfig: JourneyConfig): OngoingStubbing[_] =
+    when(mockAuditService.auditJourney(
+      ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier],ArgumentMatchers.any[ExecutionContext])
     ).thenReturn(Future.successful(()))
 
-  def mockVerifyAuditSoleTraderJourney(journeyId: String): Unit =
-    verify(mockAuditService).auditSoleTraderJourney(
-      ArgumentMatchers.eq(journeyId)
+  def mockVerifyAuditJourney(journeyId: String, journeyConfig: JourneyConfig): Unit =
+    verify(mockAuditService).auditJourney(
+      ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier],ArgumentMatchers.any[ExecutionContext])
 
 }

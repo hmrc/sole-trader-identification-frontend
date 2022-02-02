@@ -43,7 +43,7 @@ class BusinessVerificationController @Inject()(mcc: MessagesControllerComponents
               journeyConfig <- journeyService.getJourneyConfig(journeyId)
               verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
               _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
-              _ <- registrationOrchestrationService.register(journeyId, journeyConfig.regime)
+              _ <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
             } yield {
               SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
             }

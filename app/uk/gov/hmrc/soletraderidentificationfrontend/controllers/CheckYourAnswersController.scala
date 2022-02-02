@@ -53,7 +53,8 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
           optAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
           optSaPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
           optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifiers(journeyId)
-          summaryRows = rowBuilder.buildSummaryListRows(journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, journeyConfig.pageConfig.enableSautrCheck)
+          summaryRows = rowBuilder.buildSummaryListRows(
+            journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, journeyConfig.pageConfig.enableSautrCheck)
         } yield Ok(view(
           pageConfig = journeyConfig.pageConfig,
           formAction = routes.CheckYourAnswersController.submit(journeyId),
@@ -71,20 +72,16 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
               case StartBusinessVerification(businessVerificationUrl) =>
                 Redirect(businessVerificationUrl)
               case JourneyCompleted(continueUrl) =>
-                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
-                else auditService.auditIndividualJourney(journeyId)
+                auditService.auditJourney(journeyId, journeyConfig)
                 Redirect(continueUrl + s"?journeyId=$journeyId")
               case SoleTraderDetailsMismatch(NinoNotFound) =>
-                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
-                else auditService.auditIndividualJourney(journeyId)
+                auditService.auditJourney(journeyId, journeyConfig)
                 Redirect(routes.DetailsNotFoundController.show(journeyId))
               case SoleTraderDetailsMismatch(_) =>
-                if (journeyConfig.pageConfig.enableSautrCheck) auditService.auditSoleTraderJourney(journeyId)
-                else auditService.auditIndividualJourney(journeyId)
+                auditService.auditJourney(journeyId, journeyConfig)
                 Redirect(routes.CannotConfirmBusinessErrorController.show(journeyId))
             }
         }
       }
   }
-
 }
