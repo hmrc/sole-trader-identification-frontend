@@ -24,7 +24,8 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
 trait BusinessVerificationStub extends WireMockMethods {
 
   def stubCreateBusinessVerificationJourney(sautr: String,
-                                            journeyId: String
+                                            journeyId: String,
+                                            accessibilityUrl: String
                                            )(status: Int,
                                              body: JsObject = Json.obj()): StubMapping = {
 
@@ -35,7 +36,8 @@ trait BusinessVerificationStub extends WireMockMethods {
           "saUtr" -> sautr
         )
       ),
-      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "accessibilityStatementUrl" -> accessibilityUrl
     )
 
     when(method = POST, uri = "/business-verification/journey", postBody)
@@ -55,7 +57,8 @@ trait BusinessVerificationStub extends WireMockMethods {
       )
 
   def stubCreateBusinessVerificationJourneyFromStub(sautr: String,
-                                                    journeyId: String
+                                                    journeyId: String,
+                                                    accessibilityUrl: String
                                                    )(status: Int,
                                                      body: JsObject = Json.obj()): StubMapping = {
 
@@ -66,7 +69,9 @@ trait BusinessVerificationStub extends WireMockMethods {
           "saUtr" -> sautr
         )
       ),
-      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "accessibilityStatementUrl" -> accessibilityUrl
+
     )
 
     when(method = POST, uri = "/identify-your-sole-trader-business/test-only/business-verification/journey", postBody)

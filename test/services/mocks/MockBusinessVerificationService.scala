@@ -38,11 +38,13 @@ trait MockBusinessVerificationService extends MockitoSugar with BeforeAndAfterEa
   }
 
   def mockCreateBusinessVerificationJourney(journeyId: String,
-                                            sautr: String
+                                            sautr: String,
+                                            accessibilityUrl: String
                                            )(response: Future[BusinessVerificationJourneyCreationResponse]): OngoingStubbing[_] =
     when(mockBusinessVerificationService.createBusinessVerificationJourney(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(sautr)
+      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(accessibilityUrl),
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

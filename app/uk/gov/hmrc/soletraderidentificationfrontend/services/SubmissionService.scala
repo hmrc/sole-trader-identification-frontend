@@ -94,7 +94,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                                 (implicit hc: HeaderCarrier,
                                                  ec: ExecutionContext): Future[SubmissionResponse] = matchingResult match {
     case SuccessfulMatch if individualDetails.optSautr.nonEmpty =>
-      businessVerificationService.createBusinessVerificationJourney(journeyId, individualDetails.optSautr.getOrElse(throwASaUtrNotDefinedException)).flatMap {
+      businessVerificationService.createBusinessVerificationJourney(journeyId, individualDetails.optSautr.getOrElse(throwASaUtrNotDefinedException), journeyConfig.pageConfig.accessibilityUrl).flatMap {
         case Right(BusinessVerificationJourneyCreated(businessVerificationUrl)) =>
           Future.successful(StartBusinessVerification(businessVerificationUrl))
         case _ =>
