@@ -20,7 +20,7 @@ import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
 import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testContinueUrl, testJourneyId, testSautr}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testAccessibilityUrl, testContinueUrl, testJourneyId, testSautr}
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.BusinessVerificationStub
@@ -37,9 +37,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -48,17 +48,17 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Left(NotEnoughEvidence)
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Left(UserLockedOut)
         }
@@ -68,9 +68,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -79,17 +79,17 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Left(NotEnoughEvidence)
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl))
 
           result mustBe Left(UserLockedOut)
         }

@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, Int
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +33,8 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                                           )(implicit ec: ExecutionContext) {
 
   def createBusinessVerificationJourney(journeyId: String,
-                                        sautr: String
+                                        sautr: String,
+                                        accessibilityUrl: String
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
     val jsonBody: JsObject =
@@ -43,7 +45,8 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
           Json.obj(
             "saUtr" -> sautr
           )),
-        "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url
+        "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+        "accessibilityStatementUrl" -> accessibilityUrl
       )
 
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
