@@ -37,6 +37,22 @@ class StubAuthenticatorMatchController @Inject()(controllerComponents: Controlle
           Unauthorized(Json.obj("errors" -> "CID returned no record"))
         case "deceased" =>
           FailedDependency
+        case "ppt-a" =>
+          Ok(Json.obj(
+            "firstName" -> authenticatorDetails.firstName,
+            "lastName" -> authenticatorDetails.lastName,
+            "dateOfBirth" -> authenticatorDetails.dateOfBirth,
+            "nino" -> authenticatorDetails.optNino,
+            "saUtr" -> "1875540988"
+          ))
+        case "ppt-b" =>
+          Ok(Json.obj(
+            "firstName" -> authenticatorDetails.firstName,
+            "lastName" -> authenticatorDetails.lastName,
+            "dateOfBirth" -> authenticatorDetails.dateOfBirth,
+            "nino" -> authenticatorDetails.optNino,
+            "saUtr" -> "1875540987"
+          ))
         case "no-sautr" =>
           Ok(Json.obj(
             "firstName" -> authenticatorDetails.firstName,
