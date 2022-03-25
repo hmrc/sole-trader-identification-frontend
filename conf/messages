@@ -9,6 +9,7 @@ base.change                                                 = Change
 base.confirm_and_continue                                   = Confirm and continue
 base.continue                                               = Continue
 base.back                                                   = Back
+base.try_again                                              = Try again
 date.day                                                    = Day
 date.month                                                  = Month
 date.year                                                   = Year
@@ -126,6 +127,11 @@ cannot-confirm-business.title                               = The details you pr
 cannot-confirm-business.heading                             = The details you provided do not match records held by HMRC
 cannot-confirm-business.line_1                              = If these details are correct, you can still register. If you entered the wrong details, go back and make changes.
 cannot-confirm-business.radio                               = Do you want to continue registering with the details you provided?
+
+## Could not confirm business error page
+could-not-confirm-business.title                            = We could not confirm your business
+could-not-confirm-business.heading                          = We could not confirm your business
+could-not-confirm-business.line_1                           = The information you provided does not match the details we have about your business.
 
 ## Errors
 error.no_entry_first_name                                   = Enter your first name

@@ -42,6 +42,8 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     verify(getRequestedFor(urlEqualTo(uri)))
   }
 
+  def verifyDelete(uri: String): Unit = verify(deleteRequestedFor(urlEqualTo(uri)))
+
   def stubGet(url: String, status: Integer, body: String): StubMapping =
     stubFor(get(urlMatching(url))
       .willReturn(

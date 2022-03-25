@@ -29,6 +29,7 @@ object MessageLookup {
     val yes = "Yes"
     val no = "No"
     val back = "Back"
+    val try_again = "Try again"
 
     val technicalDifficultiesTitle = "Sorry, we are experiencing technical difficulties - 500"
     val technicalDifficultiesHeading = "Sorry, we’re experiencing technical difficulties"
@@ -189,6 +190,12 @@ object MessageLookup {
       val no_selection = "Select yes if you want to continue registering with the details you provided"
     }
 
+  }
+
+  object CouldNotConfirmBusiness {
+    val title = "We could not confirm your business"
+    val heading = "We could not confirm your business"
+    val line_1 = "The information you provided does not match the details we have about your business."
   }
 
   object CheckYourAnswers {

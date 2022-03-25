@@ -34,7 +34,10 @@ GET         /:journeyId/cannot-confirm-business          uk.gov.hmrc.soletraderi
 POST        /:journeyId/cannot-confirm-business          uk.gov.hmrc.soletraderidentificationfrontend.controllers.CannotConfirmBusinessErrorController.submit(journeyId: String)
 
 GET         /:journeyId/details-not-found                uk.gov.hmrc.soletraderidentificationfrontend.controllers.DetailsNotFoundController.show(journeyId: String)
-GET         /:journeyId/try-again                        uk.gov.hmrc.soletraderidentificationfrontend.controllers.DetailsNotFoundController.tryAgain(journeyId: String)
+
+GET         /:journeyId/could-not-confirm-business       uk.gov.hmrc.soletraderidentificationfrontend.controllers.CouldNotConfirmBusinessErrorController.show(journeyId: String)
+
+GET         /:journeyId/try-again                        uk.gov.hmrc.soletraderidentificationfrontend.controllers.RetryJourneyController.tryAgain(journeyId: String)
 
 GET         /:journeyId/business-verification-result     uk.gov.hmrc.soletraderidentificationfrontend.controllers.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId)
 

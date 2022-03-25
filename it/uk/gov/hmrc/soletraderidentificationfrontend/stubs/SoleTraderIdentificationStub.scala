@@ -358,4 +358,7 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       optBody = Some(Json.toJsObject(es20Details).toString())
     )
 
+  def verifyRemoveAllData(journeyId: String) =
+    WiremockHelper.verifyDelete(uri = s"/sole-trader-identification/journey/$journeyId")
+
 }

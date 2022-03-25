@@ -363,4 +363,9 @@ object TestConstants {
     )
   )
 
+  val signInRedirectUrl: (String, String) => String = (journeyId, currentPageUrl) =>
+    "/bas-gateway/sign-in" +
+      s"?continue_url=%2Fidentify-your-sole-trader-business%2F$journeyId%2F$currentPageUrl" +
+      "&origin=sole-trader-identification-frontend"
+
 }
