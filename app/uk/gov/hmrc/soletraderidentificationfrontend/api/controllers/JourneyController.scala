@@ -25,6 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetails.jsonWriterForCallingServices
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 
@@ -126,7 +127,8 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
     implicit req =>
       authorised() {
         soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId).map {
-          case Some(journeyData) => Ok(Json.toJson(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
+          case Some(journeyData) =>
+            Ok(Json.toJson(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase)))(jsonWriterForCallingServices))
           case None => NotFound
         }
       }

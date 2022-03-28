@@ -24,7 +24,6 @@ object CannotConfirmBusinessErrorForm {
 
   val cannotConfirmBusinessForm: Form[Boolean] = Form(
     "yes_no" -> of(yesNoMapping("error.no_selection"))
-
   )
 }
 

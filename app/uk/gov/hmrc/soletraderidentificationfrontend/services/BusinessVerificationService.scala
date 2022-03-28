@@ -39,7 +39,7 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
       case success@Right(BusinessVerificationJourneyCreated(_)) =>
         Future.successful(success)
       case Left(NotEnoughEvidence) =>
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged).map {
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map {
           _ => Left(NotEnoughEvidence)
         }
       case Left(UserLockedOut) =>

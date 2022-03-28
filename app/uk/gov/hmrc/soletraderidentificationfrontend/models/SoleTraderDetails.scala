@@ -18,6 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
 
 import java.time.LocalDate
 
@@ -76,5 +77,22 @@ object SoleTraderDetails {
     ) (unlift(SoleTraderDetails.unapply))
 
   implicit val format: OFormat[SoleTraderDetails] = OFormat(reads, writes)
+
+  val jsonWriterForCallingServices: Writes[SoleTraderDetails] = (soleTraderDetails: SoleTraderDetails) =>
+    format.writes(soleTraderDetails) ++ {
+      soleTraderDetails.businessVerification
+        .map(businessVerification => {
+          val businessVerificationStatusForCallingServices: String = businessVerification match {
+            case BusinessVerificationNotEnoughInformationToCallBV |
+                 BusinessVerificationNotEnoughInformationToChallenge |
+                 BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
+            case BusinessVerificationPass => BusinessVerificationPassKey
+            case BusinessVerificationFail => BusinessVerificationFailKey
+            case SaEnrolled => BusinessVerificationSaEnrolledKey
+          }
+          Json.obj(BusinessVerificationKey -> Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusForCallingServices))
+        })
+        .getOrElse(Json.obj())
+    }
 
 }

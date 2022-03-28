@@ -104,7 +104,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
       }
 
     case SuccessfulMatch => for {
-      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
+      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
       _ <- registrationOrchestrationService.registerWithoutBusinessVerification(journeyId, individualDetails.optNino, individualDetails.optSautr, journeyConfig)
     } yield
       JourneyCompleted(journeyConfig.continueUrl)
@@ -113,12 +113,12 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
       _ <-
         if (individualDetails.optNino.isEmpty) createTrnService.createTrn(journeyId)
         else Future.successful((): Unit)
-      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
+      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
       _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
     } yield JourneyCompleted(journeyConfig.continueUrl)
 
     case failure: SoleTraderDetailsMatchFailure => for {
-      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationUnchallenged)
+      _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
       _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
     } yield
       SoleTraderDetailsMismatch(failure)
