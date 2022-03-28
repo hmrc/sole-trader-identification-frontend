@@ -106,9 +106,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         }
 
         "the business entity was not challenged to verify" in {
-          mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
-          mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
-          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationUnchallenged)))
+          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationNotEnoughInformationToCallBV)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
           await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
@@ -188,7 +186,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         "the business entity was not challenged to verify" in {
           mockRetrieveNino(testJourneyId)(Future.successful(None))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
-          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationUnchallenged)))
+          mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationNotEnoughInformationToCallBV)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
           await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {

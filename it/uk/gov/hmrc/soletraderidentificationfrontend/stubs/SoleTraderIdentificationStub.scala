@@ -152,7 +152,6 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       body = body
     )
 
-
   def stubRetrieveFullName(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/journey/$journeyId/fullName"
@@ -192,7 +191,6 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       status = status,
       body = JsString(body)
     )
-
 
   def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
     when(method = GET,

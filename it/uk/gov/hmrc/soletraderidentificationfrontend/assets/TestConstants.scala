@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey, BusinessVerificationUnchallengedKey}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallBVKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey, BusinessVerificationUnchallengedKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationFailedKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -61,6 +61,8 @@ object TestConstants {
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
   val testBusinessVerificationUnchallengedJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationUnchallengedKey)
+  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
+  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
 
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
     registrationStatusKey -> RegisteredKey,
@@ -209,7 +211,7 @@ object TestConstants {
     )
   }
 
-  val testSoleTraderDetailsJsonMisMatch: JsObject = {
+  def testSoleTraderDetailsJsonMisMatch(bvStatus: JsObject): JsObject = {
     Json.obj("fullName" -> Json.obj(
       "firstName" -> testFirstName,
       "lastName" -> testLastName
@@ -219,7 +221,7 @@ object TestConstants {
       "saPostcode" -> testSaPostcode,
       "sautr" -> testSautr,
       "identifiersMatch" -> false,
-      "businessVerification" -> testBusinessVerificationUnchallengedJson,
+      "businessVerification" -> bvStatus,
       "registration" -> testRegistrationNotCalledJson
     )
   }

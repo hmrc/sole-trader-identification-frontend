@@ -24,6 +24,11 @@ case object BusinessVerificationPass extends BusinessVerificationStatus
 
 case object BusinessVerificationFail extends BusinessVerificationStatus
 
+case object BusinessVerificationNotEnoughInformationToChallenge extends BusinessVerificationStatus
+
+case object BusinessVerificationNotEnoughInformationToCallBV extends BusinessVerificationStatus
+
+// to be removed after SAR-9396 release
 case object BusinessVerificationUnchallenged extends BusinessVerificationStatus
 
 case object SaEnrolled extends BusinessVerificationStatus
@@ -31,7 +36,9 @@ case object SaEnrolled extends BusinessVerificationStatus
 object BusinessVerificationStatus {
   val BusinessVerificationPassKey = "PASS"
   val BusinessVerificationFailKey = "FAIL"
-  val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
+  val BusinessVerificationNotEnoughInfoToChallengeKey = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"
+  val BusinessVerificationNotEnoughInfoToCallBVKey = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"
+  val BusinessVerificationUnchallengedKey = "UNCHALLENGED" // remove after SAR-9396 release
   val BusinessVerificationSaEnrolledKey = "SA_ENROLLED"
   val BusinessVerificationStatusKey = "verificationStatus"
 
@@ -40,8 +47,10 @@ object BusinessVerificationStatus {
       val businessVerificationStatusString = businessVerificationStatus match {
         case BusinessVerificationPass => BusinessVerificationPassKey
         case BusinessVerificationFail => BusinessVerificationFailKey
-        case BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
+        case BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationNotEnoughInfoToChallengeKey
+        case BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationNotEnoughInfoToCallBVKey
         case SaEnrolled => BusinessVerificationSaEnrolledKey
+        case BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
       }
 
       Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
@@ -51,9 +60,10 @@ object BusinessVerificationStatus {
       (json \ BusinessVerificationStatusKey).validate[String].collect(JsonValidationError("Invalid business validation state")) {
         case BusinessVerificationPassKey => BusinessVerificationPass
         case BusinessVerificationFailKey => BusinessVerificationFail
-        case BusinessVerificationUnchallengedKey => BusinessVerificationUnchallenged
+        case BusinessVerificationNotEnoughInfoToChallengeKey => BusinessVerificationNotEnoughInformationToChallenge
+        case BusinessVerificationNotEnoughInfoToCallBVKey => BusinessVerificationNotEnoughInformationToCallBV
         case BusinessVerificationSaEnrolledKey => SaEnrolled
+        case BusinessVerificationUnchallengedKey => BusinessVerificationUnchallenged
       }
   }
-
 }
