@@ -21,21 +21,24 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.AuthStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
-import uk.gov.hmrc.soletraderidentificationfrontend.views.DetailsNotFoundViewTests
+import uk.gov.hmrc.soletraderidentificationfrontend.views.CouldNotConfirmBusinessErrorViewTests
 
-class DetailsNotFoundControllerISpec extends ComponentSpecHelper
-  with DetailsNotFoundViewTests
+class CouldNotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
+  with CouldNotConfirmBusinessErrorViewTests
   with AuthStub {
 
-  "GET /details-not-found" should {
+  "GET /could-not-confirm-business" should {
+
     lazy val result = {
       await(journeyConfigRepository.insertJourneyConfig(
         journeyId = testJourneyId,
         authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
+        journeyConfig = testSoleTraderJourneyConfig
       ))
+
       stubAuth(OK, successfulAuthResponse())
-      get(s"/identify-your-sole-trader-business/$testJourneyId/details-not-found")
+
+      get(s"/identify-your-sole-trader-business/$testJourneyId/could-not-confirm-business")
     }
 
     "return OK" in {
@@ -43,29 +46,34 @@ class DetailsNotFoundControllerISpec extends ComponentSpecHelper
     }
 
     "return a view which" should {
-      testDetailsNotFoundView(result)
+      testCouldNotConfirmBusinessView(result)
     }
 
     "redirect to sign in page" when {
-      "the user is UNAUTHORISED" in {
+
+      "the user is not authorised" in {
+
         stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/details-not-found")
+
+        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/could-not-confirm-business")
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(signInRedirectUrl(testJourneyId, "details-not-found"))
+          redirectUri(signInRedirectUrl(testJourneyId, "could-not-confirm-business"))
         )
       }
     }
+
   }
 
-  "POST /details-not-found" should {
+  "POST /could-not-confirm-business" should {
 
     "return not found" in {
 
-      lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/details-not-found")()
+      lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/could-not-confirm-business")()
 
       result.status mustBe NOT_FOUND
     }
   }
+
 }

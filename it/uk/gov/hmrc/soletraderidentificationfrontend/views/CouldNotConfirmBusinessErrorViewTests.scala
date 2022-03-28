@@ -19,24 +19,23 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, DetailsNotFound => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CouldNotConfirmBusiness => messages}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testJourneyId, testSignOutUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
-trait DetailsNotFoundViewTests {
+trait CouldNotConfirmBusinessErrorViewTests {
   this: ComponentSpecHelper =>
 
-  val four: Int = 4
-
-  def testDetailsNotFoundView(result: => WSResponse): Unit = {
+  def testCouldNotConfirmBusinessView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
-    lazy val config = app.injector.instanceOf[AppConfig]
 
-    "have the correct title" in {
-      doc.title mustBe messages.title
+    lazy val config: AppConfig = app.injector.instanceOf[AppConfig]
+
+    "have a sign out link in the header with the correct text" in {
+      doc.getSignOutText mustBe Header.signOut
     }
 
     "have sign out link redirecting to signOutUrl from journey config" in {
@@ -52,6 +51,10 @@ trait DetailsNotFoundViewTests {
       doc.getBackLinkText mustBe Base.back
     }
 
+    "have the correct title" in {
+      doc.title mustBe messages.title
+    }
+
     "have the correct heading" in {
       doc.getH1Elements.get(0).text mustBe messages.heading
     }
@@ -60,27 +63,22 @@ trait DetailsNotFoundViewTests {
       doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have the correct second line" in {
-      doc.getParagraphs.get(2).text mustBe messages.line_2
-    }
-
-    "have the correct link to try again" in {
-      val links: Elements = doc.getLink(id = "TryAgain")
+    "have a try again link configured to appear link as a button" in {
+      val links: Elements = doc.getLink("tryAgain")
       links.size mustBe 1
-      links.first.text mustBe messages.link_2
+      links.first.attr("class") mustBe "govuk-button"
       links.first.attr("href") mustBe routes.RetryJourneyController.tryAgain(testJourneyId).url
+      links.first.attr("role") mustBe "button"
+      links.first.attr("data-module") mustBe "govuk-button"
+      links.first.text mustBe Base.try_again
     }
 
-    "have the correct third line" in {
-      doc.getParagraphs.get(3).text mustBe messages.line_3
+    "have a link to contact frontend" in {
+      val links: Elements = doc.getLink("get-help")
+      links.size mustBe 1
+      links.first.text mustBe Base.getHelp
     }
 
-    "have the correct fourth line" in {
-      doc.getParagraphs.get(four).text mustBe messages.line_4
-    }
-
-    "have the correct link text for contacting Nino Team" in {
-      doc.getLink(id = "ninoTeam").text mustBe messages.link_4
-    }
   }
+
 }
