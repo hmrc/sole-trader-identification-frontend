@@ -16,8 +16,8 @@
 
 package helpers
 
-import play.api.libs.json.{JsNull, JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey, BusinessVerificationUnchallengedKey}
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -57,11 +57,8 @@ object TestConstants {
   val testFailedBusinessVerificationStatusJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
 
-  val testUnchallengedBusinessVerificationStatusJson: JsObject =
-    Json.obj(BusinessVerificationStatusKey -> BusinessVerificationUnchallengedKey)
-
   val testRegistrationSuccess: String = "success"
-  val testRegistrationFailed: String  = "fail"
+  val testRegistrationFailed: String = "fail"
   val testRegistrationNotCalled: String = "not called"
 
   val testSoleTraderDetails: SoleTraderDetails =
@@ -88,7 +85,7 @@ object TestConstants {
       optSaPostcode = None,
       optSautr = Some(testSautr),
       identifiersMatch = false,
-      businessVerification = Some(BusinessVerificationUnchallenged),
+      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
       optOverseas = None
@@ -103,7 +100,7 @@ object TestConstants {
       optSaPostcode = None,
       optSautr = None,
       identifiersMatch = true,
-      businessVerification = Some(BusinessVerificationUnchallenged),
+      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
       optOverseas = None
@@ -118,7 +115,7 @@ object TestConstants {
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
       identifiersMatch = true,
-      businessVerification = Some(BusinessVerificationUnchallenged),
+      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = Some(testTrn),
       optOverseas = Some(testOverseasIdentifiers)
@@ -208,7 +205,7 @@ object TestConstants {
 
   val testSoleTraderJourneyConfig: JourneyConfig = testJourneyConfig(enableSautrCheck = true)
 
-  val testSoleTraderJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(enableSautrCheck = true,  optServiceName = Some(testServiceName))
+  val testSoleTraderJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(enableSautrCheck = true, optServiceName = Some(testServiceName))
 
   val testSoleTraderJourneyConfigWithBVCheckDisabled: JourneyConfig = testJourneyConfig(enableSautrCheck = true, businessVerificationCheck = false)
 
@@ -256,7 +253,7 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testPassedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
 
@@ -272,7 +269,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
@@ -285,7 +282,7 @@ object TestConstants {
     "address" -> testAddress,
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseUK,
@@ -303,7 +300,7 @@ object TestConstants {
     "address" -> testOverseasAddress,
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseOverseas,
@@ -322,7 +319,7 @@ object TestConstants {
     "authenticatorResponse" -> DetailsMismatch.toString,
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testUnchallengedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
@@ -336,7 +333,7 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> JsNull,
+    "VerificationStatus" -> "not requested",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
 
@@ -350,7 +347,7 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
     "sautrMatch" -> identifiersMatch,
-    "VerificationStatus" -> testPassedBusinessVerificationStatusJson,
+    "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationFailed
   )
 

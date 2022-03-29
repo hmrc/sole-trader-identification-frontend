@@ -42,9 +42,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
   "auditIndividualJourney" should {
     "send an event" when {
       "the entity is an individual and identifiers match" in {
-        mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
-        mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
-        mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
 
@@ -57,9 +55,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
       }
 
       "the entity is an individual, identifiers match and the journey config defines a calling service" in {
-        mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
-        mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
-        mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
 
@@ -72,9 +68,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
       }
 
       "the entity is an individual and identifiers do not match" in {
-        mockRetrieveFullName(testJourneyId)(Future.successful(Some(testFullName)))
-        mockRetrieveDateOfBirth(testJourneyId)(Future.successful(Some(testDateOfBirth)))
-        mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
 
@@ -89,7 +83,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
     "throw an exception" when {
       "there is missing data for the audit" in {
-        mockRetrieveFullName(testJourneyId)(Future.failed(new InternalServerException("failed")))
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(None))
+        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(None))
+        mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(None))
 
         intercept[InternalServerException](
           await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
