@@ -192,7 +192,7 @@ Example response body for the Sole Trader Journey:
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "sautr": "1234567890",
-    "identifiersMatch": true,
+    "identifiersMatch": "true",
     "businessVerification": {
         "verificationStatus":"PASS"
       },
@@ -210,7 +210,7 @@ Example response body for the Individual Flow:
     "lastName": "Smith",
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
-    "identifiersMatch": true
+    "identifiersMatch": "true"
 }
 ```
 

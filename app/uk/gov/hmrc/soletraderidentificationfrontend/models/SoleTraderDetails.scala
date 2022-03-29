@@ -28,7 +28,7 @@ case class SoleTraderDetails(fullName: FullName,
                              address: Option[Address],
                              optSaPostcode: Option[String],
                              optSautr: Option[String],
-                             identifiersMatch: Boolean,
+                             identifiersMatch: String,
                              businessVerification: Option[BusinessVerificationStatus],
                              registrationStatus: Option[RegistrationStatus],
                              optTrn: Option[String],
@@ -55,7 +55,7 @@ object SoleTraderDetails {
       (JsPath \ AddressKey).readNullable[Address] and
       (JsPath \ SaPostcodeKey).readNullable[String] and
       (JsPath \ SautrKey).readNullable[String] and
-      (JsPath \ IdentifiersMatchKey).read[Boolean] and
+      (JsPath \ IdentifiersMatchKey).read[String] and
       (JsPath \ BusinessVerificationKey).readNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).readNullable[RegistrationStatus] and
       (JsPath \ TrnKey).readNullable[String] and
@@ -69,7 +69,7 @@ object SoleTraderDetails {
       (JsPath \ AddressKey).writeNullable[Address] and
       (JsPath \ SaPostcodeKey).writeNullable[String] and
       (JsPath \ SautrKey).writeNullable[String] and
-      (JsPath \ IdentifiersMatchKey).write[Boolean] and
+      (JsPath \ IdentifiersMatchKey).write[String] and
       (JsPath \ BusinessVerificationKey).writeNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).writeNullable[RegistrationStatus] and
       (JsPath \ TrnKey).writeNullable[String] and

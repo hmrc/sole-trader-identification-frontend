@@ -48,14 +48,14 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
         case Right(details) =>
           soleTraderIdentificationService.storeAuthenticatorDetails(journeyId, details).flatMap {
             _ =>
-              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = true).map {
+              soleTraderIdentificationService.storeIsMatch(journeyId, identifiersMatch = "true").map {
                 _ => SuccessfulMatch
               }
           }
         case Left(failureResponse) =>
           soleTraderIdentificationService.storeAuthenticatorFailureResponse(journeyId, failureResponse).flatMap {
             _ =>
-              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = false).map {
+              soleTraderIdentificationService.storeIsMatch(journeyId, identifiersMatch = "false").map {
                 _ => failureResponse
               }
           }
@@ -91,8 +91,8 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
         }
       _
         <- matchingResponse match {
-        case SuccessfulMatch => soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = true)
-        case _ => soleTraderIdentificationService.storeIdentifiersMatch(journeyId, identifiersMatch = false)
+        case SuccessfulMatch => soleTraderIdentificationService.storeIsMatch(journeyId, identifiersMatch = "true")
+        case _ => soleTraderIdentificationService.storeIsMatch(journeyId, identifiersMatch = "false")
       }
     }
 

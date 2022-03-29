@@ -19,12 +19,12 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsBoolean, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{BusinessVerificationPass, Registered}
-import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, CreateTrnStub, RegisterStub, SoleTraderIdentificationStub}
+import uk.gov.hmrc.soletraderidentificationfrontend.stubs._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 
@@ -77,7 +77,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+          stubRetrieveIsMatch(testJourneyId)(OK, "true")
           stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
@@ -117,7 +117,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+          stubRetrieveIsMatch(testJourneyId)(OK, "true")
           stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
@@ -178,7 +178,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+          stubRetrieveIsMatch(testJourneyId)(OK, "true")
           stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
@@ -219,7 +219,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+          stubRetrieveIsMatch(testJourneyId)(OK, "true")
           stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)

@@ -42,8 +42,8 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
   "auditIndividualJourney" should {
     "send an event" when {
       "the entity is an individual and identifiers match" in {
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
@@ -56,7 +56,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
       "the entity is an individual, identifiers match and the journey config defines a calling service" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfigWithCallingService))
@@ -69,7 +69,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
       "the entity is an individual and identifiers do not match" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("false")))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
@@ -84,7 +84,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
     "throw an exception" when {
       "there is missing data for the audit" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(None))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(None))
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(None))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(None))
 
         intercept[InternalServerException](
@@ -99,7 +99,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
       "the entity is a Sole Trader and identifiers match" when {
         "there is an sautr" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -109,11 +109,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson(identifiersMatch = true)
+          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson(isMatch = "true")
         }
         "there is an sautr and the journey config defines a calling service" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -123,11 +123,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch = true)
+          auditEventCaptor.getValue mustBe testSoleTraderWithCallingServiceAuditEventJson(isMatch = "true")
         }
         "there is an sa utr and the journey config has disabled business verification" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderWithoutBVCheckDetails)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -137,11 +137,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch = true)
+          auditEventCaptor.getValue mustBe testSoleTraderWithoutBVCheckAuditEventJson(isMatch = "true")
         }
         "there is an sautr but registration fails" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsRegistrationFailed)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -151,11 +151,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch = true)
+          auditEventCaptor.getValue mustBe testSoleTraderRegistrationFailedAuditEventJson(isMatch = "true")
         }
         "there is not an sautr" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoSautr)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -164,11 +164,11 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoSautr(true)
+          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoSautr("true")
         }
         "there is not a nino" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoNinoButUtr)))
-          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+          mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(Some(testKnownFactsResponseUK)))
 
@@ -177,12 +177,12 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNino(identifiersMatch = true)
+          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNino(isMatch = "true")
         }
       }
       "the entity is a Sole Trader and identifiers do not match" in {
         mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoMatch)))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(false)))
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("false")))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
         mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
@@ -195,7 +195,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
       }
       "the entity is a Sole Trader and the user is overseas" in {
         mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoNinoAndOverseas)))
-        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(true)))
+        mockRetrieveIsMatch(testJourneyId)(Future.successful(Some("true")))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
         mockRetrieveES20Response(testJourneyId)(Future.successful(Some(testKnownFactsResponseOverseas)))
 
@@ -205,7 +205,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         result mustBe a[Unit]
 
         verifySendExplicitAuditSoleTraders()
-        auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch = true)
+        auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNinoOverseas(isMatch = "true")
       }
     }
 

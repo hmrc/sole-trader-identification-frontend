@@ -63,7 +63,6 @@ object TestConstants {
   val testBusinessVerificationUnchallengedJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationUnchallengedKey)
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
-
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
     registrationStatusKey -> RegisteredKey,
     registeredBusinessPartnerIdKey -> testSafeId)
@@ -118,7 +117,7 @@ object TestConstants {
       address = None,
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
-      identifiersMatch = true,
+      identifiersMatch = "true",
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
@@ -133,7 +132,7 @@ object TestConstants {
       address = None,
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
-      identifiersMatch = false,
+      identifiersMatch = "false",
       businessVerification = Some(BusinessVerificationUnchallenged),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
@@ -150,7 +149,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = None,
-      identifiersMatch = true,
+      identifiersMatch = "true",
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
@@ -165,7 +164,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = None,
-      identifiersMatch = false,
+      identifiersMatch = "false",
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
@@ -205,7 +204,7 @@ object TestConstants {
       "nino" -> testNino,
       "saPostcode" -> testSaPostcode,
       "sautr" -> testSautr,
-      "identifiersMatch" -> true,
+      "identifiersMatch" -> "true",
       "businessVerification" -> testBusinessVerificationPassJson,
       "registration" -> testSuccessfulRegistrationJson
     )
@@ -220,7 +219,7 @@ object TestConstants {
       "nino" -> testNino,
       "saPostcode" -> testSaPostcode,
       "sautr" -> testSautr,
-      "identifiersMatch" -> false,
+      "identifiersMatch" -> "false",
       "businessVerification" -> bvStatus,
       "registration" -> testRegistrationNotCalledJson
     )
@@ -233,7 +232,7 @@ object TestConstants {
     ),
       "nino" -> testNino,
       "dateOfBirth" -> testDateOfBirth,
-      "identifiersMatch" -> true
+      "identifiersMatch" -> "true"
     )
   }
 
@@ -243,7 +242,7 @@ object TestConstants {
       "lastName" -> testLastName
     ),
       "dateOfBirth" -> testDateOfBirth,
-      "identifiersMatch" -> false
+      "identifiersMatch" -> "false"
     )
   }
 

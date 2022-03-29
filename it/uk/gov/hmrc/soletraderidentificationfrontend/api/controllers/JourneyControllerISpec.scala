@@ -268,7 +268,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             ),
               "nino" -> "aa111111a",
               "dateOfBirth" -> testDateOfBirth,
-              "identifiersMatch" -> true
+              "identifiersMatch" -> "true"
             )
           }
 
@@ -308,7 +308,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             "nino" -> testNino,
             "saPostcode" -> testSaPostcode,
             "sautr" -> testSautr,
-            "identifiersMatch" -> true,
+            "identifiersMatch" -> "true",
             "registration" -> Json.obj(
               "registrationStatus" -> "REGISTERED",
               "registeredBusinessPartnerId" -> testSafeId

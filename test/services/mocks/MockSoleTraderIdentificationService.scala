@@ -68,9 +68,9 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveIdentifiersMatch(journeyId: String)
-                                  (response: Future[Option[Boolean]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveIdentifiersMatch(
+  def mockRetrieveIsMatch(journeyId: String)
+                                  (response: Future[Option[String]]): OngoingStubbing[_] =
+    when(mockSoleTraderIdentificationService.retrieveIsMatch(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
@@ -161,11 +161,11 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean)
+  def mockStoreIsMatch(journeyId: String, isMatch: String)
                                (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeIdentifiersMatch(
+    when(mockSoleTraderIdentificationService.storeIsMatch(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(identifiersMatch)
+      ArgumentMatchers.eq(isMatch)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
@@ -213,10 +213,10 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
       ArgumentMatchers.eq(businessVerificationStatus)
     )(ArgumentMatchers.any[HeaderCarrier])
 
-  def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean): Unit =
-    verify(mockSoleTraderIdentificationService).storeIdentifiersMatch(
+  def verifyStoreIsMatch(journeyId: String, isMatch: String): Unit =
+    verify(mockSoleTraderIdentificationService).storeIsMatch(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(identifiersMatch)
+      ArgumentMatchers.eq(isMatch)
     )(ArgumentMatchers.any[HeaderCarrier])
 
   def verifyStoreTrn(journeyId: String, trn: String): Unit =

@@ -42,18 +42,18 @@ class AuditService @Inject()(appConfig: AppConfig,
     val soleTraderAudit: Future[JsObject] = for {
       optSoleTraderRecord <- soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId)
       optES20Response <- soleTraderIdentificationService.retrieveES20Details(journeyId)
-      optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
+      optIsMatch <- soleTraderIdentificationService.retrieveIsMatch(journeyId)
       optAuthenticatorResponse <-
-        optIdentifiersMatch match {
+        optIsMatch match {
           case Some(_) if optSoleTraderRecord.exists(details => details.optNino.isEmpty) => Future.successful(None)
-          case Some(identifiersMatch) if identifiersMatch =>
+          case Some("true") =>
             soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
           case _ =>
             soleTraderIdentificationService.retrieveAuthenticatorFailureResponse(journeyId)
         }
     } yield {
-      (optSoleTraderRecord, optES20Response, optIdentifiersMatch, optAuthenticatorResponse) match {
-        case (Some(soleTraderRecord), optES20Response, Some(identifiersMatch), optAuthenticatorResponse) =>
+      (optSoleTraderRecord, optES20Response, optIsMatch, optAuthenticatorResponse) match {
+        case (Some(soleTraderRecord), optES20Response, Some(isMatch), optAuthenticatorResponse) =>
 
           val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
 
@@ -135,7 +135,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             "firstName" -> soleTraderRecord.fullName.firstName,
             "lastName" -> soleTraderRecord.fullName.lastName,
             "dateOfBirth" -> soleTraderRecord.dateOfBirth,
-            "sautrMatch" -> identifiersMatch,
+            "isMatch" -> isMatch,
             "VerificationStatus" -> businessVerificationStatus
           ) ++ registrationStatusBlock ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
         case _ =>
@@ -155,10 +155,10 @@ class AuditService @Inject()(appConfig: AppConfig,
 
     val individualAudit: Future[JsObject] = for {
       optIndividualDetails <- soleTraderIdentificationService.retrieveIndividualDetails(journeyId)
-      optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
+      optIsMatch <- soleTraderIdentificationService.retrieveIsMatch(journeyId)
       optAuthenticatorResponse <-
-        (optIndividualDetails, optIdentifiersMatch) match {
-          case (Some(_), Some(true)) =>
+        (optIndividualDetails, optIsMatch) match {
+          case (Some(_), Some("true")) =>
             soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
           case (Some(individualDetails), Some(_)) if individualDetails.optNino.isEmpty => Future.successful(None)
           case _ =>
@@ -171,15 +171,15 @@ class AuditService @Inject()(appConfig: AppConfig,
           case Some(authenticatorFailureResponse: String) => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
           case _ => Json.obj()
         }
-      (optIndividualDetails, optIdentifiersMatch) match {
-        case (Some(IndividualDetails(firstName, lastName, dateOfBirth, Some(nino), None)), Some(identifiersMatch)) =>
+      (optIndividualDetails, optIsMatch) match {
+        case (Some(IndividualDetails(firstName, lastName, dateOfBirth, Some(nino), None)), Some(isMatch)) =>
           Json.obj(
             "callingService" -> callingService,
             "firstName" -> firstName,
             "lastName" -> lastName,
             "nino" -> nino,
             "dateOfBirth" -> dateOfBirth,
-            "identifiersMatch" -> identifiersMatch
+            "isMatch" -> isMatch
           ) ++ authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")

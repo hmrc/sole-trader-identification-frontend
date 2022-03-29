@@ -50,8 +50,8 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeSaPostcode(journeyId: String, saPostcode: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[String](journeyId, SaPostcodeKey, saPostcode)
 
-  def storeIdentifiersMatch(journeyId: String, identifiersMatch: Boolean)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeData[Boolean](journeyId, IdentifiersMatchKey, identifiersMatch)
+  def storeIsMatch(journeyId: String, identifiersMatch: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeData[String](journeyId, IdentifiersMatchKey, identifiersMatch)
 
   def storeAuthenticatorFailureResponse(journeyId: String,
                                         authenticatorFailureResponse: SoleTraderDetailsMatchFailure
@@ -106,9 +106,9 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
                                         )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
     connector.retrieveSoleTraderDetails[BusinessVerificationStatus](journeyId, VerificationStatusKey)
 
-  def retrieveIdentifiersMatch(journeyId: String
-                              )(implicit hc: HeaderCarrier): Future[Option[Boolean]] =
-    connector.retrieveSoleTraderDetails[Boolean](journeyId, IdentifiersMatchKey)
+  def retrieveIsMatch(journeyId: String
+                              )(implicit hc: HeaderCarrier): Future[Option[String]] =
+    connector.retrieveSoleTraderDetails[String](journeyId, IdentifiersMatchKey)
 
   def retrieveAuthenticatorDetails(journeyId: String
                                   )(implicit hc: HeaderCarrier): Future[Option[IndividualDetails]] =
