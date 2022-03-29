@@ -34,7 +34,7 @@ import scala.concurrent.ExecutionContext
 class CouldNotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerComponents,
                                                         val authConnector: AuthConnector,
                                                         journeyService: JourneyService,
-                                                        view: could_not_confirm_business_error_page,
+                                                        view: could_not_confirm_business_error_page
                                                        )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
                                                        extends FrontendController(mcc) with AuthorisedFunctions {
 
