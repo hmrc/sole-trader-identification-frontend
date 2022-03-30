@@ -219,7 +219,7 @@ object TestConstants {
     "lastName" -> testLastName,
     "dateOfBirth" -> testDateOfBirth,
     "nino" -> testNino,
-    "identifiersMatch" -> true,
+    "isMatch" -> "true",
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr)
   )
 
@@ -252,7 +252,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
@@ -268,7 +268,7 @@ object TestConstants {
     "nino" -> testNino,
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
@@ -281,7 +281,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "address" -> testAddress,
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
@@ -299,7 +299,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "address" -> testOverseasAddress,
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
@@ -318,7 +318,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> DetailsMismatch.toString,
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
@@ -332,7 +332,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "not requested",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
@@ -346,7 +346,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "sautrMatch" -> identifiersMatch,
+    "isMatch" -> identifiersMatch.toString,
     "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationFailed
   )
@@ -357,7 +357,7 @@ object TestConstants {
     "lastName" -> testLastName,
     "dateOfBirth" -> testDateOfBirth,
     "nino" -> testNino,
-    "identifiersMatch" -> false,
+    "isMatch" -> "false",
     "authenticatorResponse" -> DetailsMismatch.toString
   )
 

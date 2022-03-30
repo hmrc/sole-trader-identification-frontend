@@ -135,7 +135,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             "firstName" -> soleTraderRecord.fullName.firstName,
             "lastName" -> soleTraderRecord.fullName.lastName,
             "dateOfBirth" -> soleTraderRecord.dateOfBirth,
-            "sautrMatch" -> identifiersMatch,
+            "isMatch" -> identifiersMatch.toString,
             "VerificationStatus" -> businessVerificationStatus
           ) ++ registrationStatusBlock ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
         case _ =>
@@ -179,7 +179,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             "lastName" -> lastName,
             "nino" -> nino,
             "dateOfBirth" -> dateOfBirth,
-            "identifiersMatch" -> identifiersMatch
+            "isMatch" -> identifiersMatch.toString
           ) ++ authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
