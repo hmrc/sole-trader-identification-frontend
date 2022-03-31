@@ -28,9 +28,6 @@ case object BusinessVerificationNotEnoughInformationToChallenge extends Business
 
 case object BusinessVerificationNotEnoughInformationToCallBV extends BusinessVerificationStatus
 
-// to be removed after SAR-9396 release
-case object BusinessVerificationUnchallenged extends BusinessVerificationStatus
-
 case object SaEnrolled extends BusinessVerificationStatus
 
 object BusinessVerificationStatus {
@@ -38,7 +35,6 @@ object BusinessVerificationStatus {
   val BusinessVerificationFailKey = "FAIL"
   val BusinessVerificationNotEnoughInfoToChallengeKey = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"
   val BusinessVerificationNotEnoughInfoToCallBVKey = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"
-  val BusinessVerificationUnchallengedKey = "UNCHALLENGED" // remove after SAR-9396 release
   val BusinessVerificationSaEnrolledKey = "SA_ENROLLED"
   val BusinessVerificationStatusKey = "verificationStatus"
 
@@ -50,7 +46,6 @@ object BusinessVerificationStatus {
         case BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationNotEnoughInfoToChallengeKey
         case BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationNotEnoughInfoToCallBVKey
         case SaEnrolled => BusinessVerificationSaEnrolledKey
-        case BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
       }
 
       Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
@@ -63,7 +58,6 @@ object BusinessVerificationStatus {
         case BusinessVerificationNotEnoughInfoToChallengeKey => BusinessVerificationNotEnoughInformationToChallenge
         case BusinessVerificationNotEnoughInfoToCallBVKey => BusinessVerificationNotEnoughInformationToCallBV
         case BusinessVerificationSaEnrolledKey => SaEnrolled
-        case BusinessVerificationUnchallengedKey => BusinessVerificationUnchallenged
       }
   }
 }
