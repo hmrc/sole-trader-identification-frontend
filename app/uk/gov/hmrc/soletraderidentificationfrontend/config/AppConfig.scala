@@ -35,7 +35,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environme
       s"${servicesConfig.baseUrl("authenticator")}/authenticator/match"
     }
 
-  private lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
+  lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
 
   private val assetsUrl = servicesConfig.getString("assets.url")
 
@@ -44,12 +44,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environme
   val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
   val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
   val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
-
-  def reportAProblemPartialUrl(serviceIdentifier: String): String =
-    s"$contactHost/contact/problem_reports_ajax?service=$serviceIdentifier"
-
-  def reportAProblemNonJSUrl(serviceIdentifier: String): String =
-    s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
   def soleTraderIdentificationUrl(journeyId: String): String = s"$backendUrl/sole-trader-identification/journey/$journeyId"
 

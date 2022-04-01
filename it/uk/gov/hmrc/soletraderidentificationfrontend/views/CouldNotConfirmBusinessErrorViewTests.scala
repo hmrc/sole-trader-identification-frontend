@@ -20,7 +20,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CouldNotConfirmBusiness => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testJourneyId, testSignOutUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testJourneyId, testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -73,10 +73,9 @@ trait CouldNotConfirmBusinessErrorViewTests {
       links.first.text mustBe Base.try_again
     }
 
-    "have a link to contact frontend" in {
-      val links: Elements = doc.getLink("get-help")
-      links.size mustBe 1
-      links.first.text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
 
   }
