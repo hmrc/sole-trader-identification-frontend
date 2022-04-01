@@ -83,9 +83,8 @@ object SoleTraderDetails {
       soleTraderDetails.businessVerification
         .map(businessVerification => {
           val businessVerificationStatusForCallingServices: String = businessVerification match {
-            case BusinessVerificationNotEnoughInformationToCallBV |
-                 BusinessVerificationNotEnoughInformationToChallenge |
-                 BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
+            case BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationNotEnoughInfoToCallBVKey
+            case BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationNotEnoughInfoToChallengeKey
             case BusinessVerificationPass => BusinessVerificationPassKey
             case BusinessVerificationFail => BusinessVerificationFailKey
             case SaEnrolled => BusinessVerificationSaEnrolledKey

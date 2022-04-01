@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallBVKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey, BusinessVerificationUnchallengedKey}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallBVKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationFailedKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -60,7 +60,6 @@ object TestConstants {
 
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
-  val testBusinessVerificationUnchallengedJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationUnchallengedKey)
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
 
@@ -134,7 +133,7 @@ object TestConstants {
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
       identifiersMatch = false,
-      businessVerification = Some(BusinessVerificationUnchallenged),
+      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
       optOverseas = None

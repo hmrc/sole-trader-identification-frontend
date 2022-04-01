@@ -218,19 +218,6 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       }
 
       "the journeyId exists and the identifiers do not match" when {
-        "business verification is stored a Unchallenged" in {
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveSoleTraderDetails(testJourneyId)(
-            status = OK,
-            body = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationUnchallengedJson)
-          )
-
-          lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
-
-          result.status mustBe OK
-
-          result.json mustBe Json.toJsObject(testSoleTraderDetailsMismatch)
-        }
         "business verification is stored as BusinessVerificationNotEnoughInformationToCallBV" in {
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
