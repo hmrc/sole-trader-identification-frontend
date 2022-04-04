@@ -47,7 +47,7 @@ object SoleTraderDetails {
   private val RegistrationKey = "registration"
   private val TrnKey = "trn"
   private val OverseasIdentifiersKey = "overseas"
-  private val businessVerificationUnchallengedKey = "UNCHALLENGED"
+  private val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
 
   val reads: Reads[SoleTraderDetails] = (
     (JsPath \ FullNameKey).read[FullName] and
@@ -85,7 +85,7 @@ object SoleTraderDetails {
         .map(businessVerification => {
           val businessVerificationStatusForCallingServices: String = businessVerification match {
             case BusinessVerificationNotEnoughInformationToCallBV |
-                 BusinessVerificationNotEnoughInformationToChallenge => businessVerificationUnchallengedKey
+                 BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationUnchallengedKey
             case BusinessVerificationPass => BusinessVerificationPassKey
             case BusinessVerificationFail => BusinessVerificationFailKey
             case SaEnrolled => BusinessVerificationSaEnrolledKey
