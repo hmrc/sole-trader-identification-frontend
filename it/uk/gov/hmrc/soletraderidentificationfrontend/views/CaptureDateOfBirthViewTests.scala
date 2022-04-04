@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureDateOfBirth => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testSignOutUrl
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -92,8 +92,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getSubmitButton.first.text mustBe Base.saveAndContinue
     }
 
-    "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
 
   }

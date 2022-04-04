@@ -119,8 +119,9 @@ trait CheckYourAnswersViewTests {
       }
     }
 
-    "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
   }
 
@@ -201,8 +202,9 @@ trait CheckYourAnswersViewTests {
       }
     }
 
-    "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
   }
 
@@ -319,8 +321,9 @@ trait CheckYourAnswersViewTests {
       }
     }
 
-    "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
   }
 
@@ -401,8 +404,9 @@ trait CheckYourAnswersViewTests {
       }
     }
 
-    "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+    "have the correct technical help link and text" in {
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
   }
 }

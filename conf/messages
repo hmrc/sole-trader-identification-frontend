@@ -1,5 +1,4 @@
 service.name                                                = Register for VAT
-getpagehelp.linkText                                        = Is this page not working properly?
 error.summary.title                                         = There is a problem
 error.title-prefix                                          = 'Error: '
 
