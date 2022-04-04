@@ -33,6 +33,7 @@ object TestConstants {
   val testFullName: FullName = FullName(testFirstName, testLastName)
   val testFullNameLowerCase: FullName = FullName("john", "smith")
   val testNino: String = "AA111111A"
+  val testNinoRecordedByKnownFacts: String = "BB111111B"
   val testSautr: String = "1234567890"
   val testContinueUrl = "/test-continue-url"
   val testRegime: String = "VATC"
@@ -306,7 +307,9 @@ object TestConstants {
       )
     )
   )
-  val testKnownFactsResponseNino: JsObject = Json.obj(
+  val testKnownFactsResponseNino: JsObject = testKnownFactsResponseNino(nino = testNino)
+
+  def testKnownFactsResponseNino(nino:String): JsObject = Json.obj(
     "service" -> "IR-SA",
     "enrolments" -> Json.arr(
       Json.obj(
@@ -319,8 +322,28 @@ object TestConstants {
         "verifiers" -> Json.arr(
           Json.obj(
             "key" -> "NINO",
-            "value" -> testNino
+            "value" -> nino
           ),
+          Json.obj(
+            "key" -> "Postcode",
+            "value" -> testSaPostcode
+          )
+        )
+      )
+    )
+  )
+
+  def testKnownFactsResponseWithoutNino: JsObject = Json.obj(
+    "service" -> "IR-SA",
+    "enrolments" -> Json.arr(
+      Json.obj(
+        "identifiers" -> Json.arr(
+          Json.obj(
+            "key" -> "UTR",
+            "value" -> testSautr
+          )
+        ),
+        "verifiers" -> Json.arr(
           Json.obj(
             "key" -> "Postcode",
             "value" -> testSaPostcode

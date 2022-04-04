@@ -42,6 +42,7 @@ object TestConstants {
   val testFullName: FullName = FullName(testFirstName, testLastName)
   val testFullNameLowecase: FullName = FullName("john", "smith")
   val testNino: String = "AA111111A"
+  val testKnownFactsRecordedNino: String = "BB111111B"
   val testTrn: String = "99A99999"
   val testAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), Some("AA1 1AA"), "GB")
   val testAddressWrongPostcodeFormat: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), Some("AA11AA"), "GB")
@@ -238,7 +239,7 @@ object TestConstants {
       signOutUrl = testSignOutUrl,
       enableSautrCheck = enableSautrCheck,
       accessibilityUrl = testAccessibilityUrl,
-      optFullNamePageLabel = None,
+      optFullNamePageLabel = None
     ),
     testRegime
   )

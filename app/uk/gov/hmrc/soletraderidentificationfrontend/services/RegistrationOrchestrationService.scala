@@ -53,10 +53,9 @@ class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService
                                          (implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
     registrationStatus <- register(journeyId, optNino, saUtr, journeyConfig.regime)
     _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
-  } yield {
-    auditService.auditJourney(journeyId, journeyConfig)
+  } yield
     registrationStatus
-  }
+
 
   private def register(journeyId: String,
                        optNino: Option[String],

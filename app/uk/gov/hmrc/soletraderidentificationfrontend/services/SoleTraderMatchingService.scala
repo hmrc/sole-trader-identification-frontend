@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{AuthenticatorConnector, RetrieveKnownFactsConnector}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NotEnoughInformationToMatch, SoleTraderDetailsMatchResult, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig, KnownFactsResponse}
 
 import javax.inject.{Inject, Singleton}
@@ -74,6 +74,10 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
         }
         else {
           retrieveKnownFactsConnector.retrieveKnownFacts(individualDetails.optSautr.get).flatMap {
+            case KnownFacts@KnownFactsResponse(_, _, Some(_)) =>
+              soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
+                _ => NinoNotDeclaredButFound
+              )
             case KnownFacts@KnownFactsResponse(Some(retrievePostcode), _, _)
               if optUserPostcode.exists(userPostcode => userPostcode filterNot (_.isWhitespace) equalsIgnoreCase (retrievePostcode filterNot (_.isWhitespace))) =>
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
@@ -87,7 +91,7 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
                 _ => DetailsMismatch
               )
-          }
+      }
         }
       _
         <- matchingResponse match {
