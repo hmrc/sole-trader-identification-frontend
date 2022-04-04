@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.api.controllers
 
 import play.api.http.Status.CREATED
-import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
@@ -218,7 +218,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       }
 
       "the journeyId exists and the identifiers do not match" when {
-        "business verification is stored as BusinessVerificationNotEnoughInformationToCallBV" in {
+        "the journeyId exists and verificationStatus is BusinessVerificationNotEnoughInfoToCallBV (remapped to UNCHALLENGED)" in {
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
@@ -229,7 +229,25 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
           result.status mustBe OK
 
-          result.json mustBe Json.toJsObject(testSoleTraderDetailsMismatch)
+          extractBusinessVerificationJsonBranch(fullJson = result.json) mustBe
+            testJourneyControllerBusinessVerificationJson(verificationStatus = "UNCHALLENGED")
+
+        }
+
+        "the journeyId exists and verificationStatus is BusinessVerificationNotEnoughInformationToChallenge (remapped to UNCHALLENGED)" in {
+          stubAuth(OK, successfulAuthResponse())
+          stubRetrieveSoleTraderDetails(testJourneyId)(
+            status = OK,
+            body = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationNotEnoughInfoToChallengeJson)
+          )
+
+          lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractBusinessVerificationJsonBranch(fullJson = result.json) mustBe
+            testJourneyControllerBusinessVerificationJson(verificationStatus = "UNCHALLENGED")
+
         }
       }
 
@@ -343,5 +361,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       }
     }
   }
+
+  def testJourneyControllerBusinessVerificationJson(verificationStatus: String): JsObject = Json.obj(
+    "businessVerification" -> Json.obj(
+      "verificationStatus" -> verificationStatus
+    )
+  )
+
+  private def extractBusinessVerificationJsonBranch(fullJson: JsValue): JsObject = fullJson.transform((JsPath \ "businessVerification").json.pickBranch).get
 
 }
