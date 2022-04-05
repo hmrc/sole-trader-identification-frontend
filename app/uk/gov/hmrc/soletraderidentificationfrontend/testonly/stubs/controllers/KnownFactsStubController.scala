@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers
 
-import play.api.libs.json.{JsObject, JsSuccess, JsValue, Json}
+import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -27,56 +27,67 @@ import scala.concurrent.Future
 @Singleton
 class KnownFactsStubController @Inject()(controllerComponents: ControllerComponents) extends BackendController(controllerComponents) {
 
+  val postCodeIsAbroadUtr: String = "0000000000"
+
+  val noNinoDeclaredButNinoFoundUtr: String = "1234567891"
+
   def stubKnownFacts: Action[JsValue] = Action.async(parse.json) {
     implicit request =>
       val knownFacts = (request.body \ "knownFacts").head.validate[JsObject]
-
-      knownFacts match {
+      val (identifiersValueJson, verifiersValueJson): (JsArray, JsArray) = knownFacts match {
         case JsSuccess(sautrBlock, _) =>
           (sautrBlock \ "value").validate[String] match {
-            case JsSuccess("0000000000", _) =>
-              Future.successful(Ok(Json.obj(
-                "service" -> "IR-SA",
-                "enrolments" -> Json.arr(
+            case JsSuccess(`postCodeIsAbroadUtr`, _) =>
+              (
+                identifiersJson(utr = postCodeIsAbroadUtr),
+                Json.arr(
                   Json.obj(
-                    "identifiers" -> Json.arr(
-                      Json.obj(
-                        "key" -> "UTR",
-                        "value" -> "0000000000"
-                      )
-                    ),
-                    "verifiers" -> Json.arr(
-                      Json.obj(
-                        "key" -> "IsAbroad",
-                        "value" -> "Y"
-                      )
-                    )
+                    "key" -> "IsAbroad",
+                    "value" -> "Y"
                   )
                 )
-              )))
-            case JsSuccess(sautr, _) =>
-              Future.successful(Ok(Json.obj(
-                "service" -> "IR-SA",
-                "enrolments" -> Json.arr(
+              )
+            case JsSuccess(`noNinoDeclaredButNinoFoundUtr`, _) =>
+              (
+                identifiersJson(utr = noNinoDeclaredButNinoFoundUtr),
+                Json.arr(
                   Json.obj(
-                    "identifiers" -> Json.arr(
-                      Json.obj(
-                        "key" -> "UTR",
-                        "value" -> sautr
-                      )
-                    ),
-                    "verifiers" -> Json.arr(
-                      Json.obj(
-                        "key" -> "Postcode",
-                        "value" -> "AA1 1AA"
-                      )
-                    )
+                    "key" -> "NINO",
+                    "value" -> "BB111111B"
                   )
                 )
-              )))
+              )
+            case JsSuccess(utr, _) =>
+              (
+                identifiersJson(utr),
+                Json.arr(
+                  Json.obj(
+                    "key" -> "Postcode",
+                    "value" -> "AA1 1AA"
+                  )
+                )
+              )
           }
         case _ => throw new InternalServerException("KnownFactsStubController: Error in parsing data posted to stub")
       }
+
+      Future.successful(Ok(Json.obj(
+        "service" -> "IR-SA",
+        "enrolments" -> Json.arr(
+          Json.obj(
+            "identifiers" -> identifiersValueJson,
+            "verifiers" -> verifiersValueJson
+          )
+        )
+      )))
+
   }
 
+  private def identifiersJson(utr: String): JsArray =
+    Json.arr(
+      Json.obj(
+        "key" -> "UTR",
+        "value" -> utr
+      )
+    )
 }
