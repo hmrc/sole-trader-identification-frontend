@@ -30,6 +30,8 @@ object SoleTraderDetailsMatching {
 
   case object DetailsMismatch extends SoleTraderDetailsMatchFailure
 
+  case object NinoNotDeclaredButFound extends SoleTraderDetailsMatchFailure
+
   case object NinoNotFound extends SoleTraderDetailsMatchFailure
 
   case object DeceasedCitizensDetails extends SoleTraderDetailsMatchFailure

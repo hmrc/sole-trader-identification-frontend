@@ -40,13 +40,18 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
           matchingResult <-
             if (individualDetails.optNino.isEmpty && !isEnabled(EnableOptionalNinoJourney))
               Future.failed(throw new IllegalStateException("[Submission Service] Unexpected state of Nino"))
-            else if (individualDetails.optNino.isEmpty) soleTraderMatchingService.matchSoleTraderDetailsNoNino(journeyId, individualDetails)
+            else if (individualDetails.optNino.isEmpty)
+              soleTraderMatchingService.matchSoleTraderDetailsNoNino(journeyId, individualDetails)
             else
               soleTraderMatchingService.matchSoleTraderDetails(journeyId, individualDetails, journeyConfig)
           response <-
             if (journeyConfig.pageConfig.enableSautrCheck) {
               if (journeyConfig.businessVerificationCheck) {
-                handleSoleTraderJourneyWithBVCheck(journeyId, matchingResult, journeyConfig, individualDetails)
+                handleSoleTraderJourneyWithBVCheck(
+                  journeyId,
+                  matchingResult,
+                  journeyConfig,
+                  individualDetails)
               } else {
                 handleSoleTraderJourneySkippingBVCheck(
                   journeyId,

@@ -18,6 +18,7 @@ package services
 
 import connectors.mocks.MockRegistrationConnector
 import helpers.TestConstants._
+import org.mockito.Mockito.verifyNoInteractions
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers._
@@ -209,7 +210,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
     }
   }
 
-  "register without business verification" when {
+  "register without business verification (No audit happens)" when {
 
     "the user has a nino" should {
       "register and then store the registration response" in {
@@ -222,7 +223,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
         verifyRegistration(testNino, Some(testSautr), testRegime)
         verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
+        verifyNoInteractions(mockAuditService)
       }
     }
 
@@ -238,7 +239,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
           verifyRegistration(testNino, None, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-          mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
+          verifyNoInteractions(mockAuditService)
         }
         "the business entity is not successfully registered" in {
           mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed))
@@ -250,7 +251,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
           verifyRegistration(testNino, None, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
-          mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
+          verifyNoInteractions(mockAuditService)
         }
       }
     }
@@ -267,7 +268,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
         verifyStoreRegistrationResponse(testJourneyId, Registered(testSafeId))
-        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
+        verifyNoInteractions(mockAuditService)
       }
 
       "return RegistrationFailed if fails to register with Trn" in {
@@ -281,7 +282,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
         verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed)
-        mockVerifyAuditJourney(testJourneyId, testSoleTraderJourneyConfig)
+        verifyNoInteractions(mockAuditService)
       }
     }
 

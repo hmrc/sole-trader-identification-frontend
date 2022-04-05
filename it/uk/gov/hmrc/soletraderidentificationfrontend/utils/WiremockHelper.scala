@@ -21,8 +21,14 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import com.github.tomakehurst.wiremock.http.RequestMethod
+import com.github.tomakehurst.wiremock.matching.{ContainsPattern, RequestPatternBuilder, UrlPathPattern}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+
+import scala.util.{Failure, Success, Try}
 
 object WiremockHelper extends Eventually with IntegrationPatience {
 
@@ -106,6 +112,34 @@ object WiremockHelper extends Eventually with IntegrationPatience {
   def verifyAudit(): Unit = {
     verifyPost("/write/audit")
     verifyPost("/write/audit/merged")
+  }
+
+  def verifyAuditTypeFor(auditTypeToBeFound: String): Unit = {
+    def extractRequestBody(request: LoggedRequest): JsValue = Try(Json.parse(request.getBodyAsString)) match {
+      case Failure(_) => throw new IllegalStateException(s"Audit should receive json request but it did not. Request details:\n$request")
+      case Success(value) => value
+    }
+
+    val auditRequest = new RequestPatternBuilder(RequestMethod.POST, new UrlPathPattern(new ContainsPattern("/write/audit"), false))
+
+    def filterAuditTypeRequests(allAuditMessages: Seq[LoggedRequest], auditType: String) = allAuditMessages.filter(loggedRequest =>
+      (extractRequestBody(loggedRequest) \ "auditType").validate[String] match {
+        case JsSuccess(value, _) => value.equals(auditType)
+        case JsError(_) => false
+      })
+
+    eventually {
+      import scala.collection.JavaConverters.asScalaIteratorConverter
+      val allAuditRequests = WireMock.findAll(auditRequest)
+        .listIterator
+        .asScala
+        .toList
+
+      val allAuditTypeRequestsFound: Seq[LoggedRequest] = filterAuditTypeRequests(allAuditRequests, auditTypeToBeFound)
+
+      if (allAuditTypeRequestsFound.size == 1) ()
+      else throw new AssertionError(s"Expecting exactly 1 json with auditType equals to $auditTypeToBeFound but got ${allAuditTypeRequestsFound.size}")
+    }
   }
 
 }

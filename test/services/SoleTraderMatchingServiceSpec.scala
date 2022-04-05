@@ -18,7 +18,9 @@ package services
 
 import connectors.mocks.{MockAuthenticatorConnector, MockRetrieveKnownFactsConnector}
 import helpers.TestConstants._
+import org.mockito.Mockito.reset
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableFor2
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import services.mocks.MockSoleTraderIdentificationService
@@ -36,7 +38,8 @@ class SoleTraderMatchingServiceSpec
     with Matchers
     with MockAuthenticatorConnector
     with MockRetrieveKnownFactsConnector
-    with MockSoleTraderIdentificationService {
+    with MockSoleTraderIdentificationService
+    with org.scalatest.prop.TableDrivenPropertyChecks {
 
   object TestService extends SoleTraderMatchingService(mockAuthenticatorConnector, mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
 
@@ -183,6 +186,40 @@ class SoleTraderMatchingServiceSpec
   }
 
   "matchSoleTraderDetailsNoNino" should {
+    "return NinoNotDeclaredButFound" when {
+      "the user declares no NINO but retrieveKnownFacts find one" in {
+
+        val knownFactsResponseScenarios: TableFor2[Option[String], Option[Boolean]] =
+          Table(
+            ("postcode", "isAbroad"),
+            (Some(testSaPostcode), Some(true)),
+            (Some(testSaPostcode), Some(false)),
+            (Some(testSaPostcode), None),
+            (None, Some(true)),
+            (None, Some(false)),
+            (None, None)
+          )
+
+        forAll(knownFactsResponseScenarios) { (optPostCode: Option[String], optIsAbroad: Option[Boolean]) => {
+
+          val incomingKnownFactsResponse = KnownFactsResponse(optPostCode, optIsAbroad, nino = Some(testKnownFactsRecordedNino))
+
+          mockRetrieveSaPostcode(testJourneyId)(Future.successful(None))
+          mockRetrieveKnownFacts(testSautr)(Future.successful(incomingKnownFactsResponse))
+          mockStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(Future.successful(SuccessfullyStored))
+          mockStoreES20Details(testJourneyId, incomingKnownFactsResponse)(Future.successful(SuccessfullyStored))
+
+          val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
+
+          result mustBe NinoNotDeclaredButFound
+
+          verifyRetrieveKnownFacts(testSautr)
+          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          reset(mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
+        }
+        }
+      }
+    }
     "return SuccessfulMatch" when {
       "the user's postcode matches the postcode returned from ES20" when {
         "the postcode's are provided in the same format" in {

@@ -22,7 +22,6 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, Int
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

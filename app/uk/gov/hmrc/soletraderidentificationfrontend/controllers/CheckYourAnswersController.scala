@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.FeatureSwitching
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.NinoNotFound
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NinoNotDeclaredButFound, NinoNotFound}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services._
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.check_your_answers_page
@@ -68,20 +68,25 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
       authorised() {
         journeyService.getJourneyConfig(journeyId).flatMap {
           journeyConfig =>
-            submissionService.submit(journeyId, journeyConfig).map {
-              case StartBusinessVerification(businessVerificationUrl) =>
-                Redirect(businessVerificationUrl)
-              case JourneyCompleted(continueUrl) =>
-                auditService.auditJourney(journeyId, journeyConfig)
-                Redirect(continueUrl + s"?journeyId=$journeyId")
-              case SoleTraderDetailsMismatch(NinoNotFound) =>
-                auditService.auditJourney(journeyId, journeyConfig)
-                Redirect(routes.DetailsNotFoundController.show(journeyId))
-              case SoleTraderDetailsMismatch(_) =>
-                auditService.auditJourney(journeyId, journeyConfig)
-                Redirect(routes.CannotConfirmBusinessErrorController.show(journeyId))
+            for {
+              (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig).map({
+                case StartBusinessVerification(businessVerificationUrl) => (businessVerificationUrl, DoNotAuditJourney)
+                case JourneyCompleted(continueUrl)                      => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
+                case SoleTraderDetailsMismatch(NinoNotFound)            => (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
+                case SoleTraderDetailsMismatch(NinoNotDeclaredButFound) => (routes.CouldNotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
+                case SoleTraderDetailsMismatch(_)                       => (routes.CannotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
+              })
+            } yield {
+              if (shouldAuditJourney == AuditJourney) auditService.auditJourney(journeyId, journeyConfig) else ()
+              Redirect(nextUrl)
             }
         }
       }
   }
+
+  sealed trait JourneyState
+
+  case object AuditJourney extends JourneyState
+
+  case object DoNotAuditJourney extends JourneyState
 }
