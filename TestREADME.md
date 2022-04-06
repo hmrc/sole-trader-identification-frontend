@@ -301,9 +301,32 @@ Response body:
 }
 ```
 
+#### Sautr: 1234567891
+___
+Mimics a response for the user with NINO BB111111B, that declare SAUTR equals to 1234567891. If user asserts they have no Nino, the front end will show a retry page given the mismatch between what the user declared (No Nino) and what Known Facts has recorded for the user (NINO BB111111B).
+
+Status: **OK(200)**
+
+Response body:
+```
+{
+ "service": "IR-SA",
+ "enrolments": [{
+     "identifiers": [{
+         "key": "UTR",
+         "value": "1234567891"
+     }],
+     "verifiers": [{
+         "key": "NINO",
+         "value": "BB111111B"
+     }]
+ }]
+}
+```
+
 #### Any other sautr
 ___
-Mimics a response for users with a UK postcode. If this matches the SA postcode entered by the user then identifersMatch will be stored as true
+Mimics a response for users with a UK postcode. If this matches the SA postcode entered by the user then identifiersMatch will be stored as true
 
 Status: **OK(200)**
 
