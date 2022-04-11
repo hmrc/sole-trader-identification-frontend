@@ -21,12 +21,12 @@ import play.api.Application
 import play.api.http.Status.FORBIDDEN
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.{JsBoolean, Json}
+import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{EnableNoNinoJourney, KnownFactsStub}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DeceasedCitizensDetails, DetailsMismatch, NinoNotFound}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DeceasedCitizensDetails, DeceasedCitizensDetailsKey, DetailsMismatch, DetailsMismatchKey, NinoNotDeclaredButFound, NinoNotDeclaredButFoundKey, NinoNotFound, NinoNotFoundKey, NotEnoughInfoToMatchKey, NotEnoughInformationToMatch, SuccessfulMatch, SuccessfulMatchKey}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit, verifyAuditTypeFor}
@@ -67,7 +67,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
     super.afterEach()
   }
 
-    "GET /check-your-answers-business" when {
+  "GET /check-your-answers-business" when {
     "the applicant has a nino and an sautr" should {
       lazy val result: WSResponse = {
         await(journeyConfigRepository.insertJourneyConfig(
@@ -267,7 +267,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
             stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
             stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
-            stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
+            stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
             stubRetrieveNino(testJourneyId)(OK, testNino)
             stubRetrieveAddress(testJourneyId)(NOT_FOUND)
             stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
@@ -281,7 +281,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             }
 
             verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
-            verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
             verifyAudit()
           }
           "the user does not have a nino" in {
@@ -296,7 +296,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
             stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
             stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponse)
-            stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
+            stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
             stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))(OK)
             stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
             stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
@@ -312,85 +312,13 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             }
 
             verifyStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))
-            verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
             verifyAudit()
           }
         }
       }
 
       "redirect to continue url" when {
-        "the sautr is not provided but the details match what is held in the database" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetailsNoSautr)(OK, successfulMatchJson(testIndividualDetailsNoSautr))
-          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
-          stubRegister(testNino, None, testRegime)(OK, Registered(testSafeId))
-          stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
-
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> true)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
-          stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetailsNoSautr))
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
-          stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
-          verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
-          verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
-        }
-
-        "business verification does not have enough information to identify the user" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
-          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(NOT_FOUND, Json.obj())
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToChallenge)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> true)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
-          stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToChallengeJson)
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToChallenge)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
-          verifyAudit()
-        }
-
         "the user has been locked out of business verification" in {
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,
@@ -403,13 +331,13 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
           stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
           stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl)(FORBIDDEN, Json.obj())
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> true)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> SuccessfulMatchKey)).setRequiredScenarioState("auditing")
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatch)
           stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationFailJson)
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -424,7 +352,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
 
@@ -440,7 +368,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr).setNewScenarioState("auditing")
           stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
           stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(OK)
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
           stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
           stubRetrieveAddress(testJourneyId)(OK, Json.toJson(testAddress))
@@ -449,8 +377,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr ++ Json.obj("identifiersMatch" -> NotEnoughInfoToMatchKey)).setRequiredScenarioState("auditing")
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, NotEnoughInformationToMatch)
 
           val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
@@ -459,85 +387,10 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             redirectUri(testContinueUrl)
           }
 
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(NotEnoughInfoToMatchKey))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
-        }
-
-        "the nino is provided and the user enters a wrong postcode format" in {
-          enable(EnableNoNinoJourney)
-          enable(KnownFactsStub)
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr).setNewScenarioState("auditing")
-          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
-          stubRetrieveAddress(testJourneyId)(OK, Json.toJson(testAddressWrongPostcodeFormat))
-          stubCreateTrn(testDateOfBirth, testFullName, testAddress)(CREATED, Json.obj("temporaryReferenceNumber" -> testTrn))
-          stubStoreTrn(testJourneyId, testTrn)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
-        }
-
-        "the user enter their full name in lowercase" in {
-          enable(EnableNoNinoJourney)
-          enable(KnownFactsStub)
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr)
-          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullNameLowerCase))
-          stubRetrieveAddress(testJourneyId)(OK, Json.toJson(testAddress))
-          stubCreateTrn(testDateOfBirth, testFullName, testAddress)(CREATED, Json.obj("temporaryReferenceNumber" -> testTrn))
-          stubStoreTrn(testJourneyId, testTrn)(OK)
-          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
-          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr ++ Json.obj("identifiersMatch" -> false))
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyAudit()
         }
       }
 
@@ -553,12 +406,12 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
             stubMatch(testIndividualDetails)(UNAUTHORIZED, mismatchErrorJson)
             stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
-            stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+            stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
             stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
             stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
             stubAudit()
-            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-            stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> DetailsMismatchKey)).setRequiredScenarioState("auditing")
+            stubRetrieveIdentifiersMatch(testJourneyId)(OK, DetailsMismatch)
             stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DetailsMismatch")
             stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
             stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -573,82 +426,46 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
             verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
             verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-            verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
             verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
           }
         }
-          "the user does not have a nino (and KnowFacts does not have a nino either)" when {
-            "the SA postcode does not match postcode returned from ES20" in {
-              enable(EnableNoNinoJourney)
-              await(journeyConfigRepository.insertJourneyConfig(
-                journeyId = testJourneyId,
-                authInternalId = testInternalId,
-                journeyConfig = testSoleTraderJourneyConfig
-              ))
-              stubAuth(OK, successfulAuthResponse())
-              stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
-              stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
-              stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
-              stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseWithoutNino)
-              stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-              stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))(OK)
-              stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
-              stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
-              stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-              stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
-              stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
-              stubAudit()
-              stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
+        "the user does not have a nino (and KnowFacts does not have a nino either)" when {
+          "the SA postcode does not match postcode returned from ES20" in {
+            enable(EnableNoNinoJourney)
+            await(journeyConfigRepository.insertJourneyConfig(
+              journeyId = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig = testSoleTraderJourneyConfig
+            ))
+            stubAuth(OK, successfulAuthResponse())
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
+            stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
+            stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
+            stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseWithoutNino)
+            stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
+            stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))(OK)
+            stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
+            stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+            stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+            stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
+            stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
+            stubAudit()
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> DetailsMismatchKey)).setRequiredScenarioState("auditing")
 
-              val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+            val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
-              result must have {
-                httpStatus(SEE_OTHER)
-                redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
-              }
-
-              verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-              verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-              verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-              verifyAudit()
+            result must have {
+              httpStatus(SEE_OTHER)
+              redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
             }
-            "the user does not provide a SA postcode and ES20 returns N for isAbroad flag" in {
-              enable(EnableNoNinoJourney)
-              await(journeyConfigRepository.insertJourneyConfig(
-                journeyId = testJourneyId,
-                authInternalId = testInternalId,
-                journeyConfig = testSoleTraderJourneyConfig
-              ))
-              stubAuth(OK, successfulAuthResponse())
-              stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
-              stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-              stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
-              stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseIsAbroad("N"))
-              stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-              stubStoreES20Details(testJourneyId, KnownFactsResponse(None, Some(false), None))(OK)
-              stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
-              stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
-              stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-              stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
-              stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
-              stubAudit()
-              stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
 
-              val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-              result must have {
-                httpStatus(SEE_OTHER)
-                redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
-              }
-
-              verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-              verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-              verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-              verifyAudit()
-            }
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
+            verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
+            verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+            verifyAudit()
           }
         }
-
         "the provided details are for a deceased citizen" in {
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,
@@ -659,12 +476,12 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
           stubMatch(testIndividualDetails)(FAILED_DEPENDENCY, Json.obj())
           stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, DeceasedCitizensDetails)(OK)
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> DeceasedCitizensDetailsKey)).setRequiredScenarioState("auditing")
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, DeceasedCitizensDetails)
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DeceasedCitizensDetails")
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -679,7 +496,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(DeceasedCitizensDetailsKey))
           verifyAudit()
         }
       }
@@ -695,12 +512,12 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
           stubMatch(testIndividualDetails)(UNAUTHORIZED, notFoundErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, NinoNotFound)(OK)
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> NinoNotFoundKey)).setRequiredScenarioState("auditing")
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, NinoNotFound)
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "NinoNotFound")
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -715,13 +532,13 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotFoundKey))
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
       }
 
       "redirect to 'we could not confirm your business' controller" when {
-        "the user declare SaUTR and no Nino but KnownFacts found one" in {
+        "the user declares SaUTR and no Nino but KnownFacts found one" in {
           enable(EnableNoNinoJourney)
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,
@@ -734,17 +551,17 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
           stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
           stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)
           stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, Some(testNinoRecordedByKnownFacts)))(OK)
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
 
           stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> NinoNotDeclaredButFoundKey)).setRequiredScenarioState("auditing")
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
           stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
           stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, NinoNotDeclaredButFound)
           stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
           stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
 
@@ -757,181 +574,181 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotDeclaredButFoundKey))
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
       }
     }
+  }
 
-    "the sautr check is disabled (KnowFacts is not contacted in this scenario)" should {
-      "redirect to continue url" when {
-        "the provided details match what is held in the database" in {
-          enable(EnableNoNinoJourney)
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetailsNoSautr)(OK, successfulMatchJson(testIndividualDetailsNoSautr))
-          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> true)).setRequiredScenarioState("auditing")
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveNino(testJourneyId)(OK, testNino)
-          stubRetrieveSautr(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(true))
-          stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-          stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+  "the sautr check is disabled (KnowFacts is not contacted in this scenario)" should {
+    "redirect to continue url" when {
+      "the provided details match what is held in the database" in {
+        enable(EnableNoNinoJourney)
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubMatch(testIndividualDetailsNoSautr)(OK, successfulMatchJson(testIndividualDetailsNoSautr))
+        stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(OK)
+        stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+        stubAudit()
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> SuccessfulMatchKey)).setRequiredScenarioState("auditing")
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatch)
+        stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
 
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+        val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)
-          verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(testContinueUrl)
         }
-        "the user does not have a nino" in {
-          enable(EnableNoNinoJourney)
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr)
-          stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubAudit()
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveNino(testJourneyId)(NOT_FOUND)
-          stubRetrieveSautr(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-          stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-          stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
 
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(testContinueUrl)
-          }
-
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyAudit()
-        }
+        verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+        verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
+      "the user does not have a nino" in {
+        enable(EnableNoNinoJourney)
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr)
+        stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
+        stubStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(OK)
+        stubAudit()
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(NOT_FOUND)
+        stubRetrieveSautr(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, NotEnoughInformationToMatch)
+        stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
 
-      "redirect to cannot confirm business error controller" when {
-        "the provided details do not match what is held in the database" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, mismatchErrorJson)
-          stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveNino(testJourneyId)(OK, testNino)
-          stubRetrieveSautr(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-          stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DetailsMismatch")
+        val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
-          }
-
-          verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(testContinueUrl)
         }
 
-        "the provided details are for a deceased citizen" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetailsNoSautr)(FAILED_DEPENDENCY, Json.obj())
-          stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveNino(testJourneyId)(OK, testNino)
-          stubRetrieveSautr(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-          stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DeceasedCitizensDetails")
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
-          }
-
-          verifyStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
-        }
-      }
-
-      "redirect to details not found controller" when {
-        "the provided details do not exist in the database" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
-          stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, notFoundErrorJson)
-          stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
-          stubAudit()
-          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
-          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
-          stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
-          stubRetrieveNino(testJourneyId)(OK, testNino)
-          stubRetrieveSautr(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
-          stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "NinoNotFound")
-
-          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(routes.DetailsNotFoundController.show(testJourneyId).url)
-          }
-
-          verifyStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
-          verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
-        }
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(NotEnoughInfoToMatchKey))
+        verifyAudit()
       }
     }
+
+    "redirect to cannot confirm business error controller" when {
+      "the provided details do not match what is held in the database" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, mismatchErrorJson)
+        stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
+        stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
+        stubAudit()
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> DetailsMismatchKey)).setRequiredScenarioState("auditing")
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, DetailsMismatch)
+        stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DetailsMismatch")
+
+        val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
+        }
+
+        verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
+        verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
+      }
+      "the provided details are for a deceased citizen" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubMatch(testIndividualDetailsNoSautr)(FAILED_DEPENDENCY, Json.obj())
+        stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
+        stubStoreIdentifiersMatch(testJourneyId, DeceasedCitizensDetails)(OK)
+        stubAudit()
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> DeceasedCitizensDetailsKey)).setRequiredScenarioState("auditing")
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, DeceasedCitizensDetails)
+        stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "DeceasedCitizensDetails")
+
+        val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
+        }
+
+        verifyStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(DeceasedCitizensDetailsKey))
+        verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
+      }
+    }
+
+    "redirect to details not found controller" when {
+      "the provided details do not exist in the database" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, notFoundErrorJson)
+        stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
+        stubStoreIdentifiersMatch(testJourneyId, NinoNotFound)(OK)
+        stubAudit()
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> NinoNotFoundKey)).setRequiredScenarioState("auditing")
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+        stubRetrieveSautr(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, NinoNotFound)
+        stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "NinoNotFound")
+
+        val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(routes.DetailsNotFoundController.show(testJourneyId).url)
+        }
+
+        verifyStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotFoundKey))
+        verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
+      }
+    }
+  }
 
   "businessVerificationCheck false scenario: POST /check-your-answers-business" should {
     "redirect to journey config continue url" when {
@@ -947,7 +764,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
           stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = true)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
 
           stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
 
@@ -980,7 +797,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
           stubMatch(testIndividualDetails)(UNAUTHORIZED, mismatchErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
-          stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()
 
@@ -993,12 +810,11 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
           verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
 
           verifyAudit()
 
         }
-
       }
     }
 
@@ -1015,16 +831,16 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
-        stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(OK)
+        stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)
         stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, Some(testNinoRecordedByKnownFacts)))(OK)
         stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
 
         stubAudit()
-        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> false)).setRequiredScenarioState("auditing")
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> NinoNotDeclaredButFoundKey)).setRequiredScenarioState("auditing")
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
         stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, JsBoolean(false))
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, NinoNotDeclaredButFound)
         stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
 
         val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
@@ -1035,7 +851,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         }
 
         verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-        verifyStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)
+        verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotDeclaredButFoundKey))
         verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
       }
     }

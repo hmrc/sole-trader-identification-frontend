@@ -19,6 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchResult, SuccessfulMatchKey}
 
 import java.time.LocalDate
 
@@ -28,7 +29,7 @@ case class SoleTraderDetails(fullName: FullName,
                              address: Option[Address],
                              optSaPostcode: Option[String],
                              optSautr: Option[String],
-                             identifiersMatch: Boolean,
+                             identifiersMatch: SoleTraderDetailsMatchResult,
                              businessVerification: Option[BusinessVerificationStatus],
                              registrationStatus: Option[RegistrationStatus],
                              optTrn: Option[String],
@@ -56,7 +57,7 @@ object SoleTraderDetails {
       (JsPath \ AddressKey).readNullable[Address] and
       (JsPath \ SaPostcodeKey).readNullable[String] and
       (JsPath \ SautrKey).readNullable[String] and
-      (JsPath \ IdentifiersMatchKey).read[Boolean] and
+      (JsPath \ IdentifiersMatchKey).read[SoleTraderDetailsMatchResult] and
       (JsPath \ BusinessVerificationKey).readNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).readNullable[RegistrationStatus] and
       (JsPath \ TrnKey).readNullable[String] and
@@ -70,7 +71,7 @@ object SoleTraderDetails {
       (JsPath \ AddressKey).writeNullable[Address] and
       (JsPath \ SaPostcodeKey).writeNullable[String] and
       (JsPath \ SautrKey).writeNullable[String] and
-      (JsPath \ IdentifiersMatchKey).write[Boolean] and
+      (JsPath \ IdentifiersMatchKey).write[SoleTraderDetailsMatchResult] and
       (JsPath \ BusinessVerificationKey).writeNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).writeNullable[RegistrationStatus] and
       (JsPath \ TrnKey).writeNullable[String] and
@@ -93,6 +94,8 @@ object SoleTraderDetails {
           Json.obj(BusinessVerificationKey -> Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusForCallingServices))
         })
         .getOrElse(Json.obj())
+    } ++ {
+      Json.obj(IdentifiersMatchKey -> soleTraderDetails.identifiersMatch.toString.contains(SuccessfulMatchKey))
     }
 
 }

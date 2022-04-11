@@ -208,13 +208,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = testSoleTraderDetailsJson
+          body = Json.toJson(testSoleTraderDetails)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
-        result.json mustBe Json.toJsObject(testSoleTraderDetails)
+        result.json mustBe testSoleTraderDetailsJson
       }
 
       "the journeyId exists and the identifiers do not match" when {
@@ -256,17 +256,17 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testSoleTraderDetailsJsonIndividual
+            body = Json.toJson(testSoleTraderDetailsJsonIndividual)
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
-          result.json mustBe Json.toJsObject(testSoleTraderDetailsIndividualJourney)
+          result.json mustBe testSoleTraderDetailsJsonIndividual
         }
         "the Nino is lowercase" in {
           stubAuth(OK, successfulAuthResponse())
-          val testSoleTraderDetailsJsonIndividual: JsObject = {
+          val testIndividualJson: JsObject = {
             Json.obj("fullName" -> Json.obj(
               "firstName" -> testFirstName,
               "lastName" -> testLastName
@@ -279,13 +279,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testSoleTraderDetailsJsonIndividual
+            body = testIndividualJson
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
-          result.json mustBe Json.toJsObject(testSoleTraderDetailsIndividualJourney)
+          result.json mustBe testSoleTraderDetailsJsonIndividual
         }
       }
 
@@ -293,13 +293,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = testSoleTraderDetailsJsonIndividualNoNino
+          body = Json.toJsObject(testSoleTraderDetailsIndividualJourneyNoNino)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
-        result.json mustBe Json.toJsObject(testSoleTraderDetailsIndividualJourneyNoNino)
+        result.json mustBe testSoleTraderDetailsJsonIndividualNoNino
       }
 
       "the journeyId exists but no business verification status is stored" in {
@@ -324,13 +324,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = testSoleTraderDetailsJson
+          body = Json.toJsObject(testSoleTraderDetailsNoBV)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
-        result.json mustBe Json.toJsObject(testSoleTraderDetailsNoBV)
+        result.json mustBe testSoleTraderDetailsJson
       }
     }
 

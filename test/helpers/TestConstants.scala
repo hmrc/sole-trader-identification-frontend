@@ -18,7 +18,7 @@ package helpers
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.DetailsMismatch
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -70,7 +70,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = Some(testSautr),
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
@@ -85,7 +85,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = Some(testSautr),
-      identifiersMatch = false,
+      identifiersMatch = DetailsMismatch,
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
@@ -100,22 +100,22 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = None,
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
       optOverseas = None
     )
 
-  val testSoleTraderDetailsNoNinoButUtr: SoleTraderDetails =
+  def testSoleTraderDetailsNoNino(optSautr: Option[String] = Some(testSautr)): SoleTraderDetails =
     SoleTraderDetails(
       fullName = testFullName,
       dateOfBirth = testDateOfBirth,
       optNino = None,
       address = Some(testAddress),
       optSaPostcode = Some(testSaPostcode),
-      optSautr = Some(testSautr),
-      identifiersMatch = true,
+      optSautr = optSautr,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = Some(testTrn),
@@ -130,7 +130,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = Some(testSautr),
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = None,
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
@@ -145,14 +145,14 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = Some(testSautr),
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(RegistrationFailed),
       optTrn = None,
       optOverseas = None
     )
 
-  val testSoleTraderDetailsNoNinoAndOverseas: SoleTraderDetails = testSoleTraderDetailsNoNinoButUtr.copy(address = Some(testOverseasAddress))
+  val testSoleTraderDetailsNoNinoAndOverseas: SoleTraderDetails = testSoleTraderDetailsNoNino().copy(address = Some(testOverseasAddress))
 
   val testIndividualDetails: IndividualDetails =
     IndividualDetails(
@@ -244,7 +244,7 @@ object TestConstants {
     testRegime
   )
 
-  def testSoleTraderAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -253,15 +253,15 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
 
-  def testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch: Boolean = false): JsObject =
+  def testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch: String = "false"): JsObject =
     testSoleTraderAuditEventJson(identifiersMatch) ++ Json.obj("callingService" -> testServiceName)
 
-  def testSoleTraderAuditEventJsonNoSautr(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderAuditEventJsonNoSautr(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -269,12 +269,12 @@ object TestConstants {
     "nino" -> testNino,
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
-  def testSoleTraderAuditEventJsonNoNino(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderAuditEventJsonNoNino(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -282,7 +282,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "address" -> testAddress,
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
@@ -292,7 +292,7 @@ object TestConstants {
     "overseasTaxIdentifierCountry" -> testOverseasIdentifiers.country
   )
 
-  def testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -300,7 +300,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "address" -> testOverseasAddress,
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
@@ -310,7 +310,7 @@ object TestConstants {
     "overseasTaxIdentifierCountry" -> testOverseasIdentifiers.country
   )
 
-  def testSoleTraderFailureAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderFailureAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -319,12 +319,12 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> DetailsMismatch.toString,
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
-  def testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -333,12 +333,12 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "not requested",
     "RegisterApiStatus" -> testRegistrationSuccess
   )
 
-  def testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch: Boolean = false): JsObject = Json.obj(
+  def testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
@@ -347,7 +347,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
     "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch.toString,
+    "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "success",
     "RegisterApiStatus" -> testRegistrationFailed
   )
@@ -361,6 +361,5 @@ object TestConstants {
     "isMatch" -> "false",
     "authenticatorResponse" -> DetailsMismatch.toString
   )
-
 
 }

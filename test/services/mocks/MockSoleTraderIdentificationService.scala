@@ -23,7 +23,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.SoleTraderDetailsMatchFailure
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentificationService
 
@@ -69,7 +69,7 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     ).thenReturn(response)
 
   def mockRetrieveIdentifiersMatch(journeyId: String)
-                                  (response: Future[Option[Boolean]]): OngoingStubbing[_] =
+                                  (response: Future[Option[SoleTraderDetailsMatchResult]]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.retrieveIdentifiersMatch(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
@@ -161,7 +161,7 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean)
+  def mockStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)
                                (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.storeIdentifiersMatch(
       ArgumentMatchers.eq(journeyId),
@@ -213,7 +213,7 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
       ArgumentMatchers.eq(businessVerificationStatus)
     )(ArgumentMatchers.any[HeaderCarrier])
 
-  def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean): Unit =
+  def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult): Unit =
     verify(mockSoleTraderIdentificationService).storeIdentifiersMatch(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(identifiersMatch)

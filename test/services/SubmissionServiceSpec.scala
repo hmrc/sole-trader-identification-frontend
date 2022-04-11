@@ -214,7 +214,7 @@ class SubmissionServiceSpec
           enable(EnableOptionalNinoJourney)
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNinoNoSautr)))
           mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNinoNoSautr)(Future.successful(NotEnoughInformationToMatch))
-          mockStoreIdentifiersMatch(testJourneyId, identifiersMatch = false)(Future.successful(SuccessfullyStored))
+          mockStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(Future.successful(SuccessfullyStored))
           mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
           mockCreateTrn(testJourneyId)(Future.successful(testTrn))

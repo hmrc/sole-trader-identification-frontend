@@ -17,8 +17,9 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallBVKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationFailedKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -119,7 +120,7 @@ object TestConstants {
       address = None,
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
@@ -134,7 +135,7 @@ object TestConstants {
       address = None,
       optSaPostcode = Some(testSaPostcode),
       optSautr = Some(testSautr),
-      identifiersMatch = false,
+      identifiersMatch = DetailsMismatch,
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
@@ -151,7 +152,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = None,
-      identifiersMatch = true,
+      identifiersMatch = SuccessfulMatch,
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
@@ -166,7 +167,7 @@ object TestConstants {
       address = None,
       optSaPostcode = None,
       optSautr = None,
-      identifiersMatch = false,
+      identifiersMatch = DetailsMismatch,
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,

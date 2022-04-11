@@ -17,8 +17,8 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.SoleTraderDetailsMatchFailure
+import play.api.libs.json.{JsString, JsValue, Json}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, WiremockHelper}
 
@@ -85,9 +85,9 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       status = status
     )
 
-  def stubStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean)(status: Int): StubMapping =
+  def stubStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(status: Int): StubMapping =
     when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch", body = JsBoolean(identifiersMatch)
+      uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch", body = JsString(identifiersMatch.toString)
     ).thenReturn(
       status = status
     )
@@ -287,12 +287,12 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       body = body
     )
 
-  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
+  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatch: SoleTraderDetailsMatchResult): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch"
     ).thenReturn(
       status = status,
-      body = body
+      body = JsString(identifiersMatch.toString)
     )
 
   def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
@@ -340,10 +340,10 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
     )
   }
 
-  def verifyStoreIdentifiersMatch(journeyId: String, identifiersMatch: Boolean): Unit =
+  def verifyStoreIdentifiersMatch(journeyId: String, expBody: JsValue): Unit =
     WiremockHelper.verifyPut(
       uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch",
-      optBody = Some(JsBoolean(identifiersMatch).toString())
+      optBody = Some(Json.stringify(expBody))
     )
 
   def verifyStoreTrn(journeyId: String, trn: String): Unit =
