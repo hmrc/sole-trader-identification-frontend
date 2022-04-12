@@ -20,6 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NotEnoughInformationToMatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import javax.inject.{Inject, Singleton}
@@ -46,7 +47,7 @@ class AuditService @Inject()(appConfig: AppConfig,
       optAuthenticatorResponse <-
         optIdentifiersMatch match {
           case Some(_) if optSoleTraderRecord.exists(details => details.optNino.isEmpty) => Future.successful(None)
-          case Some(identifiersMatch) if identifiersMatch =>
+          case Some(SuccessfulMatch) =>
             soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
           case _ =>
             soleTraderIdentificationService.retrieveAuthenticatorFailureResponse(journeyId)
@@ -129,13 +130,19 @@ class AuditService @Inject()(appConfig: AppConfig,
               }
             }
 
+          val identifiersMatchStatus: String = identifiersMatch match {
+            case SuccessfulMatch => "true"
+            case NotEnoughInformationToMatch => "unmatchable"
+            case _ => "false"
+          }
+
           Json.obj(
             "callingService" -> callingService,
             "businessType" -> "Sole Trader",
             "firstName" -> soleTraderRecord.fullName.firstName,
             "lastName" -> soleTraderRecord.fullName.lastName,
             "dateOfBirth" -> soleTraderRecord.dateOfBirth,
-            "isMatch" -> identifiersMatch.toString,
+            "isMatch" -> identifiersMatchStatus,
             "VerificationStatus" -> businessVerificationStatus
           ) ++ registrationStatusBlock ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
         case _ =>
@@ -158,7 +165,7 @@ class AuditService @Inject()(appConfig: AppConfig,
       optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
       optAuthenticatorResponse <-
         (optIndividualDetails, optIdentifiersMatch) match {
-          case (Some(_), Some(true)) =>
+          case (Some(_), Some(SuccessfulMatch)) =>
             soleTraderIdentificationService.retrieveAuthenticatorDetails(journeyId)
           case (Some(individualDetails), Some(_)) if individualDetails.optNino.isEmpty => Future.successful(None)
           case _ =>
@@ -171,6 +178,11 @@ class AuditService @Inject()(appConfig: AppConfig,
           case Some(authenticatorFailureResponse: String) => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
           case _ => Json.obj()
         }
+      val identifiersMatchStatus: String = optIdentifiersMatch match {
+        case Some(SuccessfulMatch) => "true"
+        case Some(NotEnoughInformationToMatch) => "unmatchable"
+        case _ => "false"
+      }
       (optIndividualDetails, optIdentifiersMatch) match {
         case (Some(IndividualDetails(firstName, lastName, dateOfBirth, Some(nino), None)), Some(identifiersMatch)) =>
           Json.obj(
@@ -179,7 +191,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             "lastName" -> lastName,
             "nino" -> nino,
             "dateOfBirth" -> dateOfBirth,
-            "isMatch" -> identifiersMatch.toString
+            "isMatch" -> identifiersMatchStatus
           ) ++ authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
