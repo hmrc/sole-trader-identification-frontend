@@ -74,12 +74,6 @@ class AuditService @Inject()(appConfig: AppConfig,
               case _ => Json.obj()
             }
 
-          val ninoBlock =
-            soleTraderRecord.optNino match {
-              case Some(nino) => Json.obj("nino" -> nino)
-              case _ => Json.obj()
-            }
-
           val addressBlock =
             soleTraderRecord.address match {
               case Some(address) => Json.obj("address" -> Json.toJson(address))
@@ -144,7 +138,15 @@ class AuditService @Inject()(appConfig: AppConfig,
             "dateOfBirth" -> soleTraderRecord.dateOfBirth,
             "isMatch" -> identifiersMatchStatus,
             "VerificationStatus" -> businessVerificationStatus
-          ) ++ registrationStatusBlock ++ sautrBlock ++ ninoBlock ++ addressBlock ++ saPostCodeBlock ++ overseasIdentifiersBlock ++ trnBlock ++ eS20Block ++ authenticatorResponseBlock
+          ) ++ registrationStatusBlock ++
+            sautrBlock ++
+            ninoBlock(soleTraderRecord.optNino) ++
+            addressBlock ++
+            saPostCodeBlock ++
+            overseasIdentifiersBlock ++
+            trnBlock ++
+            eS20Block ++
+            authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit sole trader journey for Journey ID $journeyId")
       }
@@ -183,16 +185,16 @@ class AuditService @Inject()(appConfig: AppConfig,
         case Some(NotEnoughInformationToMatch) => "unmatchable"
         case _ => "false"
       }
-      (optIndividualDetails, optIdentifiersMatch) match {
-        case (Some(IndividualDetails(firstName, lastName, dateOfBirth, Some(nino), None)), Some(identifiersMatch)) =>
+      optIndividualDetails match {
+        case Some(IndividualDetails(firstName, lastName, dateOfBirth, optNino, None)) =>
           Json.obj(
             "callingService" -> callingService,
             "firstName" -> firstName,
             "lastName" -> lastName,
-            "nino" -> nino,
             "dateOfBirth" -> dateOfBirth,
             "isMatch" -> identifiersMatchStatus
-          ) ++ authenticatorResponseBlock
+          ) ++ authenticatorResponseBlock ++
+            ninoBlock(optNino)
         case _ =>
           throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
       }
@@ -201,6 +203,11 @@ class AuditService @Inject()(appConfig: AppConfig,
     individualAudit.map {
       individualAuditJson => auditConnector.sendExplicitAudit(auditType = "IndividualIdentification", detail = individualAuditJson)
     }
+  }
+
+  private def ninoBlock(optNino: Option[String]): JsObject = optNino match {
+    case Some(nino) => Json.obj("nino" -> nino)
+    case _ => Json.obj()
   }
 
 }
