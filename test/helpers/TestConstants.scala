@@ -352,13 +352,13 @@ object TestConstants {
     "RegisterApiStatus" -> testRegistrationFailed
   )
 
-  val testIndividualFailureAuditEventJson: JsObject = Json.obj(
+  def testIndividualFailureAuditEventJson(isMatch: String): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "firstName" -> testFirstName,
     "lastName" -> testLastName,
     "dateOfBirth" -> testDateOfBirth,
     "nino" -> testNino,
-    "isMatch" -> "false",
+    "isMatch" -> isMatch,
     "authenticatorResponse" -> DetailsMismatch.toString
   )
 

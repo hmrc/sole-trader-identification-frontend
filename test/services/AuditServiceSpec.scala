@@ -77,7 +77,20 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         result mustBe a[Unit]
 
         verifySendExplicitAuditIndividuals()
-        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson
+        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "false")
+      }
+
+      "the entity is an individual and there is no NINO (non nino in the event)" in {
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr.copy(optNino = None))))
+        mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(NotEnoughInformationToMatch)))
+
+        val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
+
+        result mustBe a[Unit]
+
+        verifySendExplicitAuditIndividuals()
+
+        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "unmatchable") - "nino" - "authenticatorResponse"
       }
     }
 

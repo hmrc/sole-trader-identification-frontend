@@ -646,7 +646,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, JsString(NotEnoughInfoToMatchKey))
-        verifyAudit()
+        verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
     }
 
