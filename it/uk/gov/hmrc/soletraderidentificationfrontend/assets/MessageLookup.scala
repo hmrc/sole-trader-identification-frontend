@@ -50,7 +50,8 @@ object MessageLookup {
   }
 
   object CaptureFullName {
-    val title = "What is your full name?"
+    val title = "What is your full name? - Entity Validation Service - GOV.UK"
+    val testFullNamePageTitle = "What is the name of the nominated partner? - Entity Validation Service - GOV.UK"
     val heading = "What is your full name?"
     val line_1 = "We will attempt to match these details with the information we already have."
     val form_field_1 = "First name"
@@ -66,7 +67,7 @@ object MessageLookup {
   }
 
   object CaptureDateOfBirth {
-    val title = s"What is applicant’s date of birth?"
+    val title = s"What is applicant’s date of birth? - Entity Validation Service - GOV.UK"
     val heading = s"What is $testFirstName’s date of birth?"
     val hint = "For example, 27 3 2007"
 
@@ -80,7 +81,7 @@ object MessageLookup {
   }
 
   object CaptureNino {
-    val title = s"What is applicant’s National Insurance number?"
+    val title = s"What is applicant’s National Insurance number? - Entity Validation Service - GOV.UK"
     val heading = s"What is $testFirstName’s National Insurance number?"
     val line_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
     val form_field_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
@@ -93,7 +94,7 @@ object MessageLookup {
   }
 
   object CaptureAddress {
-    val title = s"Enter applicant’s home address"
+    val title = s"Enter applicant’s home address - Entity Validation Service - GOV.UK"
     val heading = s"Enter $testFirstName’s home address"
     val line_1 = "Address line 1"
     val line_2 = "Address line 2"
@@ -116,7 +117,7 @@ object MessageLookup {
   }
 
   object CaptureSautr {
-    val title = s"What is applicant’s Unique Taxpayer Reference?"
+    val title = s"What is applicant’s Unique Taxpayer Reference? - Entity Validation Service - GOV.UK"
     val heading = s"What is $testFirstName’s Unique Taxpayer Reference?"
     val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
     val line_2 = "I do not have a Unique Taxpayer Reference"
@@ -132,7 +133,7 @@ object MessageLookup {
 
   object CaptureSaPostcode {
 
-    val title = "What is the postcode where the business is registered for Self Assessment?"
+    val title = "What is the postcode where the business is registered for Self Assessment? - Test Service - GOV.UK"
     val heading = "What is the postcode where the business is registered for Self Assessment?"
     val hint = "For example, AB1 2YZ"
     val no_postcodeLink = "The business does not have a Self Assessment postcode"
@@ -146,7 +147,7 @@ object MessageLookup {
 
   object CaptureOverseasTaxIdentifiers {
 
-    val title = "What is the business’s overseas tax identifier?"
+    val title = "What is the business’s overseas tax identifier? - Entity Validation Service - GOV.UK"
     val heading = "What is the business’s overseas tax identifier?"
     val hint = "We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
     val form_field_1 = "Enter a tax identifier"
@@ -170,7 +171,7 @@ object MessageLookup {
   }
 
   object DetailsNotFound {
-    val title = "The details you entered did not match our records"
+    val title = "The details you entered did not match our records - Entity Validation Service - GOV.UK"
     val heading = "The details you entered did not match our records"
     val line_1 = "We could not match the details you entered with records held by HMRC."
     val line_2 = "If you used the wrong details, you can try again using different details."
@@ -181,7 +182,7 @@ object MessageLookup {
   }
 
   object CannotConfirmBusiness {
-    val title = "The details you provided do not match records held by HMRC"
+    val title = "The details you provided do not match records held by HMRC - Test Service - GOV.UK"
     val heading = "The details you provided do not match records held by HMRC"
     val line_1 = "If these details are correct, you can still register. If you entered the wrong details, go back and make changes."
     val radio = "Do you want to continue registering with the details you provided?"
@@ -193,13 +194,13 @@ object MessageLookup {
   }
 
   object CouldNotConfirmBusiness {
-    val title = "We could not confirm your business"
+    val title = "We could not confirm your business - Entity Validation Service - GOV.UK"
     val heading = "We could not confirm your business"
     val line_1 = "The information you provided does not match the details we have about your business."
   }
 
   object CheckYourAnswers {
-    val title = "Check your answers"
+    val title = "Check your answers - Entity Validation Service - GOV.UK"
     val heading = "Check your answers"
     val firstName = "First name"
     val lastName = "Last name"

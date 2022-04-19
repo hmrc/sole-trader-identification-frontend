@@ -35,7 +35,7 @@
 
 @(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call,  form: Form[Address], countries: Seq[Country])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title(messages("enter-address.title"), form)) {
+@layout(pageConfig, title = title("enter-address.title", pageConfig, form)) {
 
     @formWithCSRF(action = formAction) {
         @errorSummary(form.errors)

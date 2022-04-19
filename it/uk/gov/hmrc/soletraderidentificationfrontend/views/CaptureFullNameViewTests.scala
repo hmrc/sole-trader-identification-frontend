@@ -19,8 +19,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.CaptureFullName.testFullNamePageTitle
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureFullName => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testFullNamePageLabel, testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -32,7 +33,7 @@ trait CaptureFullNameViewTests {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "have a correct custom title" in {
-      doc.title mustBe testFullNamePageLabel
+      doc.title mustBe testFullNamePageTitle
     }
 
     "have a correct custom heading" in {
@@ -45,7 +46,7 @@ trait CaptureFullNameViewTests {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "have a correct custom title" in {
-      doc.title mustBe Base.Error.error + testFullNamePageLabel
+      doc.title mustBe Base.Error.error + testFullNamePageTitle
     }
 
     "have a correct custom heading" in {
@@ -105,6 +106,10 @@ trait CaptureFullNameViewTests {
   def testCaptureFullNameErrorMessage(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.noFirstNameEntered + " " + messages.Error.noLastNameEntered
@@ -116,6 +121,10 @@ trait CaptureFullNameViewTests {
 
   def testCaptureFullNameErrorMessageNoFirstName(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
@@ -129,6 +138,10 @@ trait CaptureFullNameViewTests {
   def testCaptureFullNameErrorMessageNoLastName(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.noLastNameEntered
@@ -140,6 +153,10 @@ trait CaptureFullNameViewTests {
 
   def testCaptureFullNameErrorMessageNoFirstNameAndLastName(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
@@ -153,6 +170,10 @@ trait CaptureFullNameViewTests {
   def testCaptureFullNameErrorMessageInvalidFirstName(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalidFirstNameEntered
@@ -164,6 +185,10 @@ trait CaptureFullNameViewTests {
 
   def testCaptureFullNameErrorMessageInvalidLastName(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

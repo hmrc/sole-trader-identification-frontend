@@ -75,7 +75,8 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
-
+  val testDefaultServiceName: String = "Entity Validation Service"
+  val testServiceName: String = "Test Service"
   val testFullNamePageLabel: String = "What is the name of the nominated partner?"
 
   val testIndividualPageConfig: PageConfig = PageConfig(
@@ -95,6 +96,10 @@ object TestConstants {
     pageConfig = testIndividualPageConfig,
     testRegime
   )
+
+  val testIndividualJourneyConfigWithCallingService: JourneyConfig =
+    testIndividualJourneyConfig
+      .copy(pageConfig = testIndividualPageConfig.copy(optServiceName = Some(testServiceName)))
 
   val testIndividualJourneyConfigJsonNoRegime: JsObject =
     Json.obj(

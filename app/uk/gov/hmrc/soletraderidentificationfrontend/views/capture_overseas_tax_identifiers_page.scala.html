@@ -37,7 +37,7 @@
 
 @(journeyId: String,pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title(messages("tax-identifiers.title"), form)) {
+@layout(pageConfig, title = title("tax-identifiers.title", pageConfig, form)) {
 
     @formWithCSRF(action = formAction) {
         @errorSummary(form.errors)

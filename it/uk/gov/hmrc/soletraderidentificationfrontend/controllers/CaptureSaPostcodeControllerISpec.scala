@@ -33,7 +33,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
       await(journeyConfigRepository.insertJourneyConfig(
         journeyId = testJourneyId,
         authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
+        journeyConfig = testIndividualJourneyConfigWithCallingService
       ))
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/self-assessment-postcode")
@@ -88,7 +88,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
+          journeyConfig = testIndividualJourneyConfigWithCallingService
         ))
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/self-assessment-postcode")("saPostcode" -> "")
@@ -106,7 +106,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
+          journeyConfig = testIndividualJourneyConfigWithCallingService
         ))
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/self-assessment-postcode")("saPostcode" -> "AA!0!!")

@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureSautr => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testDefaultServiceName, testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -81,6 +81,10 @@ trait CaptureSautrViewTests {
 
   def testCaptureSautrErrorMessages(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

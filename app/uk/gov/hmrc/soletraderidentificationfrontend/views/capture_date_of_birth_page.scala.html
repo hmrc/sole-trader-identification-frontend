@@ -30,7 +30,7 @@
 
 @(firstName: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title(messages("date-of-birth.title"), form)) {
+@layout(pageConfig, title = title("date-of-birth.title", pageConfig, form)) {
 
     @errorSummary(form.errors)
     @formWithCSRF(action = formAction) {

@@ -20,7 +20,7 @@ import play.api.http.Status._
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig

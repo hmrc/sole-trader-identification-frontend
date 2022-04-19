@@ -1,4 +1,5 @@
 service.name                                                = Register for VAT
+service.govuk                                               = GOV.UK
 error.summary.title                                         = There is a problem
 error.title-prefix                                          = 'Error: '
 
