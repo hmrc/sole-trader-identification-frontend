@@ -222,20 +222,9 @@ object TestConstants {
       "nino" -> testNino,
       "saPostcode" -> testSaPostcode,
       "sautr" -> testSautr,
-      "identifiersMatch" -> false,
+      "identifiersMatch" -> "DetailsMismatch",
       "businessVerification" -> bvStatus,
       "registration" -> testRegistrationNotCalledJson
-    )
-  }
-
-  val testSoleTraderDetailsJsonIndividual: JsObject = {
-    Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "nino" -> testNino,
-      "dateOfBirth" -> testDateOfBirth,
-      "identifiersMatch" -> true
     )
   }
 

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 import play.api.libs.json._
-import uk.gov.hmrc.http.InternalServerException
 
 object SoleTraderDetailsMatching {
 
@@ -40,6 +39,7 @@ object SoleTraderDetailsMatching {
   case object DeceasedCitizensDetails extends SoleTraderDetailsMatchFailure
 
   val KnownFactsMatchingResultKey = "identifiersMatch"
+
   val SuccessfulMatchKey = "SuccessfulMatch"
   val NotEnoughInfoToMatchKey = "NotEnoughInformationToMatch"
   val DetailsMismatchKey = "DetailsMismatch"
@@ -62,14 +62,6 @@ object SoleTraderDetailsMatching {
     }
 
     override def reads(json: JsValue): JsResult[SoleTraderDetailsMatchResult] =
-    //      json.validate[String].collect(JsonValidationError("Invalid Sole Trader Matching Result")) {
-    //        case SuccessfulMatchKey => SuccessfulMatch
-    //        case NotEnoughInfoToMatchKey => NotEnoughInformationToMatch
-    //        case DetailsMismatchKey => DetailsMismatch
-    //        case NinoNotDeclaredButFoundKey => NinoNotDeclaredButFound
-    //        case NinoNotFoundKey => NinoNotFound
-    //        case DeceasedCitizensDetailsKey => DeceasedCitizensDetails
-    //      }
       json.validate[String] match {
         case JsSuccess(identifiersMatchString, _) => identifiersMatchString match {
           case SuccessfulMatchKey => JsSuccess(SuccessfulMatch)
@@ -78,14 +70,9 @@ object SoleTraderDetailsMatching {
           case NinoNotDeclaredButFoundKey => JsSuccess(NinoNotDeclaredButFound)
           case NinoNotFoundKey => JsSuccess(NinoNotFound)
           case DeceasedCitizensDetailsKey => JsSuccess(DeceasedCitizensDetails)
+          case notMapped => JsError(s"Error trying to match Sole Trader Matching Result. $notMapped is not mapped to any match result")
         }
-        case JsError(_) =>
-          json.validate[Boolean] match {
-            case JsSuccess(identifiersMatchBoolean, _) =>
-              if (identifiersMatchBoolean) JsSuccess(SuccessfulMatch)
-              else JsSuccess(DetailsMismatch)
-            case JsError(_) => throw new InternalServerException("Invalid Sole Trader Matching Result")
-          }
+        case JsError(error) => JsError(s"Error reading Sole Trader Matching Result json. Details: $error")
       }
   }
 }

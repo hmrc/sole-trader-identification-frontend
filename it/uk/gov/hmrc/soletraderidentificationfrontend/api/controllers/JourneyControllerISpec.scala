@@ -252,40 +252,47 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       }
 
       "the journeyId exists for an individual with a nino" when {
+
+        val testExpectedRetrievedJourneyDataJson: JsObject = {
+          Json.obj("fullName" -> Json.obj(
+            "firstName" -> testFirstName,
+            "lastName" -> testLastName
+          ),
+            "dateOfBirth" -> testDateOfBirth,
+            "nino" -> testNino,
+            "identifiersMatch" -> true
+          )
+        }
+
         "the Nino is uppercase" in {
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = Json.toJson(testSoleTraderDetailsJsonIndividual)
+            body = testExpectedRetrievedJourneyDataJson ++
+              Json.obj("nino" -> testNino) ++
+              Json.obj("identifiersMatch" ->  "SuccessfulMatch")
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
-          result.json mustBe testSoleTraderDetailsJsonIndividual
+          result.json mustBe testExpectedRetrievedJourneyDataJson
         }
+
         "the Nino is lowercase" in {
           stubAuth(OK, successfulAuthResponse())
-          val testIndividualJson: JsObject = {
-            Json.obj("fullName" -> Json.obj(
-              "firstName" -> testFirstName,
-              "lastName" -> testLastName
-            ),
-              "nino" -> "aa111111a",
-              "dateOfBirth" -> testDateOfBirth,
-              "identifiersMatch" -> true
-            )
-          }
 
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testIndividualJson
+            body = testExpectedRetrievedJourneyDataJson ++
+              Json.obj("nino" -> testNino.toLowerCase) ++
+              Json.obj("identifiersMatch" ->  "SuccessfulMatch")
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
-          result.json mustBe testSoleTraderDetailsJsonIndividual
+          result.json mustBe testExpectedRetrievedJourneyDataJson
         }
       }
 
