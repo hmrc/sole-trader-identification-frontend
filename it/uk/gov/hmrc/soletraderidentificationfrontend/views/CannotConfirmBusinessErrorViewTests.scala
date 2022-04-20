@@ -65,7 +65,7 @@ trait CannotConfirmBusinessErrorViewTests {
     "have correct text on the radio buttons" in {
       doc.getLabelElement.first.text() mustBe Base.yes
       doc.getLabelElement.get(1).text() mustBe Base.no
-      doc.getH1Elements.get(1).text() mustBe messages.radio
+      doc.getLegendElement.first.text() mustBe messages.radio
     }
 
     "have a confirm button" in {
