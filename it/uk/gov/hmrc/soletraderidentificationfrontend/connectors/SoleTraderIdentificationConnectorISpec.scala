@@ -17,13 +17,16 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
+import org.scalatest.prop.{TableFor2, Tables}
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, JsValidationException}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.RemoveSoleTraderDetailsHttpParser.SuccessfullyRemoved
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.SoleTraderIdentificationStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -43,29 +46,41 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
 
 
   s"retrieveSoleTraderDetails($testJourneyId)" should {
-    "return SoleTraderDetails" when {
-      "there are SoleTraderDetails stored against the journeyId and identifiers match" in {
+    "return all possible values of SoleTraderDetailsMatchResult" in {
+      val identifiersMatchScenarios: TableFor2[String, SoleTraderDetailsMatchResult] =
+        Tables.Table(
+          ("identifiersMatchStored", "identifiersMatchRetrieved"),
+          ("SuccessfulMatch", SuccessfulMatch),
+          ("NotEnoughInformationToMatch", NotEnoughInformationToMatch),
+          ("DetailsMismatch", DetailsMismatch),
+          ("NinoNotDeclaredButFound", NinoNotDeclaredButFound),
+          ("DeceasedCitizensDetails", DeceasedCitizensDetails)
+        )
+
+      forAll(identifiersMatchScenarios) { (identifiersMatchStored: String, identifiersMatchRetrieved: SoleTraderDetailsMatchResult) => {
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = testSoleTraderDetailsJson
+          body = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> identifiersMatchStored)
         )
 
         val result = await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId))
 
-        result mustBe Some(testSoleTraderDetails)
+        result mustBe Some(testSoleTraderDetails.copy(identifiersMatch = identifiersMatchRetrieved))
       }
-
-      "there are SoleTraderDetails stored against the journeyId and identifiers do not match" in {
-        stubRetrieveSoleTraderDetails(testJourneyId)(
-          status = OK,
-          body = testSoleTraderDetailsJson
-        )
-
-        val result = await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId))
-
-        result mustBe Some(testSoleTraderDetails)
       }
     }
+
+    "throws an exception if SoleTraderDetailsMatchResult cannot be parsed correctly" in {
+      stubRetrieveSoleTraderDetails(testJourneyId)(
+        status = OK,
+        body = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> "crappy value")
+      )
+
+      val exception = intercept[JsValidationException](await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId)))
+      exception.getMessage() must include("Error trying to match Sole Trader Matching Result. crappy value is not mapped to any match result")
+
+    }
+
     "return None" when {
       "there is no SoleTraderDetails stored against the journeyId" in {
         stubRetrieveSoleTraderDetails(testJourneyId)(
