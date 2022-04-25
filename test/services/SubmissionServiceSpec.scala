@@ -133,7 +133,7 @@ class SubmissionServiceSpec
       s"return StartBusinessVerification($testBusinessVerificationRedirectUrl)" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true))(Future.successful(SuccessfulMatch))
-        mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
+        mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
 
         val result = await(TestService.submit(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -143,7 +143,7 @@ class SubmissionServiceSpec
         "Business Verification Journey Creation fails" in {
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
-          mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl)(Future.successful(Left(NotEnoughEvidence)))
+          mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime)(Future.successful(Left(NotEnoughEvidence)))
           mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToChallenge)(Future.successful(SuccessfullyStored))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
@@ -191,7 +191,7 @@ class SubmissionServiceSpec
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
-        mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
+        mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
 
         val result = await(TestService.submit(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -202,7 +202,7 @@ class SubmissionServiceSpec
           enable(EnableOptionalNinoJourney)
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
           mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
-          mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl)(Future.successful(Left(NotEnoughEvidence)))
+          mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime)(Future.successful(Left(NotEnoughEvidence)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
           mockCreateTrn(testJourneyId)(Future.successful(testTrn))
 

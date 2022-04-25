@@ -31,12 +31,16 @@ class BusinessVerificationStubController extends InjectedController {
 
   def createBusinessVerificationJourney: Action[JsValue] = Action.async(parse.json) {
     implicit request =>
-      val continueUrl: String = (request.body \ "continueUrl").as[String]
-
-      Future.successful {
-        Created(Json.obj(
-          "redirectUri" -> (continueUrl + s"?journeyId=$businessVerificationJourneyId")
-        ))
+      val regime: String = (request.body \ "origin").as[String]
+      if (!regime.equals(regime.toLowerCase))
+        Future.failed(new IllegalArgumentException(s"origin value $regime has to be lower case, but it was not"))
+      else {
+        val continueUrl: String = (request.body \ "continueUrl").as[String]
+        Future.successful {
+          Created(Json.obj(
+            "redirectUri" -> (continueUrl + s"?journeyId=$businessVerificationJourneyId")
+          ))
+        }
       }
   }
 

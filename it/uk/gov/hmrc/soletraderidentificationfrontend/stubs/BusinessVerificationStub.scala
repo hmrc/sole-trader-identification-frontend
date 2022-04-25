@@ -25,27 +25,16 @@ trait BusinessVerificationStub extends WireMockMethods {
 
   def stubCreateBusinessVerificationJourney(sautr: String,
                                             journeyId: String,
-                                            accessibilityUrl: String
+                                            accessibilityUrl: String,
+                                            regime: String
                                            )(status: Int,
-                                             body: JsObject = Json.obj()): StubMapping = {
-
-    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> "vat",
-      "identifiers" -> Json.arr(
-        Json.obj(
-          "saUtr" -> sautr
-        )
-      ),
-      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
-    )
-
-    when(method = POST, uri = "/business-verification/journey", postBody)
-      .thenReturn(
-        status = status,
-        body = body
-      )
-  }
+                                             body: JsObject = Json.obj()): StubMapping =
+    internalStubCreateBusinessVerificationJourney(
+      sautr = sautr,
+      journeyId = journeyId,
+      accessibilityUrl = accessibilityUrl,
+      regime = regime,
+      uriToPostTo = "/business-verification/journey")(status, body)
 
   def stubRetrieveBusinessVerificationResult(journeyId: String)
                                             (status: Int,
@@ -58,28 +47,16 @@ trait BusinessVerificationStub extends WireMockMethods {
 
   def stubCreateBusinessVerificationJourneyFromStub(sautr: String,
                                                     journeyId: String,
-                                                    accessibilityUrl: String
+                                                    accessibilityUrl: String,
+                                                    regime: String
                                                    )(status: Int,
-                                                     body: JsObject = Json.obj()): StubMapping = {
-
-    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> "vat",
-      "identifiers" -> Json.arr(
-        Json.obj(
-          "saUtr" -> sautr
-        )
-      ),
-      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
-
-    )
-
-    when(method = POST, uri = "/identify-your-sole-trader-business/test-only/business-verification/journey", postBody)
-      .thenReturn(
-        status = status,
-        body = body
-      )
-  }
+                                                     body: JsObject = Json.obj()): StubMapping =
+    internalStubCreateBusinessVerificationJourney(
+      sautr = sautr,
+      journeyId = journeyId,
+      accessibilityUrl = accessibilityUrl,
+      regime = regime,
+      uriToPostTo = "/identify-your-sole-trader-business/test-only/business-verification/journey")(status, body)
 
   def stubRetrieveBusinessVerificationResultFromStub(journeyId: String)
                                                     (status: Int,
@@ -89,6 +66,33 @@ trait BusinessVerificationStub extends WireMockMethods {
         status = status,
         body = body
       )
+
+  private def internalStubCreateBusinessVerificationJourney(sautr: String,
+                                                            journeyId: String,
+                                                            accessibilityUrl: String,
+                                                            regime: String,
+                                                            uriToPostTo: String
+                                                           )(status: Int,
+                                                             body: JsObject = Json.obj()): StubMapping = {
+
+    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
+      "origin" -> regime,
+      "identifiers" -> Json.arr(
+        Json.obj(
+          "saUtr" -> sautr
+        )
+      ),
+      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "accessibilityStatementUrl" -> accessibilityUrl
+    )
+    when(method = POST, uri = uriToPostTo, postBody)
+      .thenReturn(
+        status = status,
+        body = body
+      )
+  }
+
+
 
 }
 
