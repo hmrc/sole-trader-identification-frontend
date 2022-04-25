@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.api.controllers
 
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
+import org.scalatest.prop.{TableFor1, Tables}
 import play.api.http.Status.CREATED
 import play.api.libs.json._
 import play.api.test.Helpers._
@@ -27,6 +29,90 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with SoleTraderIdentificationStub with AuthStub {
+
+  "POST /sole-trader-identification/api/<typeOfJourney> for all journey types" should {
+
+    val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
+      "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+      "businessVerificationCheck" -> testSoleTraderJourneyConfig.businessVerificationCheck,
+      "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+      "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+      "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
+      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+      "regime" -> testSoleTraderJourneyConfig.regime
+    )
+
+    val createJourneyApiUrlSuffixScenarios: TableFor1[String] =
+      Tables.Table(
+        "createJourneyApiUrlSuffix",
+        "journey",
+        "sole-trader-journey",
+        "individual-journey"
+      )
+
+    val incomingUrlJsonKeyScenarios: TableFor1[String] =
+      Tables.Table(
+        "incomingNonRelativeUrlJsonKey",
+        "continueUrl",
+        "signOutUrl",
+        "accessibilityUrl"
+      )
+
+    "respond with Bad Request" when {
+      "incoming json contains a non relative url" in {
+
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) => {
+
+          forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) => {
+            stubAuth(OK, successfulAuthResponse())
+
+            stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+            val journeyUrl = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix
+
+            post(
+              uri = journeyUrl,
+              json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://www.google.com/")
+            ).status must be(BAD_REQUEST)
+
+            post(
+              uri = journeyUrl,
+              json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "/")
+            ).status must be(BAD_REQUEST)
+
+          }
+          }
+        }
+        }
+      }
+    }
+
+    "respond with Created " when {
+      "incoming json contains a localhost url" in {
+
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) => {
+
+          forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) => {
+
+            stubAuth(OK, successfulAuthResponse())
+
+            stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+            val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://localhost:9000/some/url")
+
+            lazy val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
+
+            result.status must be(CREATED)
+
+            journeyConfigRepository.drop
+
+          }
+          }
+        }
+        }
+      }
+    }
+  }
 
   "POST /api/journey" should {
     val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
@@ -127,6 +213,21 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
     }
 
+    "ignore an incoming enableSautrCheck json field set to false" in {
+
+      stubAuth(OK, successfulAuthResponse())
+      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+      val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj("enableSautrCheck" -> false)
+
+      lazy val result = post("/sole-trader-identification/api/sole-trader-journey", incomingJson)
+
+      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
+
+      await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+
+    }
+
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
@@ -182,6 +283,21 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
       }
+
+    }
+
+    "ignore an incoming enableSautrCheck json field set to true" in {
+
+      stubAuth(OK, successfulAuthResponse())
+      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+      val incomingJson = testJourneyConfigJson ++ Json.obj("enableSautrCheck" -> true)
+
+      lazy val result = post("/sole-trader-identification/api/individual-journey", incomingJson)
+
+      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
+
+      await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testIndividualJourneyConfig)
 
     }
 

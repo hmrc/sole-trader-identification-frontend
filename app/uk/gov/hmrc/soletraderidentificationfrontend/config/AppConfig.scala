@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.config
 
-import play.api.Environment
+import play.api.{Configuration, Environment}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -24,9 +24,12 @@ import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{A
 import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
 
 import javax.inject.{Inject, Singleton}
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
+class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
+
+  val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 
   def matchSoleTraderDetailsUrl: String =
     if (isEnabled(AuthenticatorStub)) {

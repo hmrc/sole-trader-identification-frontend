@@ -30,6 +30,8 @@ All other fields must be provided.
 The businessVerificationCheck field allows the calling service to bypass the verification and 
 continue to register where a successful match is found. By default "businessVerificationCheck" will be true.
 
+All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
+
 ```
 {
     "continueUrl" : "/test",
@@ -53,6 +55,8 @@ optServiceName will default to `Entity Validation Service` if the field is not p
 optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
 
 All other fields must be provided.
+
+All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
 
 ```
 {
@@ -137,6 +141,8 @@ All other fields must be provided.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and
 continue to register where a successful match is found. By default "businessVerificationCheck" will be true.
+
+All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
 
 ```
 {
