@@ -20,7 +20,7 @@ import play.api.http.Status._
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
@@ -44,10 +44,15 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
   def createIndividualJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] =
     postTo(destination = apiRoutes.JourneyController.createIndividualJourney(), journeyConfig = journeyConfig)
 
-  private def postTo(destination: Call, journeyConfig: JourneyConfig)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[String] =
-    httpClient.POST(url = appConfig.selfBaseUrl + destination.url, body = journeyConfig).map {
-      case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
+  private def postTo(destination: Call, journeyConfig: JourneyConfig)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[String] = {
+    val destinationUrl = appConfig.selfBaseUrl + destination.url
+    httpClient.POST(url = destinationUrl, body = journeyConfig).map {
+      case response@HttpResponse(CREATED, _, _) =>
+        (response.json \ "journeyStartUrl").as[String]
+      case response =>
+        throw new InternalServerException(s"Invalid response from $destinationUrl: Status: ${response.status} Body: ${response.body}")
     }
+  }
 
 }
 
