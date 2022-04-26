@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, DetailsNotFound => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testJourneyId, testSignOutUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper

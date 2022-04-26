@@ -102,6 +102,10 @@ trait CaptureDateOfBirthViewTests {
   def testCaptureDateOfBirthErrorMessage(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.noDobEntered
@@ -113,6 +117,10 @@ trait CaptureDateOfBirthViewTests {
 
   def testCaptureDateOfBirthErrorMessageNoDob(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
@@ -126,6 +134,10 @@ trait CaptureDateOfBirthViewTests {
   def testCaptureDateOfBirthErrorMessageInvalidYear(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.futureDate
@@ -138,6 +150,10 @@ trait CaptureDateOfBirthViewTests {
   def testCaptureDateOfBirthErrorMessageInvalidDate(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalidDate
@@ -149,6 +165,10 @@ trait CaptureDateOfBirthViewTests {
 
   def testCaptureDateOfBirthErrorMessageInvalidAge(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

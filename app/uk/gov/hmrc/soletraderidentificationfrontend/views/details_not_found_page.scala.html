@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
+@import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 
 @this(layout: govuk_template,
       h1: h1,
@@ -28,7 +29,7 @@
 
 @(pageConfig: PageConfig, redirectLocation: Call, journeyId: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = messages("details-not-found-page.title")) {
+@layout(pageConfig, title = title("details-not-found-page.title", pageConfig)) {
 
     @h1(messages("details-not-found-page.heading"))
 

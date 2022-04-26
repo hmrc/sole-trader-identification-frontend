@@ -33,7 +33,7 @@
 
 @(pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title(pageConfig.optFullNamePageLabel.getOrElse(messages("full-name.title")), form)) {
+@layout(pageConfig, title = title(pageConfig.optFullNamePageLabel.getOrElse("full-name.title"), pageConfig, form)) {
 
     @formWithCSRF(action = formAction) {
         @errorSummary(form.errors)

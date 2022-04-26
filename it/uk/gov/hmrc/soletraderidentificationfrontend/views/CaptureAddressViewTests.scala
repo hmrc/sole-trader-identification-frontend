@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureAddress => messages}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -105,6 +105,11 @@ trait CaptureAddressViewTests {
 
   def testCaptureAddressErrorMessageNoLine1(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.no_entry_address1
@@ -116,6 +121,10 @@ trait CaptureAddressViewTests {
 
   def testCaptureAddressErrorMessageNoLine2(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
@@ -129,6 +138,10 @@ trait CaptureAddressViewTests {
   def testCaptureAddressErrorMessageInvalid(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalid_characters_address
@@ -140,6 +153,10 @@ trait CaptureAddressViewTests {
 
   def testCaptureAddressErrorMessageTooManyCharacters(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
@@ -153,6 +170,10 @@ trait CaptureAddressViewTests {
   def testCaptureAddressErrorMessageInvalidPostcode(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalid_characters_postcode
@@ -164,6 +185,10 @@ trait CaptureAddressViewTests {
 
   def testCaptureAddressErrorMessageNoEntryCountry(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

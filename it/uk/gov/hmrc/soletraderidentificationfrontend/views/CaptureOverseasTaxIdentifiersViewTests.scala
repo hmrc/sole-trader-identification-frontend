@@ -23,7 +23,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, 
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testDefaultServiceName, testSignOutUrl, testTechnicalHelpUrl}
 
 trait CaptureOverseasTaxIdentifiersViewTests {
   this: ComponentSpecHelper =>
@@ -84,6 +84,10 @@ trait CaptureOverseasTaxIdentifiersViewTests {
   def testCaptureCaptureOverseasTaxIdentifiersErrorMessages(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.get(0).text mustBe messages.Error.no_entry_tax_identifier + " " + messages.Error.no_entry_country
@@ -98,6 +102,10 @@ trait CaptureOverseasTaxIdentifiersViewTests {
   def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesInvalidIdentifier(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.get(0).text mustBe messages.Error.invalid_tax_identifier
@@ -110,6 +118,10 @@ trait CaptureOverseasTaxIdentifiersViewTests {
 
   def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesTooLongIdentifier(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

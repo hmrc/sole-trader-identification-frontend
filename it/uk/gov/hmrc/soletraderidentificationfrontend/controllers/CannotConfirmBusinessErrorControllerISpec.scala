@@ -38,7 +38,7 @@ class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
       await(journeyConfigRepository.insertJourneyConfig(
         journeyId = testJourneyId,
         authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
+        journeyConfig = testIndividualJourneyConfigWithCallingService
       ))
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/cannot-confirm-business")
