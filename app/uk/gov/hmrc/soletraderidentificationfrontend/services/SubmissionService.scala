@@ -39,7 +39,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
         for {
           matchingResult <-
             if (individualDetails.optNino.isEmpty && !isEnabled(EnableOptionalNinoJourney))
-              Future.failed(throw new IllegalStateException("[Submission Service] Unexpected state of Nino"))
+              Future.failed(new IllegalStateException("[Submission Service] Unexpected state of Nino"))
             else if (individualDetails.optNino.isEmpty)
               soleTraderMatchingService.matchSoleTraderDetailsNoNino(journeyId, individualDetails)
             else
@@ -99,7 +99,11 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                                 (implicit hc: HeaderCarrier,
                                                  ec: ExecutionContext): Future[SubmissionResponse] = matchingResult match {
     case SuccessfulMatch if individualDetails.optSautr.nonEmpty =>
-      businessVerificationService.createBusinessVerificationJourney(journeyId, individualDetails.optSautr.getOrElse(throwASaUtrNotDefinedException), journeyConfig.pageConfig.accessibilityUrl).flatMap {
+      businessVerificationService.createBusinessVerificationJourney(
+        journeyId,
+        individualDetails.optSautr.getOrElse(throwASaUtrNotDefinedException),
+        journeyConfig.pageConfig.accessibilityUrl,
+        journeyConfig.regime).flatMap {
         case Right(BusinessVerificationJourneyCreated(businessVerificationUrl)) =>
           Future.successful(StartBusinessVerification(businessVerificationUrl))
         case _ =>

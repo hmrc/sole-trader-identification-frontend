@@ -33,13 +33,14 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
 
   def createBusinessVerificationJourney(journeyId: String,
                                         sautr: String,
-                                        accessibilityUrl: String
+                                        accessibilityUrl: String,
+                                        regime: String
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
-        "origin" -> "vat",
+        "origin" -> regime.toLowerCase,
         "identifiers" -> Json.arr(
           Json.obj(
             "saUtr" -> sautr
