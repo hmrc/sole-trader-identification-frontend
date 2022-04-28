@@ -21,7 +21,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVer
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{CreateBusinessVerificationJourneyConnector, RetrieveBusinessVerificationStatusConnector}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,10 +32,9 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
 
   def createBusinessVerificationJourney(journeyId: String,
                                         sautr: String,
-                                        accessibilityUrl: String,
-                                        regime: String
+                                        journeyConfig: JourneyConfig
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] =
-    createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, accessibilityUrl, regime).flatMap {
+    createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, journeyConfig).flatMap {
       case success@Right(BusinessVerificationJourneyCreated(_)) =>
         Future.successful(success)
       case Left(NotEnoughEvidence) =>

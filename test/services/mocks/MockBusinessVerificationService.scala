@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.BusinessVerificationJourneyCreationResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.services.BusinessVerificationService
 
 import scala.concurrent.Future
@@ -39,14 +40,12 @@ trait MockBusinessVerificationService extends MockitoSugar with BeforeAndAfterEa
 
   def mockCreateBusinessVerificationJourney(journeyId: String,
                                             sautr: String,
-                                            accessibilityUrl: String,
-                                            regime: String
+                                            journeyConfig: JourneyConfig
                                            )(response: Future[BusinessVerificationJourneyCreationResponse]): OngoingStubbing[_] =
     when(mockBusinessVerificationService.createBusinessVerificationJourney(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(accessibilityUrl),
-      ArgumentMatchers.eq(regime)
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

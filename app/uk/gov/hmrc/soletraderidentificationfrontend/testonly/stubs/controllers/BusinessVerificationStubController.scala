@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, InjectedController}
 
 import java.util.UUID
@@ -31,16 +31,26 @@ class BusinessVerificationStubController extends InjectedController {
 
   def createBusinessVerificationJourney: Action[JsValue] = Action.async(parse.json) {
     implicit request =>
-      val regime: String = (request.body \ "origin").as[String]
-      if (!regime.equals(regime.toLowerCase))
-        Future.failed(new IllegalArgumentException(s"origin value $regime has to be lower case, but it was not"))
-      else {
-        val continueUrl: String = (request.body \ "continueUrl").as[String]
-        Future.successful {
-          Created(Json.obj(
-            "redirectUri" -> (continueUrl + s"?journeyId=$businessVerificationJourneyId")
-          ))
-        }
+      val jsonBody = for {
+        _ <- (request.body \ "journeyType").validate[String]
+        origin <- (request.body \ "origin").validate[String]
+        _ <-  ((request.body \ "identifiers").head \ "saUtr").validate[String]
+        continueUrl <- (request.body \ "continueUrl").validate[String]
+        _ <- (request.body \ "accessibilityStatementUrl").validate[String]
+        _ <- (request.body \ "pageTitle").validate[String]
+        _ <- (request.body \ "deskproServiceName").validate[String]
+      } yield (origin, continueUrl)
+      jsonBody match {
+        case JsSuccess((origin, _), _) if !origin.equals(origin.toLowerCase) =>
+          Future.failed(new IllegalArgumentException(s"origin value $origin has to be lower case, but it was not"))
+        case JsSuccess((_, continueUrl), _) =>
+          Future.successful {
+            Created(Json.obj(
+              "redirectUri" -> (continueUrl + s"?journeyId=$businessVerificationJourneyId")
+            ))
+          }
+        case _ =>
+          Future.failed(new IllegalArgumentException(s"Request body for CreateBusinessVerification stub failed verification"))
       }
   }
 

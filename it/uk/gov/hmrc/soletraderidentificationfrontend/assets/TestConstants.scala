@@ -101,18 +101,6 @@ object TestConstants {
     testIndividualJourneyConfig
       .copy(pageConfig = testIndividualPageConfig.copy(optServiceName = Some(testServiceName)))
 
-  val testIndividualJourneyConfigJsonNoRegime: JsObject =
-    Json.obj(
-      "continueUrl" -> testContinueUrl,
-      "pageConfig" -> Json.obj(
-        "enableSautrCheck" -> false,
-        "deskProServiceId" -> testDeskProServiceId,
-        "signOutUrl" -> testSignOutUrl,
-        "accessibilityUrl" -> testAccessibilityUrl
-      ),
-      "businessVerificationCheck" -> false
-    )
-
   val testSoleTraderJourneyConfig: JourneyConfig = testIndividualJourneyConfig
     .copy(businessVerificationCheck = true)
     .copy(pageConfig = testSoleTraderPageConfig)
