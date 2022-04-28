@@ -102,8 +102,7 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
       businessVerificationService.createBusinessVerificationJourney(
         journeyId,
         individualDetails.optSautr.getOrElse(throwASaUtrNotDefinedException),
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.regime).flatMap {
+        journeyConfig).flatMap {
         case Right(BusinessVerificationJourneyCreated(businessVerificationUrl)) =>
           Future.successful(StartBusinessVerification(businessVerificationUrl))
         case _ =>

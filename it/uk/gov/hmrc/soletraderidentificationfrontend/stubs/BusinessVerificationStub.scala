@@ -18,22 +18,22 @@ package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testDefaultServiceName
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
 
 trait BusinessVerificationStub extends WireMockMethods {
 
   def stubCreateBusinessVerificationJourney(sautr: String,
                                             journeyId: String,
-                                            accessibilityUrl: String,
-                                            regime: String
+                                            journeyConfig: JourneyConfig
                                            )(status: Int,
                                              body: JsObject = Json.obj()): StubMapping =
     internalStubCreateBusinessVerificationJourney(
       sautr = sautr,
       journeyId = journeyId,
-      accessibilityUrl = accessibilityUrl,
-      regime = regime,
+      journeyConfig = journeyConfig,
       uriToPostTo = "/business-verification/journey")(status, body)
 
   def stubRetrieveBusinessVerificationResult(journeyId: String)
@@ -47,15 +47,13 @@ trait BusinessVerificationStub extends WireMockMethods {
 
   def stubCreateBusinessVerificationJourneyFromStub(sautr: String,
                                                     journeyId: String,
-                                                    accessibilityUrl: String,
-                                                    regime: String
+                                                    journeyConfig: JourneyConfig
                                                    )(status: Int,
                                                      body: JsObject = Json.obj()): StubMapping =
     internalStubCreateBusinessVerificationJourney(
       sautr = sautr,
       journeyId = journeyId,
-      accessibilityUrl = accessibilityUrl,
-      regime = regime,
+      journeyConfig = journeyConfig,
       uriToPostTo = "/identify-your-sole-trader-business/test-only/business-verification/journey")(status, body)
 
   def stubRetrieveBusinessVerificationResultFromStub(journeyId: String)
@@ -69,21 +67,24 @@ trait BusinessVerificationStub extends WireMockMethods {
 
   private def internalStubCreateBusinessVerificationJourney(sautr: String,
                                                             journeyId: String,
-                                                            accessibilityUrl: String,
-                                                            regime: String,
+                                                            journeyConfig: JourneyConfig,
                                                             uriToPostTo: String
                                                            )(status: Int,
                                                              body: JsObject = Json.obj()): StubMapping = {
 
+    val pageTitle: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
+
     val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> regime,
+      "origin" -> journeyConfig.regime.toLowerCase,
       "identifiers" -> Json.arr(
         Json.obj(
           "saUtr" -> sautr
         )
       ),
       "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
+      "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
+      "pageTitle" -> pageTitle,
+      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
     )
     when(method = POST, uri = uriToPostTo, postBody)
       .thenReturn(
@@ -91,7 +92,6 @@ trait BusinessVerificationStub extends WireMockMethods {
         body = body
       )
   }
-
 
 
 }

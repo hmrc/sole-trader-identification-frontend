@@ -32,16 +32,14 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  private val anUpperCaseRegimeId: String = "A_REGIME_ID"
-
   "createBusinessVerificationJourneyConnector" when {
     s"the $BusinessVerificationStub feature switch is enabled" should {
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -50,17 +48,17 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(NotEnoughEvidence)
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(UserLockedOut)
         }
@@ -70,9 +68,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -81,17 +79,17 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return no redirect URL and an appropriate BV status" when {
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(NotEnoughEvidence)
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, anUpperCaseRegimeId.toLowerCase)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, anUpperCaseRegimeId))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(UserLockedOut)
         }
@@ -100,4 +98,3 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
   }
 
 }
-
