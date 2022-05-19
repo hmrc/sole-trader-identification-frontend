@@ -122,6 +122,13 @@ details-not-found-page.line_4.2                             = and
 details-not-found-page.line_4.3                             = tell them there is an issue with your National Insurance number,
 details-not-found-page.line_4.4                             = no matter what tax regime you’re using.
 
+## Details Did Not Match
+details-did-not-match-page.title                            = The details you entered did not match our records
+details-did-not-match-page.heading                          = The details you entered did not match our records
+details-did-not-match-page.line_1                           = We could not match the details you entered with records held by HMRC.
+details-did-not-match-page.line_2                           = You cannot continue to register using this online service.
+details-did-not-match-page.sign_out                         = Sign out
+
 ## Cannot Confirm Business Error Page
 cannot-confirm-business.title                               = The details you provided do not match records held by HMRC
 cannot-confirm-business.heading                             = The details you provided do not match records held by HMRC

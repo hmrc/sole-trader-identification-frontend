@@ -19,7 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.BusinessVerificationJourneyCreated
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{FeatureSwitching, EnableNoNinoJourney => EnableOptionalNinoJourney}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NotEnoughInformationToMatch, SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NinoIsFraudulent, NotEnoughInformationToMatch, SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import javax.inject.{Inject, Singleton}
@@ -45,22 +45,30 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
             else
               soleTraderMatchingService.matchSoleTraderDetails(journeyId, individualDetails, journeyConfig)
           response <-
-            if (journeyConfig.pageConfig.enableSautrCheck) {
-              if (journeyConfig.businessVerificationCheck) {
-                handleSoleTraderJourneyWithBVCheck(
-                  journeyId,
-                  matchingResult,
-                  journeyConfig,
-                  individualDetails)
-              } else {
-                handleSoleTraderJourneySkippingBVCheck(
-                  journeyId,
-                  matchingResult,
-                  journeyConfig,
-                  individualDetails)
-              }
+            if (matchingResult == NinoIsFraudulent) {
+              for {
+                _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
+                _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
+              } yield
+                SoleTraderDetailsMismatch(NinoIsFraudulent)
             } else {
-              handleIndividualJourney(matchingResult, journeyConfig.continueUrl)
+              if (journeyConfig.pageConfig.enableSautrCheck) {
+                if (journeyConfig.businessVerificationCheck) {
+                  handleSoleTraderJourneyWithBVCheck(
+                    journeyId,
+                    matchingResult,
+                    journeyConfig,
+                    individualDetails)
+                } else {
+                  handleSoleTraderJourneySkippingBVCheck(
+                    journeyId,
+                    matchingResult,
+                    journeyConfig,
+                    individualDetails)
+                }
+              } else {
+                handleIndividualJourney(matchingResult, journeyConfig.continueUrl)
+              }
             }
         } yield response
       case None =>
@@ -143,5 +151,4 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
     case failure: SoleTraderDetailsMatchFailure =>
       Future.successful(SoleTraderDetailsMismatch(failure))
   }
-
 }

@@ -39,6 +39,8 @@ GET         /:journeyId/could-not-confirm-business       uk.gov.hmrc.soletraderi
 
 GET         /:journeyId/try-again                        uk.gov.hmrc.soletraderidentificationfrontend.controllers.RetryJourneyController.tryAgain(journeyId: String)
 
+GET         /:journeyId/details-did-not-match            uk.gov.hmrc.soletraderidentificationfrontend.controllers.DetailsDidNotMatchController.show(journeyId: String)
+
 GET         /:journeyId/business-verification-result     uk.gov.hmrc.soletraderidentificationfrontend.controllers.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId)
 
 ->          /hmrc-frontend                               hmrcfrontend.Routes

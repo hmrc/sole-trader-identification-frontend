@@ -181,6 +181,14 @@ object MessageLookup {
     val link_4 = "contact the National Insurance team (opens in a new tab)"
   }
 
+  object DetailsDidNotMatch {
+    val title = "The details you entered did not match our records - Entity Validation Service - GOV.UK"
+    val heading = "The details you entered did not match our records"
+    val line_1 = "We could not match the details you entered with records held by HMRC."
+    val line_2 = "You cannot continue to register using this online service."
+    val button = "Sign out"
+  }
+
   object CannotConfirmBusiness {
     val title = "The details you provided do not match records held by HMRC - Test Service - GOV.UK"
     val heading = "The details you provided do not match records held by HMRC"
