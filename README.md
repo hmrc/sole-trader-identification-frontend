@@ -25,6 +25,10 @@ Creates a new journey for a Sole Trader, storing the journeyConfig against the j
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
 
+labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
+If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
+used for the undefined properties.
+
 All other fields must be provided.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and 
@@ -41,7 +45,13 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
     "optFullNamePageLabel" : "What is the name of the nominated partner?",
-    "regime" : "VATC"
+    "regime" : "VATC",
+    "labels" : {
+                 "cy" : {
+                   "optFullNamePageLabel" : "Full name page label translated into welsh",
+                   "optServiceName" : "Service name translated into welsh"
+                   }
+               }
 }
 ```
 
@@ -53,6 +63,10 @@ Creates a new journey for an Individual, storing the journeyConfig against the j
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
+
+labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
+If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
+used for the undefined fields.
 
 All other fields must be provided.
 
@@ -66,7 +80,13 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
     "optFullNamePageLabel" : "What is the name of the nominated partner?",
-    "regime" : "VATC"
+    "regime" : "VATC",
+    "labels" : {
+                 "cy" : {
+                   "optFullNamePageLabel" : "Full name page label translated into welsh",
+                   "optServiceName" : "Service name translated into welsh"
+                   }
+               }
 }
 ```
 
@@ -134,6 +154,10 @@ Creates a new journey for a Sole Trader, storing the journeyConfig against the j
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
 
+labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
+If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
+used for the undefined fields.
+
 The enableSautrCheck field allows the calling service to decide whether to ask the user to provide
 an SAUTR that will be verified. By default "enableSautrCheck" will be false.
 
@@ -153,7 +177,13 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "signOutUrl" : "/sign-out",
     "enableSautrCheck" : "true",
     "optFullNamePageLabel" : "What is the name of the nominated partner?"
-    "regime" : "VATC"
+    "regime" : "VATC",
+    "labels" : {
+                 "cy" : {
+                   "optFullNamePageLabel" : "Full name page label translated into welsh",
+                   "optServiceName" : "Service name translated into welsh"
+                   }
+               }
 }
 ```
 

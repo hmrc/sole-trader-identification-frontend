@@ -77,6 +77,14 @@ This is a test entry point which simulates a service by triggering the initial P
    - It is passed down to the Registration API
    - This is currently defaulted to VATC but accepted values are PPT or VATC
 
+9. Welsh translation for Full Name Page Label (Optional)
+
+  - Welsh language version of full name page label (item 7)
+
+10. Welsh translation for Service Name (Optional)
+
+  - Welsh language translation for service name (item 2)
+
 ### GET /test-only/create-individual-journey
 
 ---
@@ -116,6 +124,14 @@ This is a test entry point which simulates a service by triggering the initial P
    - This is the Tax Regime Identifier
    - It is passed down to the Registration API
    - This is currently defaulted to VATC but accepted values are PPT or VATC
+
+8. Welsh translation for Full Name Page Label (Optional)
+
+   - Welsh language version of full name page label (item 6)
+
+9. Welsh translation for Service Name (Optional)
+
+   - Welsh language translation for service name (item 2)
    
 
 ### GET /test-only/create-journey
@@ -164,6 +180,14 @@ This is a test entry point which simulates a service by triggering the initial P
    - This is the Tax Regime Identifier
    - It is passed down to the Registration API
    - This is currently defaulted to VATC but accepted values are PPT or VATC
+
+9. Welsh translation for Full Name Page Label (Optional)
+
+   - Welsh language version of full name page label (item 7)
+
+10. Welsh translation for Service Name (Optional)
+
+   - Welsh language translation for service name (item 2)
 
 ### GET test-only/retrieve-journey/:journeyId or test-only/retrieve-journey
 
