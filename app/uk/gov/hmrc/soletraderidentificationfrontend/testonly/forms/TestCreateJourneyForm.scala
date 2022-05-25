@@ -35,6 +35,9 @@ object TestCreateJourneyForm {
   val accessibilityUrl = "accessibilityUrl"
   val fullNamePageLabel = "fullNamePageLabel"
   val regime = "regime"
+  val labels = "labels"
+  val welshFullNamePageLabel = "welshFullNamePageLabel"
+  val welshServiceName = "welshServiceName"
 
   def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
     companyNumber => validate(
@@ -80,8 +83,10 @@ object TestCreateJourneyForm {
       signOutUrl -> text.verifying(signOutUrlEmpty),
       accessibilityUrl -> text.verifying(signOutUrlEmpty),
       fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty)
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel, regime) =>
+      regime -> text.verifying(regimeEmpty),
+      welshFullNamePageLabel -> optText,
+      welshServiceName -> optText
+    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
       JourneyConfig.apply(
         continueUrl,
         businessVerificationCheck,
@@ -93,7 +98,9 @@ object TestCreateJourneyForm {
           accessibilityUrl,
           fullNamePageLabel
         ),
-        regime
+        regime,
+        welshFullNamePageLabel,
+        welshServiceName
       )
     )(journeyConfig =>
       Some(
@@ -104,10 +111,13 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.pageConfig.optFullNamePageLabel,
-        journeyConfig.regime
+        journeyConfig.regime,
+        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optFullNamePageLabel else None,
+        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optServiceName else None
       )
     ))
   }
+
 
   def deprecatedForm(): Form[JourneyConfig] = {
     Form(mapping(
@@ -119,8 +129,10 @@ object TestCreateJourneyForm {
       enableSautrCheck -> optText.toBoolean,
       accessibilityUrl -> text.verifying(signOutUrlEmpty),
       fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty)
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel, regime) =>
+      regime -> text.verifying(regimeEmpty),
+      welshFullNamePageLabel -> optText,
+      welshServiceName -> optText
+    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
       JourneyConfig.apply(
         continueUrl,
         businessVerificationCheck,
@@ -132,7 +144,9 @@ object TestCreateJourneyForm {
           accessibilityUrl,
           fullNamePageLabel
         ),
-        regime
+        regime,
+        welshFullNamePageLabel,
+        welshServiceName
       )
     )(journeyConfig =>
       Some(
@@ -144,7 +158,9 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.enableSautrCheck,
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.pageConfig.optFullNamePageLabel,
-        journeyConfig.regime
+        journeyConfig.regime,
+        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optFullNamePageLabel else None,
+        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optServiceName else None
       )
     ))
   }

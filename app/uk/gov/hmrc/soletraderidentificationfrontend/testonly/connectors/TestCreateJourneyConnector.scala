@@ -17,14 +17,14 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors
 
 import play.api.http.Status._
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, JsObject, Writes}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels}
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector.journeyConfigWriter
 
 import javax.inject.{Inject, Singleton}
@@ -67,5 +67,11 @@ object TestCreateJourneyConnector {
     accessibilityUrlKey -> journeyConfig.pageConfig.accessibilityUrl,
     optFullNamePageLabelKey -> journeyConfig.pageConfig.optFullNamePageLabel,
     regimeKey -> journeyConfig.regime
-  )
+  ) ++ labelsAsOptJsObject(journeyConfig.labels)
+
+  private def labelsAsOptJsObject(optJourneyLabels: Option[JourneyLabels]): JsObject =
+    optJourneyLabels match {
+      case Some(journeyLabels) => Json.obj(labelsKey -> Json.toJsObject(journeyLabels))
+      case _ => Json.obj()
+    }
 }
