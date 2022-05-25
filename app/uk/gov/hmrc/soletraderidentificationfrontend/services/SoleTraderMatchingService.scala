@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{AuthenticatorConnector, RetrieveKnownFactsConnector}
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{AuthenticatorConnector, RetrieveFraudulentNinoStatusConnector, RetrieveKnownFactsConnector}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig, KnownFactsResponse}
 
@@ -27,6 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorConnector,
                                           retrieveKnownFactsConnector: RetrieveKnownFactsConnector,
+                                          retrieveFraudulentNinoStatusConnector: RetrieveFraudulentNinoStatusConnector,
                                           soleTraderIdentificationService: SoleTraderIdentificationService) {
 
   def matchSoleTraderDetails(journeyId: String,
@@ -34,34 +35,15 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
                              journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier,
                                                            ec: ExecutionContext): Future[SoleTraderDetailsMatchResult] =
     for {
-      authenticatorResponse <- authenticatorConnector.matchSoleTraderDetails(individualDetails).map {
-        case Right(authenticatorDetails) if journeyConfig.pageConfig.enableSautrCheck =>
-          if (authenticatorDetails.optSautr == individualDetails.optSautr)
-            Right(authenticatorDetails)
-          else {
-            Left(DetailsMismatch)
-          }
-        case authenticatorResponse =>
-          authenticatorResponse
-      }
-      matchingResponse <- authenticatorResponse match {
-        case Right(details) =>
-          soleTraderIdentificationService.storeAuthenticatorDetails(journeyId, details).flatMap {
-            _ =>
-              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, SuccessfulMatch).map {
-                _ => SuccessfulMatch
-              }
-          }
-        case Left(failureResponse) =>
-          soleTraderIdentificationService.storeAuthenticatorFailureResponse(journeyId, failureResponse).flatMap {
-            _ =>
-              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, failureResponse).map {
-                _ => failureResponse
-              }
-          }
-      }
+      isAFraudulentNino <- retrieveFraudulentNinoStatusConnector.isFraudulentNino(individualDetails.optNino.get)
+      soleTraderDetailsMatchResult <- if (isAFraudulentNino) {
+        soleTraderIdentificationService
+          .storeIdentifiersMatch(journeyId, NinoIsFraudulent)
+          .map(_ => NinoIsFraudulent)
+      } else
+        matchSoleTraderDetailsForAValidNino(journeyId, individualDetails, journeyConfig)
     } yield
-      matchingResponse
+      soleTraderDetailsMatchResult
 
   def matchSoleTraderDetailsNoNino(journeyId: String,
                                    individualDetails: IndividualDetails
@@ -100,5 +82,37 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
       matchingResponse
     }
   }
+
+  private def matchSoleTraderDetailsForAValidNino(journeyId: String, individualDetails: IndividualDetails, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier,
+                                                                                                                                         ec: ExecutionContext): Future[SoleTraderDetailsMatchResult] =
+    for {
+      authenticatorResponse <- authenticatorConnector.matchSoleTraderDetails(individualDetails).map {
+        case Right(authenticatorDetails) if journeyConfig.pageConfig.enableSautrCheck =>
+          if (authenticatorDetails.optSautr == individualDetails.optSautr)
+            Right(authenticatorDetails)
+          else {
+            Left(DetailsMismatch)
+          }
+        case authenticatorResponse =>
+          authenticatorResponse
+      }
+      matchingResponse <- authenticatorResponse match {
+        case Right(details) =>
+          soleTraderIdentificationService.storeAuthenticatorDetails(journeyId, details).flatMap {
+            _ =>
+              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, SuccessfulMatch).map {
+                _ => SuccessfulMatch
+              }
+          }
+        case Left(failureResponse) =>
+          soleTraderIdentificationService.storeAuthenticatorFailureResponse(journeyId, failureResponse).flatMap {
+            _ =>
+              soleTraderIdentificationService.storeIdentifiersMatch(journeyId, failureResponse).map {
+                _ => failureResponse
+              }
+          }
+      }
+    } yield
+      matchingResponse
 
 }

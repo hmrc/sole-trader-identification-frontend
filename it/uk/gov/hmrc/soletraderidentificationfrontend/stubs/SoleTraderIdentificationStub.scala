@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, WiremockHelper}
@@ -358,7 +358,15 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       optBody = Some(Json.toJsObject(es20Details).toString())
     )
 
-  def verifyRemoveAllData(journeyId: String) =
+  def verifyRemoveAllData(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/sole-trader-identification/journey/$journeyId")
+
+  def stubIsFraudulentNino(ninoToBeChecked: String)(status: Int, body: JsObject): StubMapping =
+    when(method = GET,
+      uri = s"/sole-trader-identification/fraudulent-nino-info/$ninoToBeChecked"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
 
 }
