@@ -89,6 +89,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   def createTrnUrl: String = s"$backendUrl/sole-trader-identification/get-trn"
 
+  def fraudulentNinoUrl(ninoToBeChecked:String): String = s"$backendUrl/sole-trader-identification/fraudulent-nino-info/$ninoToBeChecked"
+
   lazy val enrolmentStoreProxyUrl: String = servicesConfig.baseUrl("enrolment-store-proxy") + "/enrolment-store-proxy"
 
   def knownFactsUrl: String = {
