@@ -78,6 +78,8 @@ object TestConstants {
   val testDefaultServiceName: String = "Entity Validation Service"
   val testServiceName: String = "Test Service"
   val testFullNamePageLabel: String = "What is the name of the nominated partner?"
+  val welshFullNamePageLabel: String = "Welsh " + testFullNamePageLabel
+  val welshTestServiceName: String = "Welsh " + testServiceName
 
   val testIndividualPageConfig: PageConfig = PageConfig(
     optServiceName = None,

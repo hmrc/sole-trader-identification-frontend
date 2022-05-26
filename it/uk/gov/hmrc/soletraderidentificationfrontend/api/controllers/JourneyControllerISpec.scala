@@ -23,6 +23,7 @@ import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyLabels, TranslationLabels}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, JourneyStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
@@ -153,6 +154,24 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
+      "optional Welsh language labels are provided" in {
+
+        stubAuth(OK, successfulAuthResponse())
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+        post(
+          uri = "/sole-trader-identification/api/journey",
+          json = testSoleTraderJourneyConfigJson +
+            ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel, "optServiceName" -> welshTestServiceName)))
+        )
+
+        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
+          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), Some(welshTestServiceName))))
+        )
+
+        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+      }
+
     }
 
     "redirect to Sign In page" when {
@@ -207,6 +226,25 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
+
+        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+      }
+
+      "an optional Welsh full name page label is provided" in {
+
+        stubAuth(OK, successfulAuthResponse())
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+        post(
+          uri = "/sole-trader-identification/api/sole-trader-journey",
+          json = testSoleTraderJourneyConfigJson +
+            ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel)))
+        )
+
+        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
+          .copy(businessVerificationCheck = false)
+          .copy(labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), None)))
+        )
 
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
@@ -284,6 +322,23 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
       }
 
+      "an optional Welsh service name is provided" in {
+
+        stubAuth(OK, successfulAuthResponse())
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+        post(
+          uri = "/sole-trader-identification/api/individual-journey",
+          json = testJourneyConfigJson +
+            ("labels" -> Json.obj("cy" -> Json.obj("optServiceName" -> welshTestServiceName)))
+        )
+
+        val expectedIndividualJourneyConfig = testIndividualJourneyConfig
+          .copy(businessVerificationCheck = false)
+          .copy(labels = Some(JourneyLabels(welsh = TranslationLabels(None, Some(welshTestServiceName)))))
+
+        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
+      }
     }
 
     "ignore an incoming enableSautrCheck json field set to true" in {

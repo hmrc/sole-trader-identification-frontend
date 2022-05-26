@@ -16,4 +16,27 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-case class JourneyConfig(continueUrl: String, businessVerificationCheck: Boolean, pageConfig: PageConfig, regime: String)
+case class JourneyConfig(continueUrl: String,
+                         businessVerificationCheck: Boolean,
+                         pageConfig: PageConfig,
+                         regime: String,
+                         labels: Option[JourneyLabels] = None)
+
+object JourneyConfig {
+
+  def apply(continueUrl: String,
+            businessVerificationCheck: Boolean,
+            pageConfig: PageConfig,
+            regime: String,
+            welshFullNamePageLabel: Option[String],
+            welshServiceName: Option[String]): JourneyConfig = {
+
+    val labels: Option[JourneyLabels] = (welshFullNamePageLabel, welshServiceName) match {
+      case (None, None) => None
+      case _ => Some(JourneyLabels( welsh = TranslationLabels(welshFullNamePageLabel, welshServiceName)))
+    }
+
+    new JourneyConfig(continueUrl, businessVerificationCheck, pageConfig, regime, labels)
+  }
+
+}

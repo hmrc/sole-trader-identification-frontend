@@ -26,7 +26,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyContr
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetails.jsonWriterForCallingServices
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.UrlHelper
 
@@ -76,6 +76,7 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
         accessibilityUrl <- accessibilityUrlReads.reads(json)
         optFullNamePageLabel <- (json \ optFullNamePageLabelKey).validateOpt[String]
         regime <- (json \ regimeKey).validate[String]
+        labels <- (json \ labelsKey).validateOpt[JourneyLabels]
       } yield JourneyConfig(
         continueUrl,
         businessVerificationCheck.getOrElse(true),
@@ -87,7 +88,8 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
           accessibilityUrl,
           optFullNamePageLabel
         ),
-        regime
+        regime,
+        labels
       )
   }) {
     implicit req =>
@@ -116,6 +118,7 @@ object JourneyController {
   val accessibilityUrlKey = "accessibilityUrl"
   val optFullNamePageLabelKey = "optFullNamePageLabel"
   val regimeKey = "regime"
+  val labelsKey = "labels"
 
   private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = (JsPath \ jsPathKeyToBeRead).read[String]
     .flatMap { someIncomingUrlToBeValidated =>
