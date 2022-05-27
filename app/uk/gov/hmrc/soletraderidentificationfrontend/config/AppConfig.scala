@@ -23,7 +23,9 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{AuthenticatorStub, BusinessVerificationStub, FeatureSwitching, KnownFactsStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
 
+import java.io.IOException
 import javax.inject.{Inject, Singleton}
+import org.apache.commons.io.IOUtils
 import scala.collection.JavaConverters.asScalaBufferConverter
 
 @Singleton
@@ -98,22 +100,41 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
     baseUrl + "/enrolment-store/enrolments"
   }
 
-  lazy val countries: Map[String, Country] = {
-    environment.resourceAsStream("/countries.json") match {
-      case Some(countriesStream) =>
-        Json.parse(countriesStream).as[Map[String, Country]]
-      case None =>
-        throw new InternalServerException("Country list missing")
-    }
-  }
+  private lazy val countriesListInEnglish: Map[String, Country] = getCountryList("/countries.json")
 
-  lazy val orderedCountryList: Seq[Country] = countries.values.toSeq.sortBy(_.name)
+  private lazy val countriesListInWelsh: Map[String, Country] = getCountryList("/countries_cy.json")
 
-  def getCountryName(countryCode: String): String = countries.get(countryCode) match {
+  def getCountryListByLanguage(code: String = "en"): Map[String, Country] = if(code == "cy") countriesListInWelsh else countriesListInEnglish
+
+  private lazy val orderedCountryListInEnglish: Seq[Country] = countriesListInEnglish.values.toSeq.sortBy(_.name)
+
+  private lazy val orderedCountryListInWelsh: Seq[Country] =  countriesListInWelsh.values.toSeq.sortBy(_.name)
+
+  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if(code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
+
+  def getCountryName(countryCode: String, langCode: String = "en"): String = getCountryListByLanguage(langCode).get(countryCode) match {
     case Some(Country(_, name)) =>
       name
     case None =>
       throw new InternalServerException("Invalid country code")
+  }
+
+  def getCountryList(fileName: String) : Map[String, Country] = {
+
+    environment.resourceAsStream(fileName) match {
+      case Some(countriesStream) =>
+        try {
+          Json.parse(countriesStream).as[Map[String, Country]]
+        } finally {
+          try {
+            IOUtils.close(countriesStream)
+          } catch {
+            case ex : IOException =>
+              throw new InternalServerException(s"I/O exception raised on closing file $fileName : ${ex.getMessage}")
+          }
+        }
+      case None => throw new InternalServerException(s"Country list file $fileName cannot be found")
+    }
 
   }
 

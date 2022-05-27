@@ -24,7 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, IndividualDetails, Overseas}
-import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.checkYourAnswersFormat
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.formatDate
 
 import javax.inject.{Inject, Singleton}
 
@@ -53,7 +53,7 @@ class CheckYourAnswersRowBuilder @Inject()() {
 
     val dateOfBirthRow = buildSummaryRow(
       messages("check-your-answers.dob"),
-      individualDetails.dateOfBirth.format(checkYourAnswersFormat),
+      formatDate(individualDetails.dateOfBirth),
       routes.CaptureDateOfBirthController.show(journeyId)
     )
 
@@ -96,7 +96,8 @@ class CheckYourAnswersRowBuilder @Inject()() {
       Some(buildSummaryRow(
         messages("check-your-answers.tax_identifiers"),
         optOverseasTaxId match {
-          case Some(overseasTaxId) => Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country)).mkString("<br>")
+          case Some(overseasTaxId) =>
+            Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country, messages.lang.code)).mkString("<br>")
           case None => messages("check-your-answers.no_tax-identifiers")
         },
         routes.CaptureOverseasTaxIdentifiersController.show(journeyId)
@@ -114,7 +115,7 @@ class CheckYourAnswersRowBuilder @Inject()() {
           address.line4,
           address.line5,
           address.postcode,
-          Some(config.getCountryName(address.countryCode))
+          Some(config.getCountryName(address.countryCode, messages.lang.code))
         ).flatten.mkString("<br>")
 
         buildSummaryRow(
@@ -128,13 +129,13 @@ class CheckYourAnswersRowBuilder @Inject()() {
 
   }
 
-  private def buildSummaryRow(key: String, value: String, changeLink: Call) = SummaryListRow(
+  private def buildSummaryRow(key: String, value: String, changeLink: Call)(implicit messages: Messages) = SummaryListRow(
     key = Key(content = Text(key)),
     value = Value(HtmlContent(value)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = changeLink.url,
-        content = Text("Change"),
+        content = Text(messages("base.change")),
         visuallyHiddenText = Some(key)
       )
     )))

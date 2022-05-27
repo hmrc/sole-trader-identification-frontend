@@ -46,7 +46,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
               form = CaptureOverseasTaxIdentifiersForm.form,
-              countries = config.orderedCountryList
+              countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
             ))
         }
       }
@@ -64,7 +64,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
                   form = formWithErrors,
-                  countries = config.orderedCountryList
+                  countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
                 ))
             },
           taxIdentifiers =>
