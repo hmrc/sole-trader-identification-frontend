@@ -31,7 +31,7 @@ object DateHelper {
       val monthAsNumber: Int = localDate.getMonthValue
 
       val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
-        s"""d '${messages(s"date.month.name.$monthAsNumber")}' YYYY"""
+        s"""d '${messages(s"date.month.name.$monthAsNumber")}' yyyy"""
       ).withResolverStyle(ResolverStyle.STRICT)
 
       localDate.format(dateTimeFormatter)
