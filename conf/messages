@@ -1,4 +1,4 @@
-service.name                                                = Register for VAT
+service.name.default                                        = Entity Validation Service
 service.govuk                                               = GOV.UK
 error.summary.title                                         = There is a problem
 error.title-prefix                                          = 'Error: '
@@ -20,6 +20,8 @@ localDate.label.year                                        = year
 
 app.common.yes                                              = Yes
 app.common.no                                               = No
+
+country.select                                              = Select a country
 
 ## Banner
 feedback.before                                             = This is a new service - your
@@ -88,7 +90,7 @@ error.no_entry_sa-postcode                                   = Enter a postcode
 ## Overseas Tax Identifiers Page
 tax-identifiers.title                                        = What is the business’s overseas tax identifier?
 tax-identifiers.heading                                      = What is the business’s overseas tax identifier?
-tax-identifiers.line_1                                       = We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
+tax-identifiers.line_1                                       = We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
 tax-identifiers.field_1                                      = Enter a tax identifier
 tax-identifiers.field_2                                      = Enter the name of the country that issued the tax identifier
 tax-identifiers.no_identifier_link                           = I do not want to provide an identifier

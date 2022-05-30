@@ -16,8 +16,28 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.utils
 
+import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, ResolverStyle}
+
+import play.api.i18n.Messages
 
 object DateHelper {
   val checkYourAnswersFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy").withResolverStyle(ResolverStyle.STRICT)
+
+  def formatDate(localDate: LocalDate)(implicit messages: Messages): String = {
+
+    if(messages.lang.code == "cy") {
+
+      val monthAsNumber: Int = localDate.getMonthValue
+
+      val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
+        s"""d '${messages(s"date.month.name.$monthAsNumber")}' YYYY"""
+      ).withResolverStyle(ResolverStyle.STRICT)
+
+      localDate.format(dateTimeFormatter)
+    } else {
+      localDate.format(checkYourAnswersFormat)
+    }
+  }
+
 }

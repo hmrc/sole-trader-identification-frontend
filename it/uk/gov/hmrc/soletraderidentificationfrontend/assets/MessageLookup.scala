@@ -149,7 +149,7 @@ object MessageLookup {
 
     val title = "What is the business’s overseas tax identifier? - Entity Validation Service - GOV.UK"
     val heading = "What is the business’s overseas tax identifier?"
-    val hint = "We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+    val hint = "We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
     val form_field_1 = "Enter a tax identifier"
     val form_field_2 = "Enter the name of the country that issued the tax identifier"
     val no_identifierLink = "I do not want to provide an identifier"
