@@ -361,12 +361,4 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def verifyRemoveAllData(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/sole-trader-identification/journey/$journeyId")
 
-  def stubIsFraudulentNino(ninoToBeChecked: String)(status: Int, body: JsObject): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/fraudulent-nino-info/$ninoToBeChecked"
-    ).thenReturn(
-      status = status,
-      body = body
-    )
-
 }

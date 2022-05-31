@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.FeatureSwitching
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NinoIsFraudulent, NinoNotDeclaredButFound, NinoNotFound}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NinoNotDeclaredButFound, NinoNotFound}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services._
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.check_your_answers_page
@@ -71,7 +71,6 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
             for {
               (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig).map({
                 case StartBusinessVerification(businessVerificationUrl) => (businessVerificationUrl, DoNotAuditJourney)
-                case SoleTraderDetailsMismatch(NinoIsFraudulent)        => (routes.DetailsDidNotMatchController.show(journeyId).url, AuditJourney)
                 case JourneyCompleted(continueUrl)                      => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
                 case SoleTraderDetailsMismatch(NinoNotFound)            => (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
                 case SoleTraderDetailsMismatch(NinoNotDeclaredButFound) => (routes.CouldNotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)

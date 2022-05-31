@@ -376,10 +376,4 @@ object TestConstants {
       s"?continue_url=%2Fidentify-your-sole-trader-business%2F$journeyId%2F$currentPageUrl" +
       "&origin=sole-trader-identification-frontend"
 
-  val fraudulentNinoJson: JsObject = createFraudulentNinoJson(isAFraudulentNino = true)
-
-  val nonFraudulentNinoJson: JsObject = createFraudulentNinoJson(isAFraudulentNino = false)
-
-  private def createFraudulentNinoJson(isAFraudulentNino: Boolean): JsObject = Json.obj("isAFraudulentNino" -> isAFraudulentNino)
-
 }
