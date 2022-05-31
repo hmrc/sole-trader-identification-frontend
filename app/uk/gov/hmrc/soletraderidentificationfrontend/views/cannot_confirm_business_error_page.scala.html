@@ -34,7 +34,7 @@
 
 @(pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title("cannot-confirm-business.title", pageConfig)) {
+@layout(pageConfig, title = title("cannot-confirm-business.title")) {
 
     @errorSummary(form.errors)
 

@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureFullNameForm
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_full_name_page
 
 import javax.inject.{Inject, Singleton}
@@ -33,7 +35,8 @@ class CaptureFullNameController @Inject()(mcc: MessagesControllerComponents,
                                           captureFullNameForm: CaptureFullNameForm,
                                           soleTraderIdentificationService: SoleTraderIdentificationService,
                                           val authConnector: AuthConnector,
-                                          journeyService: JourneyService
+                                          journeyService: JourneyService,
+                                          messagesHelper: MessagesHelper
                                          )(implicit val config: AppConfig,
                                            ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -42,10 +45,14 @@ class CaptureFullNameController @Inject()(mcc: MessagesControllerComponents,
       authorised() {
         journeyService.getJourneyConfig(journeyId).map {
           journeyConfig =>
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
+
             Ok(view(
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureFullNameController.submit(journeyId),
-              form = captureFullNameForm.apply()
+              form = captureFullNameForm.apply(),
+              label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
             ))
         }
       }
@@ -58,10 +65,13 @@ class CaptureFullNameController @Inject()(mcc: MessagesControllerComponents,
           formWithErrors =>
             journeyService.getJourneyConfig(journeyId).map {
               journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
                 BadRequest(view(
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureFullNameController.submit(journeyId),
-                  form = formWithErrors
+                  form = formWithErrors,
+                  label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
                 ))
             },
           fullName =>

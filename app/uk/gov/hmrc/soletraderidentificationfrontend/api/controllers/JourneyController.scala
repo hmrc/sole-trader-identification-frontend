@@ -86,10 +86,10 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
           signOutUrl,
           enableSautrCheck(sautrCheckPolicy, sautrCheckFromIncomingJson),
           accessibilityUrl,
-          optFullNamePageLabel
+          optFullNamePageLabel,
+          labels
         ),
-        regime,
-        labels
+        regime
       )
   }) {
     implicit req =>

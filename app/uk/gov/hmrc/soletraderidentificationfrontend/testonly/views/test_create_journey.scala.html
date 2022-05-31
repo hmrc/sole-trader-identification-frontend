@@ -32,7 +32,7 @@
 
 @(pageConfig: PageConfig, form: Form[JourneyConfig], formAction: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title("Enter Sole Trader Identification Journey Config", pageConfig)) {
+@layout(pageConfig, title = title("Enter Sole Trader Identification Journey Config")) {
 
     @govukFieldset(Fieldset(
         legend = Some(Legend(

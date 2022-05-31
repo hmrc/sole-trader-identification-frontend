@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.services.JourneyService
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.details_did_not_match_page
 
 import javax.inject.{Inject, Singleton}
@@ -28,17 +30,20 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class DetailsDidNotMatchController @Inject()(mcc: MessagesControllerComponents,
-                                   view: details_did_not_match_page,
-                                   val authConnector: AuthConnector,
-                                   journeyService: JourneyService
-                                  )(implicit val config: AppConfig,
-                                    executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+                                             view: details_did_not_match_page,
+                                             val authConnector: AuthConnector,
+                                             journeyService: JourneyService,
+                                             messagesHelper: MessagesHelper
+                                            )(implicit val config: AppConfig,
+                                              executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         journeyService.getJourneyConfig(journeyId).map {
           journeyConfig =>
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
             Ok(view(
               pageConfig = journeyConfig.pageConfig,
               redirectLocation = journeyConfig.pageConfig.signOutUrl,

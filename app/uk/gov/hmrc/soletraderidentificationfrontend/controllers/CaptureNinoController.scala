@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -23,6 +24,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{EnableNoNinoJourney, FeatureSwitching}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureNinoForm
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_nino_page
 
 import javax.inject.{Inject, Singleton}
@@ -33,7 +35,8 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
                                       view: capture_nino_page,
                                       soleTraderIdentificationService: SoleTraderIdentificationService,
                                       val authConnector: AuthConnector,
-                                      journeyService: JourneyService
+                                      journeyService: JourneyService,
+                                      messagesHelper: MessagesHelper
                                      )(implicit val config: AppConfig,
                                        executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -46,6 +49,8 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
             .retrieveFullName(journeyId)
             .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
         } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
           Ok(view(
             firstName,
             journeyId = journeyId,
@@ -69,6 +74,8 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
                 .retrieveFullName(journeyId)
                 .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
             } yield {
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
               BadRequest(view(
                 firstName,
                 journeyId = journeyId,

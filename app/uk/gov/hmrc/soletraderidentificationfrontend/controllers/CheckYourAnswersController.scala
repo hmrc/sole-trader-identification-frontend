@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
@@ -25,6 +26,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.Fe
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NinoNotDeclaredButFound, NinoNotFound}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services._
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.check_your_answers_page
 
 import javax.inject.{Inject, Singleton}
@@ -38,7 +40,8 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
                                            submissionService: SubmissionService,
                                            auditService: AuditService,
                                            rowBuilder: CheckYourAnswersRowBuilder,
-                                           val authConnector: AuthConnector
+                                           val authConnector: AuthConnector,
+                                           messagesHelper: MessagesHelper
                                           )(implicit val config: AppConfig,
                                             executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -55,11 +58,15 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
           optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifiers(journeyId)
           summaryRows = rowBuilder.buildSummaryListRows(
             journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, journeyConfig.pageConfig.enableSautrCheck)
-        } yield Ok(view(
-          pageConfig = journeyConfig.pageConfig,
-          formAction = routes.CheckYourAnswersController.submit(journeyId),
-          summaryRows = summaryRows
-        ))
+        } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(view(
+            pageConfig = journeyConfig.pageConfig,
+            formAction = routes.CheckYourAnswersController.submit(journeyId),
+            summaryRows = summaryRows
+          ))
+        }
       }
   }
 
@@ -74,7 +81,7 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
                 case JourneyCompleted(continueUrl)                      => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
                 case SoleTraderDetailsMismatch(NinoNotFound)            => (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
                 case SoleTraderDetailsMismatch(NinoNotDeclaredButFound) => (routes.CouldNotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
-                case SoleTraderDetailsMismatch(_)                       => (routes.CannotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
+                case SoleTraderDetailsMismatch(_) => (routes.CannotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
               })
             } yield {
               if (shouldAuditJourney == AuditJourney) auditService.auditJourney(journeyId, journeyConfig) else ()

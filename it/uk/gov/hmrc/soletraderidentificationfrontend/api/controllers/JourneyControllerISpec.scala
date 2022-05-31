@@ -165,8 +165,11 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel, "optServiceName" -> welshTestServiceName)))
         )
 
+        val pageConfig = testSoleTraderPageConfig.copy(
+          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), Some(welshTestServiceName)))))
+
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
-          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), Some(welshTestServiceName))))
+          pageConfig = pageConfig
         )
 
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
@@ -241,10 +244,12 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel)))
         )
 
+        val pageConfig = testSoleTraderPageConfig.copy(
+          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), None))))
+
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
           .copy(businessVerificationCheck = false)
-          .copy(labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), None)))
-        )
+          .copy(pageConfig = pageConfig)
 
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
@@ -323,7 +328,6 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       }
 
       "an optional Welsh service name is provided" in {
-
         stubAuth(OK, successfulAuthResponse())
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
@@ -333,9 +337,12 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             ("labels" -> Json.obj("cy" -> Json.obj("optServiceName" -> welshTestServiceName)))
         )
 
+        val pageConfig = testIndividualPageConfig.copy(
+          labels = Some(JourneyLabels(welsh = TranslationLabels(None, Some(welshTestServiceName)))))
+
         val expectedIndividualJourneyConfig = testIndividualJourneyConfig
           .copy(businessVerificationCheck = false)
-          .copy(labels = Some(JourneyLabels(welsh = TranslationLabels(None, Some(welshTestServiceName)))))
+          .copy(pageConfig = pageConfig)
 
         await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
       }
@@ -441,7 +448,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             status = OK,
             body = testExpectedRetrievedJourneyDataJson ++
               Json.obj("nino" -> testNino) ++
-              Json.obj("identifiersMatch" ->  "SuccessfulMatch")
+              Json.obj("identifiersMatch" -> "SuccessfulMatch")
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -457,7 +464,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             status = OK,
             body = testExpectedRetrievedJourneyDataJson ++
               Json.obj("nino" -> testNino.toLowerCase) ++
-              Json.obj("identifiersMatch" ->  "SuccessfulMatch")
+              Json.obj("identifiersMatch" -> "SuccessfulMatch")
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")

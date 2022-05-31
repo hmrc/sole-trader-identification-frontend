@@ -18,15 +18,14 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views.helpers
 
 import play.api.data.Form
 import play.api.i18n.Messages
-import uk.gov.hmrc.soletraderidentificationfrontend.models.PageConfig
 
 object TitleHelper {
-  def title(titleKey: String, pageConfig: PageConfig, form: Form[_])(implicit messages: Messages): String =
-    title(titleKey, pageConfig, form.hasErrors)
+  def title(titleKey: String, form: Form[_])(implicit messages: Messages): String =
+    title(titleKey, form.hasErrors)
 
-  def title(titleKey: String, pageConfig: PageConfig, isAnErrorPage: Boolean = false)(implicit messages: Messages): String = {
-    val titleMessage: String =
-      s"${messages(titleKey)} - ${pageConfig.optServiceName.getOrElse(messages("service.name.default"))} - ${messages("service.govuk")}"
+  def title(titleKey: String, isAnErrorPage: Boolean = false)(implicit messages: Messages): String = {
+    val serviceName = if (messages.isDefinedAt("optServiceName")) messages("optServiceName") else messages("service.name.default")
+    val titleMessage: String = s"${messages(titleKey)} - $serviceName - ${messages("service.govuk")}"
 
     if (isAnErrorPage) messages("error.title-prefix") + titleMessage
     else titleMessage
