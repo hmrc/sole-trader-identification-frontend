@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.mocks.{MockAuthenticatorConnector, MockRetrieveFraudulentNinoStatusConnector, MockRetrieveKnownFactsConnector}
+import connectors.mocks.{MockAuthenticatorConnector, MockRetrieveKnownFactsConnector}
 import helpers.TestConstants._
 import org.mockito.Mockito.reset
 import org.scalatest.matchers.must.Matchers
@@ -39,24 +39,21 @@ class SoleTraderMatchingServiceSpec
     with MockAuthenticatorConnector
     with MockRetrieveKnownFactsConnector
     with MockSoleTraderIdentificationService
-    with MockRetrieveFraudulentNinoStatusConnector
     with org.scalatest.prop.TableDrivenPropertyChecks {
 
   object TestService extends SoleTraderMatchingService(mockAuthenticatorConnector,
     mockRetrieveKnownFactsConnector,
-    mockRetrieveFraudulentNinoStatusConnector ,
     mockSoleTraderIdentificationService
   )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  "nino is not a fraudulent one: matchSoleTraderDetails" should {
+  "matchSoleTraderDetails" should {
     "return SuccessfulMatch" when {
       "the provided details match those from authenticator" when {
         "the enableSautrCheck is true and the sautr matches the returned one" in {
           mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Right(testIndividualDetails)))
           mockStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(Future.successful(SuccessfullyStored))
-          mockIsFraudulentNino(testNino)(Future.successful(false))
           mockStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(Future.successful(SuccessfullyStored))
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
@@ -71,7 +68,6 @@ class SoleTraderMatchingServiceSpec
           mockMatchSoleTraderDetails(testIndividualDetailsNoSautr)(Future.successful(Right(testIndividualDetailsNoSautr)))
           mockStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(Future.successful(SuccessfullyStored))
           mockStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(Future.successful(SuccessfullyStored))
-          mockIsFraudulentNino(testNino)(Future.successful(false))
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig()))
 
@@ -90,7 +86,6 @@ class SoleTraderMatchingServiceSpec
           mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(DetailsMismatch)))
           mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
           mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
-          mockIsFraudulentNino(testNino)(Future.successful(false))
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
 
@@ -104,7 +99,6 @@ class SoleTraderMatchingServiceSpec
           mockMatchSoleTraderDetails(testIndividualDetailsNoSautr)(Future.successful(Left(DetailsMismatch)))
           mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
           mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
-          mockIsFraudulentNino(testNino)(Future.successful(false))
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig()))
 
@@ -118,7 +112,6 @@ class SoleTraderMatchingServiceSpec
           mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(DetailsMismatch)))
           mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
           mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
-          mockIsFraudulentNino(testNino)(Future.successful(false))
 
           val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
@@ -134,7 +127,6 @@ class SoleTraderMatchingServiceSpec
         mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Right(testIndividualDetailsNoSautr)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
         mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
-        mockIsFraudulentNino(testNino)(Future.successful(false))
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true)))
 
@@ -149,7 +141,6 @@ class SoleTraderMatchingServiceSpec
         mockMatchSoleTraderDetails(testIndividualDetailsNoSautr)(Future.successful(Right(testIndividualDetails)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
         mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
-        mockIsFraudulentNino(testNino)(Future.successful(false))
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig(enableSautrCheck = true)))
 
@@ -166,7 +157,6 @@ class SoleTraderMatchingServiceSpec
         mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(NinoNotFound)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(Future.successful(SuccessfullyStored))
         mockStoreIdentifiersMatch(testJourneyId, NinoNotFound)(Future.successful(SuccessfullyStored))
-        mockIsFraudulentNino(testNino)(Future.successful(false))
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
@@ -183,7 +173,6 @@ class SoleTraderMatchingServiceSpec
         mockMatchSoleTraderDetails(testIndividualDetails)(Future.successful(Left(DeceasedCitizensDetails)))
         mockStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(Future.successful(SuccessfullyStored))
         mockStoreIdentifiersMatch(testJourneyId, DeceasedCitizensDetails)(Future.successful(SuccessfullyStored))
-        mockIsFraudulentNino(testNino)(Future.successful(false))
 
         val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
 
@@ -197,20 +186,6 @@ class SoleTraderMatchingServiceSpec
 
   }
 
-  "nino is a fraudulent one: matchSoleTraderDetails" should {
-    "return NinoFraudulentList" when {
-      "backend returns a fraudulent nino status" in {
-        mockIsFraudulentNino(testNino)(Future.successful(true))
-        mockStoreIdentifiersMatch(testJourneyId, NinoIsFraudulent)(Future.successful(SuccessfullyStored))
-
-        val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig()))
-
-        result mustBe NinoIsFraudulent
-
-        verifyStoreIdentifiersMatch(testJourneyId, NinoIsFraudulent)
-      }
-    }
-  }
 
   "matchSoleTraderDetailsNoNino" should {
     "return NinoNotDeclaredButFound" when {

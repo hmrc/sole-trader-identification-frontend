@@ -36,8 +36,6 @@ object SoleTraderDetailsMatching {
 
   case object NinoNotFound extends SoleTraderDetailsMatchFailure
 
-  case object NinoIsFraudulent extends SoleTraderDetailsMatchFailure
-
   case object DeceasedCitizensDetails extends SoleTraderDetailsMatchFailure
 
   val KnownFactsMatchingResultKey = "identifiersMatch"
@@ -48,7 +46,6 @@ object SoleTraderDetailsMatching {
   val NinoNotDeclaredButFoundKey = "NinoNotDeclaredButFound"
   val NinoNotFoundKey = "NinoNotFound"
   val DeceasedCitizensDetailsKey = "DeceasedCitizensDetails"
-  val NinoIsFraudulentKey = "NinoIsFraudulent"
 
   implicit val format: Format[SoleTraderDetailsMatchResult] = new Format[SoleTraderDetailsMatchResult] {
     override def writes(soleTraderMatchingResult: SoleTraderDetailsMatchResult): JsValue = {
@@ -59,7 +56,6 @@ object SoleTraderDetailsMatching {
         case NinoNotDeclaredButFound => NinoNotDeclaredButFoundKey
         case NinoNotFound => NinoNotFoundKey
         case DeceasedCitizensDetails => DeceasedCitizensDetailsKey
-        case NinoIsFraudulent => NinoIsFraudulentKey
       }
 
       JsString(knownFactsMatchingResultString)
@@ -74,7 +70,6 @@ object SoleTraderDetailsMatching {
           case NinoNotDeclaredButFoundKey => JsSuccess(NinoNotDeclaredButFound)
           case NinoNotFoundKey => JsSuccess(NinoNotFound)
           case DeceasedCitizensDetailsKey => JsSuccess(DeceasedCitizensDetails)
-          case NinoIsFraudulentKey => JsSuccess(NinoIsFraudulent)
           case notMapped => JsError(s"Error trying to match Sole Trader Matching Result. $notMapped is not mapped to any match result")
         }
         case JsError(error) => JsError(s"Error reading Sole Trader Matching Result json. Details: $error")

@@ -244,7 +244,7 @@ object TestConstants {
     testRegime
   )
 
-  def testSoleTraderAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
+  def testSoleTraderAuditEventJson(identifiersMatch: String = "true"): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Sole Trader",
     "firstName" -> testFirstName,
