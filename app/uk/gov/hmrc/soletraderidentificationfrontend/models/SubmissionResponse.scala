@@ -25,4 +25,3 @@ case class StartBusinessVerification(url: String) extends SubmissionResponse
 case class SoleTraderDetailsMismatch(mismatchReason: SoleTraderDetailsMatchFailure) extends SubmissionResponse
 
 case class JourneyCompleted(continueUrl: String) extends SubmissionResponse
-

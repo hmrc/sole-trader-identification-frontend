@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -23,6 +24,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureDateOfBirthForm.captureDateOfBirthForm
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.TimeMachine
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_date_of_birth_page
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +36,8 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
                                              soleTraderIdentificationService: SoleTraderIdentificationService,
                                              val authConnector: AuthConnector,
                                              timeMachine: TimeMachine,
-                                             journeyService: JourneyService
+                                             journeyService: JourneyService,
+                                             messagesHelper: MessagesHelper
                                             )(implicit val config: AppConfig,
                                               ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -47,6 +50,8 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
             .retrieveFullName(journeyId)
             .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
         } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
           Ok(view(
             firstName,
             pageConfig = journeyConfig.pageConfig,
@@ -68,6 +73,8 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
                 .retrieveFullName(journeyId)
                 .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
             } yield {
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
               BadRequest(view(
                 firstName,
                 pageConfig = journeyConfig.pageConfig,

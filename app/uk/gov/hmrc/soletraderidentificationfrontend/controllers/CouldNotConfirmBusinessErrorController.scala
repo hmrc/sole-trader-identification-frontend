@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.services.JourneyService
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.could_not_confirm_business_error_page
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +36,8 @@ import scala.concurrent.ExecutionContext
 class CouldNotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerComponents,
                                                         val authConnector: AuthConnector,
                                                         journeyService: JourneyService,
-                                                        view: could_not_confirm_business_error_page
+                                                        view: could_not_confirm_business_error_page,
+                                                        messagesHelper: MessagesHelper
                                                        )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
                                                        extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -43,6 +46,8 @@ class CouldNotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerC
       authorised(){
         journeyService.getJourneyConfig(journeyId).map {
           journeyConfig =>
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
             Ok(view(pageConfig = journeyConfig.pageConfig, redirectLocation = routes.RetryJourneyController.tryAgain(journeyId)))
         }
       }

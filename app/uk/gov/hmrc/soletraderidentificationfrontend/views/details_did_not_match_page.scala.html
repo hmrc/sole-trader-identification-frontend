@@ -29,7 +29,7 @@ formWithCSRF: FormWithCSRF)
 
 @(pageConfig: PageConfig, redirectLocation: String, journeyId: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = title("details-did-not-match-page.title", pageConfig)) {
+@layout(pageConfig, title = title("details-did-not-match-page.title")) {
 
     @h1(messages("details-did-not-match-page.heading"))
 

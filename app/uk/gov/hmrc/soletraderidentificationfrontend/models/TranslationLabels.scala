@@ -23,5 +23,5 @@ case class TranslationLabels(optFullNamePageLabel: Option[String], optServiceNam
 object TranslationLabels {
 
   implicit val format: OFormat[TranslationLabels] = Json.format[TranslationLabels]
-  
+
 }

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.i18n.Messages
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -23,6 +24,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureSaPostcodeForm
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_sa_postcode_page
 
 import javax.inject.{Inject, Singleton}
@@ -33,7 +35,8 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                                             view: capture_sa_postcode_page,
                                             soleTraderIdentificationService: SoleTraderIdentificationService,
                                             val authConnector: AuthConnector,
-                                            journeyService: JourneyService
+                                            journeyService: JourneyService,
+                                            messagesHelper: MessagesHelper
                                            )(implicit val config: AppConfig,
                                              executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -42,6 +45,8 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
       authorised() {
         journeyService.getJourneyConfig(journeyId).map {
           journeyConfig =>
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
             Ok(view(
               journeyId = journeyId,
               pageConfig = journeyConfig.pageConfig,
@@ -59,6 +64,8 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
           formWithErrors =>
             journeyService.getJourneyConfig(journeyId).map {
               journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
                 BadRequest(view(
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,

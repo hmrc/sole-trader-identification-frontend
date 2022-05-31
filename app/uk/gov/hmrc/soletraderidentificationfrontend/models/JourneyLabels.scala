@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
-case class JourneyLabels (welsh: TranslationLabels)
+case class JourneyLabels(welsh: TranslationLabels)
 
 object JourneyLabels {
 

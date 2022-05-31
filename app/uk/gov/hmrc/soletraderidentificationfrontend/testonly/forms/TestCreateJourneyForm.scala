@@ -96,11 +96,11 @@ object TestCreateJourneyForm {
           signOutUrl,
           enableSautrCheck,
           accessibilityUrl,
-          fullNamePageLabel
+          fullNamePageLabel,
+          welshFullNamePageLabel,
+          welshServiceName
         ),
-        regime,
-        welshFullNamePageLabel,
-        welshServiceName
+        regime
       )
     )(journeyConfig =>
       Some(
@@ -112,8 +112,8 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.pageConfig.optFullNamePageLabel,
         journeyConfig.regime,
-        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optServiceName else None
+        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
+        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
       )
     ))
   }
@@ -142,11 +142,11 @@ object TestCreateJourneyForm {
           signOutUrl,
           enableSautrCheck,
           accessibilityUrl,
-          fullNamePageLabel
+          fullNamePageLabel,
+          welshFullNamePageLabel,
+          welshServiceName
         ),
-        regime,
-        welshFullNamePageLabel,
-        welshServiceName
+        regime
       )
     )(journeyConfig =>
       Some(
@@ -159,8 +159,8 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.pageConfig.optFullNamePageLabel,
         journeyConfig.regime,
-        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.labels.isDefined) journeyConfig.labels.get.welsh.optServiceName else None
+        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
+        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
       )
     ))
   }
