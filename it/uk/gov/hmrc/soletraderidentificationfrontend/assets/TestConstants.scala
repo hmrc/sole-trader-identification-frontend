@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
@@ -66,10 +66,17 @@ object TestConstants {
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
 
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
-    registrationStatusKey -> RegisteredKey,
-    registeredBusinessPartnerIdKey -> testSafeId)
-  val testFailedRegistrationJson: JsObject = Json.obj(registrationStatusKey -> RegistrationFailedKey)
-  val testRegistrationNotCalledJson: JsObject = Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+    "registrationStatus" -> "REGISTERED",
+    "registeredBusinessPartnerId" -> testSafeId)
+  def testFailedRegistrationJson(failures: JsArray): JsObject = Json.obj(
+    "registrationStatus" -> "REGISTRATION_FAILED",
+    "failures" -> failures)
+  val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
+  val testRegistrationFailure: Array[Failure] = Array(Failure("PARTY_TYPE_MISMATCH", "The remote endpoint has indicated there is Party Type mismatch"))
+  val testMultipleRegistrationFailure: Array[Failure] = Array(Failure("INVALID_REGIME", "Request has not passed validation.  Invalid regime"), Failure("INVALID_PAYLOAD", "Request has not passed validation. Invalid payload."))
+
+  val testBackendSuccessfulRegistrationJson: JsObject = Json.obj("registration" -> testSuccessfulRegistrationJson)
+  def testBackendFailedRegistrationJson(failures: JsArray): JsObject = Json.obj("registration" -> testFailedRegistrationJson(failures))
 
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"
@@ -294,7 +301,7 @@ object TestConstants {
   )
   val testKnownFactsResponseNino: JsObject = testKnownFactsResponseNino(nino = testNino)
 
-  def testKnownFactsResponseNino(nino:String): JsObject = Json.obj(
+  def testKnownFactsResponseNino(nino: String): JsObject = Json.obj(
     "service" -> "IR-SA",
     "enrolments" -> Json.arr(
       Json.obj(
@@ -337,6 +344,7 @@ object TestConstants {
       )
     )
   )
+
   val testAddressJson: JsObject = Json.obj(
     "line1" -> "line1",
     "line2" -> "line2",
