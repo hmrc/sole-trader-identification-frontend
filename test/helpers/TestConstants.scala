@@ -58,6 +58,8 @@ object TestConstants {
   val testFailedBusinessVerificationStatusJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
 
+  val testRegistrationFailure: Array[Failure] = Array(Failure("PARTY_TYPE_MISMATCH", "The remote endpoint has indicated there is Party Type mismatch"))
+
   val testRegistrationSuccess: String = "success"
   val testRegistrationFailed: String = "fail"
   val testRegistrationNotCalled: String = "not called"
@@ -147,7 +149,7 @@ object TestConstants {
       optSautr = Some(testSautr),
       identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationPass),
-      registrationStatus = Some(RegistrationFailed),
+      registrationStatus = Some(RegistrationFailed(Some(testRegistrationFailure))),
       optTrn = None,
       optOverseas = None
     )

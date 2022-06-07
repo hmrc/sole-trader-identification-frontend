@@ -62,7 +62,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             soleTraderRecord.registrationStatus match {
               case Some(registrationStatus) => registrationStatus match {
                 case Registered(_) => Json.obj("RegisterApiStatus" -> "success")
-                case RegistrationFailed => Json.obj("RegisterApiStatus" -> "fail")
+                case RegistrationFailed(_) => Json.obj("RegisterApiStatus" -> "fail")
                 case RegistrationNotCalled => Json.obj("RegisterApiStatus" -> "not called")
               }
               case _ => Json.obj()

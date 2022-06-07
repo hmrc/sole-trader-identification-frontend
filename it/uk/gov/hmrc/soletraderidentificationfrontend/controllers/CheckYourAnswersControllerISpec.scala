@@ -772,7 +772,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
 
-          stubRegister(testNino, Some(testSautr), testRegime)(OK, Registered(testSafeId))
+          stubRegister(testNino, Some(testSautr), testRegime)(OK, testBackendSuccessfulRegistrationJson)
 
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
@@ -819,7 +819,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
 
           verifyAudit()
-
         }
       }
     }
