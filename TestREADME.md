@@ -202,10 +202,10 @@ A valid journeyId must be sent in the URI or as a query parameter. Example of us
 #### Response:
 Status:
 
-| Expected Response                       | Reason
-|-----------------------------------------|------------------------------
-| ```OK(200)```                           |  ```JourneyId exists```
-| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+| Expected Response                       | Reason                          |
+|-----------------------------------------|---------------------------------|
+| ```OK(200)```                           | ```JourneyId exists```          |
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```   |
 
 Example response body for the Sole Trader Journey:
 
@@ -223,6 +223,30 @@ Example response body for the Sole Trader Journey:
     "registration": {
         "registrationStatus":"REGISTERED",
         "registeredBusinessPartnerId":"X00000123456789"
+      }
+}
+```
+
+Example response body for the Sole Trader Flow where the Registration failed:
+```
+{
+    "firstName": "John",
+    "lastName": "Smith",
+    "dateOfBirth": 1978-01-05,
+    "nino": "AA111111A",
+    "sautr": "1234567890",
+    "identifiersMatch": true,
+    "businessVerification": {
+        "verificationStatus":"PASS"
+      },
+    "registration": {
+        "registrationStatus":"REGISTRATION_FAILED",
+        "failures": [
+            {
+                "code": "PARTY_TYPE_MISMATCH",
+                "reason": "The remote endpoint has indicated there is Party Type mismatch"
+            }
+        ]
       }
 }
 ```
@@ -288,12 +312,12 @@ This stub returns different responses based on the entered last name.
 
 Any other last name will return the data user has entered along with `1234567890` for the SAUTR. This is the SAUTR the user must provide in order to pass validation using this stub.
 
-| Last Name                               | Response
-|-----------------------------------------|------------------------------
-| ```fail```                              | ```Unauthorized```
-| ```deceased```                          | ```FailedDependency```
-| ```no-sautr```                          | ```Ok``` (See above)
-| Any other last name                     | ```Ok```
+| Last Name                               | Response               |
+|-----------------------------------------|------------------------|
+| ```fail```                              | ```Unauthorized```     |
+| ```deceased```                          | ```FailedDependency``` |
+| ```no-sautr```                          | ```Ok``` (See above)   |
+| Any other last name                     | ```Ok```               |
 
 
 ### Using the Known Facts stub

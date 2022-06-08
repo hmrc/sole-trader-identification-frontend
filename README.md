@@ -133,6 +133,30 @@ Example response body for the Sole Trader Flow:
 }
 ```
 
+Example response body for the Sole Trader Flow where the Registration failed:
+```
+{
+    "firstName": "John",
+    "lastName": "Smith",
+    "dateOfBirth": 1978-01-05,
+    "nino": "AA111111A",
+    "sautr": "1234567890",
+    "identifiersMatch": true,
+    "businessVerification": {
+        "verificationStatus":"PASS"
+      },
+    "registration": {
+        "registrationStatus":"REGISTRATION_FAILED",
+        "failures": [
+            {
+                "code": "PARTY_TYPE_MISMATCH",
+                "reason": "The remote endpoint has indicated there is Party Type mismatch"
+            }
+        ]
+      }
+}
+```
+
 Example response body for the Individual Flow:
 ```
 {
