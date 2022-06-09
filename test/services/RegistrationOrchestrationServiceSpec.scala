@@ -68,17 +68,17 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-          mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed(Some(testRegistrationFailure))))
-          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))(Future.successful(SuccessfullyStored))
+          mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
+          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
           await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(Some(failures)) =>
+            case RegistrationFailed(failures) =>
               failures mustBe testRegistrationFailure
             case _ => fail("Incorrect RegistrationStatus returned")
           }
 
           verifyRegistration(testNino, Some(testSautr), testRegime)
-          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))
+          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
         }
 
         "the business has an IR-SA enrolment and then registers" in {
@@ -163,16 +163,16 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
           mockCreateTrn(testJourneyId)(Future.successful(testTrn))
           mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-          mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(Some(testRegistrationFailure))))
-          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))(Future.successful(SuccessfullyStored))
+          mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
+          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
           await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(Some(failures)) =>
+            case RegistrationFailed(failures) =>
               failures mustBe testRegistrationFailure
             case _ => fail("Incorrect RegistrationStatus returned")
           }
           verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
-          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))
+          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
         }
       }
       "store a registration state of registration not called" when {
@@ -246,17 +246,17 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           verifyNoInteractions(mockAuditService)
         }
         "the business entity is not successfully registered" in {
-          mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed(Some(testRegistrationFailure))))
-          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))(Future.successful(SuccessfullyStored))
+          mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
+          mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
           await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(Some(failures)) =>
+            case RegistrationFailed(failures) =>
               failures mustBe testRegistrationFailure
             case _ => fail("Incorrect RegistrationStatus returned")
           }
 
           verifyRegistration(testNino, None, testRegime)
-          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))
+          verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
           verifyNoInteractions(mockAuditService)
         }
       }
@@ -279,36 +279,18 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
 
       "return RegistrationFailed if fails to register with Trn" in {
         mockCreateTrn(testJourneyId)(Future.successful(testTrn))
-        mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(Some(testRegistrationFailure))))
-        mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))(Future.successful(SuccessfullyStored))
+        mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
+        mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
         await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)) match {
-          case RegistrationFailed(Some(failures)) =>
+          case RegistrationFailed(failures) =>
             failures mustBe testRegistrationFailure
           case _ => fail("Incorrect RegistrationStatus returned")
         }
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
-        verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(Some(testRegistrationFailure)))
+        verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
         verifyNoInteractions(mockAuditService)
-      }
-    }
-  }
-
-  "register" when {
-    "registration fails but no failures returned" should {
-      "store the correct Registration response" in {
-        mockRetrieveNino(testJourneyId)(Future.successful(Some(testNino)))
-        mockRetrieveSautr(testJourneyId)(Future.successful(Some(testSautr)))
-        mockRetrieveBusinessVerificationStatus(testJourneyId)(Future.successful(Some(BusinessVerificationPass)))
-        mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed(None)))
-        mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(None))(Future.successful(SuccessfullyStored))
-
-        await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) mustBe {
-          RegistrationFailed(None)
-        }
-        verifyRegistration(testNino, Some(testSautr), testRegime)
-        verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(None))
       }
     }
   }

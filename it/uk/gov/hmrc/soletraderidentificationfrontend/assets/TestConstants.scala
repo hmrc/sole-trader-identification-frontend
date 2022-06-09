@@ -18,7 +18,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
