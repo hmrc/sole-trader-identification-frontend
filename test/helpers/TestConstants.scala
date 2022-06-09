@@ -149,7 +149,7 @@ object TestConstants {
       optSautr = Some(testSautr),
       identifiersMatch = SuccessfulMatch,
       businessVerification = Some(BusinessVerificationPass),
-      registrationStatus = Some(RegistrationFailed(Some(testRegistrationFailure))),
+      registrationStatus = Some(RegistrationFailed(testRegistrationFailure)),
       optTrn = None,
       optOverseas = None
     )
