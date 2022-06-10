@@ -46,7 +46,7 @@ class TestCreateIndividualJourneyController @Inject()(messagesControllerComponen
         Future.successful(
           Ok(view(
             defaultPageConfig,
-            form(enableSautrCheck = false).fill(defaultJourneyConfig),
+            form().fill(defaultJourneyConfig),
             routes.TestCreateIndividualJourneyController.submit
           ))
         )
@@ -56,7 +56,7 @@ class TestCreateIndividualJourneyController @Inject()(messagesControllerComponen
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        form(enableSautrCheck = false).bindFromRequest().fold(
+        form().bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateIndividualJourneyController.submit))

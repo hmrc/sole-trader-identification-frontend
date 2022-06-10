@@ -17,16 +17,18 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, text}
+import play.api.data.Forms.{boolean, mapping, of, text}
 import play.api.data.validation.Constraint
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.mappings.OptionalJourneyLabelsFormatter
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig}
 
 object TestCreateJourneyForm {
 
   val continueUrl = "continueUrl"
   val businessVerificationCheck = "businessVerificationCheck"
+  val pageConfig = "pageConfig"
   val serviceName = "serviceName"
   val deskProServiceId = "deskProServiceId"
   val alphanumericRegex = "^[A-Z0-9]*$"
@@ -74,95 +76,40 @@ object TestCreateJourneyForm {
     )
   )
 
-  def form(enableSautrCheck: Boolean): Form[JourneyConfig] = {
+  def form(): Form[JourneyConfig] = {
+
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       businessVerificationCheck -> boolean,
-      serviceName -> optText,
-      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
-      signOutUrl -> text.verifying(signOutUrlEmpty),
-      accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty),
-      welshFullNamePageLabel -> optText,
-      welshServiceName -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
-      JourneyConfig.apply(
-        continueUrl,
-        businessVerificationCheck,
-        PageConfig(
-          serviceName,
-          deskProServiceId,
-          signOutUrl,
-          enableSautrCheck,
-          accessibilityUrl,
-          fullNamePageLabel,
-          welshFullNamePageLabel,
-          welshServiceName
-        ),
-        regime
-      )
-    )(journeyConfig =>
-      Some(
-        journeyConfig.continueUrl,
-        journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.optServiceName,
-        journeyConfig.pageConfig.deskProServiceId,
-        journeyConfig.pageConfig.signOutUrl,
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel,
-        journeyConfig.regime,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
-      )
-    ))
+       pageConfig -> mapping(
+        serviceName -> optText,
+        deskProServiceId -> text.verifying(deskProServiceIdEmpty),
+        signOutUrl -> text.verifying(signOutUrlEmpty),
+         enableSautrCheck -> boolean,
+        accessibilityUrl -> text.verifying(signOutUrlEmpty),
+        fullNamePageLabel -> optText,
+        labels -> of[Option[JourneyLabels]](OptionalJourneyLabelsFormatter)
+        )(PageConfig.apply)(PageConfig.unapply),
+      regime -> text.verifying(regimeEmpty)
+    )(JourneyConfig.apply)(JourneyConfig.unapply))
   }
 
-
   def deprecatedForm(): Form[JourneyConfig] = {
+
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       businessVerificationCheck -> boolean,
-      serviceName -> optText,
-      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
-      signOutUrl -> text.verifying(signOutUrlEmpty),
-      enableSautrCheck -> optText.toBoolean,
-      accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty),
-      welshFullNamePageLabel -> optText,
-      welshServiceName -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
-      JourneyConfig.apply(
-        continueUrl,
-        businessVerificationCheck,
-        PageConfig(
-          serviceName,
-          deskProServiceId,
-          signOutUrl,
-          enableSautrCheck,
-          accessibilityUrl,
-          fullNamePageLabel,
-          welshFullNamePageLabel,
-          welshServiceName
-        ),
-        regime
-      )
-    )(journeyConfig =>
-      Some(
-        journeyConfig.continueUrl,
-        journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.optServiceName,
-        journeyConfig.pageConfig.deskProServiceId,
-        journeyConfig.pageConfig.signOutUrl,
-        journeyConfig.pageConfig.enableSautrCheck,
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel,
-        journeyConfig.regime,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
-      )
-    ))
+      pageConfig -> mapping(
+        serviceName -> optText,
+        deskProServiceId -> text.verifying(deskProServiceIdEmpty),
+        signOutUrl -> text.verifying(signOutUrlEmpty),
+        enableSautrCheck -> optText.toBoolean,
+        accessibilityUrl -> text.verifying(signOutUrlEmpty),
+        fullNamePageLabel -> optText,
+        labels -> of[Option[JourneyLabels]](OptionalJourneyLabelsFormatter)
+      )(PageConfig.apply)(PageConfig.unapply),
+      regime -> text.verifying(regimeEmpty)
+    )(JourneyConfig.apply)(JourneyConfig.unapply))
   }
 
 }

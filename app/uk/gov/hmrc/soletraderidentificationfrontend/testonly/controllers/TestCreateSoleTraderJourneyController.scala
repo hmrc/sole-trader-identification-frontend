@@ -44,7 +44,7 @@ class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponen
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(enableSautrCheck = true).fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form().fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit))
         )
       }
   }
@@ -52,7 +52,7 @@ class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponen
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        TestCreateJourneyForm.form(enableSautrCheck = true).bindFromRequest().fold(
+        TestCreateJourneyForm.form().bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateSoleTraderJourneyController.submit))

@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
-@import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers.inputText
+@import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers.{inputHidden, inputText}
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers.p
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
@@ -26,6 +26,7 @@
         govukCheckboxes: GovukCheckboxes,
         govukButton: GovukButton,
         inputText: inputText,
+        inputHidden: inputHidden,
         formWithCSRF: FormWithCSRF,
         p:p
 )
@@ -63,8 +64,8 @@
 
         @inputText(
             form = form,
-            id = "serviceName",
-            name = "serviceName",
+            id = "pageConfig.serviceName",
+            name = "pageConfig.serviceName",
             label = "Service Name",
             isPageHeading = false,
             hasFieldTitle = true,
@@ -73,8 +74,8 @@
 
         @inputText(
             form = form,
-            id = "deskProServiceId",
-            name = "deskProServiceId",
+            id = "pageConfig.deskProServiceId",
+            name = "pageConfig.deskProServiceId",
             label = "DeskPro Service Identifier",
             isPageHeading = false,
             hasFieldTitle = true,
@@ -83,14 +84,20 @@
 
         @inputText(
             form = form,
-            id = "signOutUrl",
-            name = "signOutUrl",
+            id = "pageConfig.signOutUrl",
+            name = "pageConfig.signOutUrl",
             label = "Sign Out Url",
             isPageHeading = false,
             hasFieldTitle = true,
             classes = "govuk-input--width-20",
             hint = Some(Html("Must be relative for staging, qa and production"))
         )
+
+        @inputHidden(
+          id = "pageConfig.enableSautrCheck",
+          name = "pageConfig.enableSautrCheck",
+          value = "true"
+       )
 
        @govukCheckboxes(Checkboxes(
          fieldset = Some(Fieldset(
@@ -113,8 +120,8 @@
 
         @inputText(
             form = form,
-            id = "accessibilityUrl",
-            name = "accessibilityUrl",
+            id = "pageConfig.accessibilityUrl",
+            name = "pageConfig.accessibilityUrl",
             label = "Accessibility Url",
             isPageHeading = false,
             hasFieldTitle = true,
@@ -124,8 +131,8 @@
 
         @inputText(
             form = form,
-            id = "fullNamePageLabel",
-            name = "fullNamePageLabel",
+            id = "pageConfig.fullNamePageLabel",
+            name = "pageConfig.fullNamePageLabel",
             label = "Full Name Page Label",
             isPageHeading = false,
             hasFieldTitle = true,
@@ -144,8 +151,8 @@
 
         @inputText(
             form = form,
-            id = "welshFullNamePageLabel",
-            name = "welshFullNamePageLabel",
+            id = "pageConfig.labels.welshFullNamePageLabel",
+            name = "pageConfig.labels.welshFullNamePageLabel",
             label = "Welsh translation for Full Name Page Label",
             isPageHeading = false,
             hasFieldTitle = true,
@@ -154,8 +161,8 @@
 
         @inputText(
             form = form,
-            id = "welshServiceName",
-            name = "welshServiceName",
+            id = "pageConfig.labels.welshServiceName",
+            name = "pageConfig.labels.welshServiceName",
             label = "Welsh translation for Service Name",
             isPageHeading = false,
             hasFieldTitle = true,
