@@ -72,10 +72,8 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
         val result = await(registrationConnector.registerWithNino(testNino, Some(testSautr), testRegime))
 
-        result match {
-          case RegistrationFailed(failures) => failures mustBe testRegistrationFailure
-          case _ => fail("Incorrect RegistrationStatus has been returned")
-        }
+        result mustBe RegistrationFailed(testRegistrationFailure)
+
       }
       "multiple failures have been returned" in {
         val registrationFailure = Json.arr(Json.obj(
@@ -91,10 +89,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
         val result = await(registrationConnector.registerWithNino(testNino, Some(testSautr), testRegime))
 
-        result match {
-          case RegistrationFailed(failures) => failures mustBe testMultipleRegistrationFailure
-          case _ => fail("Incorrect RegistrationStatus has been returned")
-        }
+        result mustBe RegistrationFailed(testMultipleRegistrationFailure)
       }
     }
   }
@@ -121,10 +116,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
         val result = await(registrationConnector.registerWithTrn(testTrn, testSautr, testRegime))
 
-        result match {
-          case RegistrationFailed(failures) => failures mustBe testRegistrationFailure
-          case _ => fail("Incorrect RegistrationStatus has been returned")
-        }
+        result mustBe RegistrationFailed(testRegistrationFailure)
       }
     }
   }

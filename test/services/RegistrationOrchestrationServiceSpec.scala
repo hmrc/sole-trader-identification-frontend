@@ -71,11 +71,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(failures) =>
-              failures mustBe testRegistrationFailure
-            case _ => fail("Incorrect RegistrationStatus returned")
-          }
+          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
+          actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
           verifyRegistration(testNino, Some(testSautr), testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
@@ -166,11 +163,9 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(failures) =>
-              failures mustBe testRegistrationFailure
-            case _ => fail("Incorrect RegistrationStatus returned")
-          }
+          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
+          actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
+
           verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
         }
@@ -249,11 +244,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)) match {
-            case RegistrationFailed(failures) =>
-              failures mustBe testRegistrationFailure
-            case _ => fail("Incorrect RegistrationStatus returned")
-          }
+          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig))
+          actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
           verifyRegistration(testNino, None, testRegime)
           verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
@@ -282,11 +274,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
         mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)) match {
-          case RegistrationFailed(failures) =>
-            failures mustBe testRegistrationFailure
-          case _ => fail("Incorrect RegistrationStatus returned")
-        }
+        val actualRegistrationStatus: RegistrationStatus = await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig))
+        actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
         verifyStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))
