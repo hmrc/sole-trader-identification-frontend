@@ -71,8 +71,13 @@ object TestConstants {
     "registrationStatus" -> "REGISTRATION_FAILED",
     "failures" -> failures)
   val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-  val testRegistrationFailure: Array[Failure] = Array(Failure("PARTY_TYPE_MISMATCH", "The remote endpoint has indicated there is Party Type mismatch"))
-  val testMultipleRegistrationFailure: Array[Failure] = Array(Failure("INVALID_REGIME", "Request has not passed validation.  Invalid regime"), Failure("INVALID_PAYLOAD", "Request has not passed validation. Invalid payload."))
+
+  val testRegistrationFailure: List[Failure] = List(Failure("PARTY_TYPE_MISMATCH", "The remote endpoint has indicated there is Party Type mismatch"))
+
+  val testMultipleRegistrationFailure: List[Failure] = List(
+    Failure("INVALID_REGIME", "Request has not passed validation.  Invalid regime"),
+    Failure("INVALID_PAYLOAD", "Request has not passed validation. Invalid payload.")
+  )
 
   val testBackendSuccessfulRegistrationJson: JsObject = Json.obj("registration" -> testSuccessfulRegistrationJson)
   def testBackendFailedRegistrationJson(failures: JsArray): JsObject = Json.obj("registration" -> testFailedRegistrationJson(failures))

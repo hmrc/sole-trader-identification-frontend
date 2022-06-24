@@ -23,7 +23,7 @@ sealed trait RegistrationStatus
 
 case class Registered(registeredBusinessPartnerId: String) extends RegistrationStatus
 
-case class RegistrationFailed(registrationFailures: Array[Failure]) extends RegistrationStatus
+case class RegistrationFailed(registrationFailures: List[Failure]) extends RegistrationStatus
 
 case object RegistrationNotCalled extends RegistrationStatus
 
@@ -62,7 +62,7 @@ object RegistrationStatus {
             businessPartnerId => Registered(businessPartnerId)
           }
         case JsSuccess(RegistrationFailedKey, _) =>
-          (json \ registrationFailuresKey).validate[Array[Failure]].map {
+          (json \ registrationFailuresKey).validate[List[Failure]].map {
             failures => RegistrationFailed(failures)
           }
         case JsSuccess(RegistrationNotCalledKey, path) =>
