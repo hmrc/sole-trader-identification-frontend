@@ -19,7 +19,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.forms
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraint
-import uk.gov.hmrc.soletraderidentificationfrontend.forms.mappings.Mappings
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
@@ -27,7 +26,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models.Address
 
 import scala.util.matching.Regex
 
-object CaptureAddressForm extends Mappings {
+object CaptureAddressForm {
 
   val addressRegex: Regex = "([A-Za-z0-9]([-'.& ]{0,1}[A-Za-z0-9 ]+)*[A-Za-z0-9]?)$".r
   val postCodeRegex: Regex = """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$""".r

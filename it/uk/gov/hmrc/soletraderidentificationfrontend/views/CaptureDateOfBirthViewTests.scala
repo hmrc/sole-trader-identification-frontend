@@ -110,8 +110,18 @@ trait CaptureDateOfBirthViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.noDobEntered
     }
+
+    "correctly define link to erroneous input" in {
+        doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
     "correctly display the field errors" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.noDobEntered
+    }
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
     }
   }
 
@@ -126,12 +136,22 @@ trait CaptureDateOfBirthViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.noDobEntered
     }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
     "correctly display the field error" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.noDobEntered
     }
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
   }
 
-  def testCaptureDateOfBirthErrorMessageInvalidYear(result: => WSResponse): Unit = {
+  def testCaptureDateOfBirthErrorMessageFutureDate(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "have the correct title" in {
@@ -142,8 +162,18 @@ trait CaptureDateOfBirthViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.futureDate
     }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
     "correctly display the field errors" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.futureDate
+    }
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
     }
   }
 
@@ -158,8 +188,18 @@ trait CaptureDateOfBirthViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalidDate
     }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
     "correctly display the field errors" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidDate
+    }
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
     }
   }
 
@@ -174,8 +214,216 @@ trait CaptureDateOfBirthViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.invalidAge
     }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
     "correctly display the field errors" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidAge
     }
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
   }
+
+  def testCaptureDateOfBirthErrorMessageYearBeforeNineteenHundred(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.invalidDate
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidDate
+    }
+
+    "assign error class to date input components" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
+
+  }
+
+  def testCaptureDateOfBirthErrorMessageMissingDay(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingDay
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingDay
+    }
+
+    "assign error class to day input input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+    }
+  }
+
+  def testCaptureDateOfBirthErrorMessagesMissingMonth(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingMonth
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-month"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingMonth
+    }
+
+    "assign error class to month input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+    }
+  }
+
+  def testCaptureDateOfBirthErrorMessagesMissingYear(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingYear
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-year"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingYear
+    }
+
+    "assign error class to year input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
+  }
+
+  def testCaptureDateOfBirthErrorMessagesMissingDayAndMonth(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingDayAndMonth
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingDayAndMonth
+    }
+
+    "assign error class to year input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+    }
+
+  }
+
+  def testCaptureDateOfBirthErrorMessagesMissingDayAndYear(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingDayAndYear
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingDayAndYear
+    }
+
+    "assign error class to year input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
+  }
+
+  def testCaptureDateOfBirthErrorMessagesMissingMonthAndYear(result: => WSResponse): Unit = {
+
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.missingMonthAndYear
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-month"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.missingMonthAndYear
+    }
+
+    "assign error class to year input component" in {
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
+  }
+
 }

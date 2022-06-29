@@ -72,10 +72,16 @@ object MessageLookup {
     val hint = "For example, 27 3 2007"
 
     object Error {
-      val noDobEntered = "Enter your date of birth"
-      val invalidDate = "Enter a real date"
+      val noDobEntered = "Enter the date of birth"
+      val invalidDate = "Enter the date of birth in the correct format"
       val futureDate = "The date of birth must be in the past"
       val invalidAge = "You must be at least 16 years of age"
+      val missingDay = "The date of birth must include a day"
+      val missingMonth = "The date of birth must include a month"
+      val missingYear = "The date of birth must include a year"
+      val missingDayAndMonth = "The date of birth must include a day and a month"
+      val missingDayAndYear = "The date of birth must include a day and a year"
+      val missingMonthAndYear = "The date of birth must include a month and a year"
     }
 
   }
