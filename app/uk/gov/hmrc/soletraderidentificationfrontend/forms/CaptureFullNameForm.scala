@@ -19,15 +19,12 @@ package uk.gov.hmrc.soletraderidentificationfrontend.forms
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.validation.Constraint
-import uk.gov.hmrc.soletraderidentificationfrontend.forms.mappings.Mappings
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 
-import javax.inject.Inject
-
-class CaptureFullNameForm @Inject() extends Mappings {
+class CaptureFullNameForm {
 
   def validName(text: String): Boolean = text.matches(nameRegex)
 

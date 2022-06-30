@@ -107,11 +107,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "",
-          "date-of-birth-month" -> "",
-          "date-of-birth-year" -> ""
-        )
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")()
       }
       "return a bad request" in {
         result.status mustBe BAD_REQUEST
@@ -152,13 +148,13 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> "2024"
+          "date-of-birth-year" -> "2050"
         )
       }
       "return a bad request" in {
         result.status mustBe BAD_REQUEST
       }
-      testCaptureDateOfBirthErrorMessageInvalidYear(result)
+      testCaptureDateOfBirthErrorMessageFutureDate(result)
     }
 
     "an invalid date is submitted" should {
@@ -201,6 +197,164 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
       testCaptureDateOfBirthErrorMessageInvalidAge(result)
+    }
+
+    "the year in the date of birth is before 1900" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
+          "date-of-birth-year" -> "1899"
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessageYearBeforeNineteenHundred(result)
+    }
+
+    "the day component of the date of birth submitted is missing" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "",
+          "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
+          "date-of-birth-year" -> testDateOfBirth.getYear.toString
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+      testCaptureDateOfBirthErrorMessageMissingDay(result)
+    }
+
+    "the month component of the date of birth submitted is missing" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-month" -> "",
+          "date-of-birth-year" -> testDateOfBirth.getYear.toString
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessagesMissingMonth(result)
+    }
+
+    "the year component of the date of birth submitted is missing" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
+          "date-of-birth-year" -> ""
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessagesMissingYear(result)
+    }
+
+    "the day and month components of the date of birth submitted are missing" should {
+
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "",
+          "date-of-birth-month" ->  "",
+          "date-of-birth-year" ->  testDateOfBirth.getYear.toString
+        )
+      }
+
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessagesMissingDayAndMonth(result)
+    }
+
+    "the day and year components of the date of birth submitted are missing" should {
+
+      lazy val result: WSResponse = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "",
+          "date-of-birth-month" ->  testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-year" ->  ""
+        )
+      }
+
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessagesMissingDayAndYear(result)
+    }
+
+    "the month and year components of the date of birth submitted are missing" should {
+      lazy val result: WSResponse = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-month" ->  "",
+          "date-of-birth-year" ->  ""
+        )
+      }
+
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureDateOfBirthErrorMessagesMissingMonthAndYear(result)
     }
 
     "there is a form error and customer full name exists" should {

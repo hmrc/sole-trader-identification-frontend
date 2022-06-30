@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.DateHelper
+
 @this(govukDateInput: GovukDateInput)
 
 @(
@@ -37,11 +39,11 @@
             )
         )
     )),
-    id = s"$id-input",
+    id = s"$id",
     items = Seq(
         InputItem(
-            id = s"$id",
-            classes = s"govuk-input--width-2${if(form(id).hasErrors || form.errors.exists(_.key.isEmpty)) " govuk-input--error" else ""}",
+            id = s"$id-day",
+            classes = s"govuk-input--width-2${DateHelper.addDayErrorClass(form)}",
             name =  s"$id-day",
             label = Some(messages("date.day")),
             value = form(s"$id-day").value,
@@ -49,7 +51,7 @@
         ),
         InputItem(
             id = s"$id-month",
-            classes = s"govuk-input--width-2${if(form(id).hasErrors || form.errors.exists(_.key.isEmpty)) " govuk-input--error" else ""}",
+            classes = s"govuk-input--width-2${DateHelper.addMonthErrorClass(form)}",
             name = s"$id-month",
             label = Some(messages("date.month")),
             value = form(s"$id-month").value,
@@ -57,7 +59,7 @@
         ),
         InputItem(
             id = s"$id-year",
-            classes = s"govuk-input--width-4${if(form(id).hasErrors || form.errors.exists(_.key.isEmpty)) " govuk-input--error" else ""}",
+            classes = s"govuk-input--width-4${DateHelper.addYearErrorClass(form)}",
             name = s"$id-year",
             label = Some(messages("date.year")),
             value = form(s"$id-year").value,
@@ -65,5 +67,5 @@
         )
     ),
     hint = hintText.map(hint => Hint(content = Text(messages(hint)))),
-    errorMessage = form(id).error.fold(form.errors.find(_.key.isEmpty))(err => Some(err)).map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
+    errorMessage = form.errors.headOption.map(error => ErrorMessage(content = Text(messages(error.message, error.args:_*))))
 ))

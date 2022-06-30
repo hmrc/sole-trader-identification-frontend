@@ -46,6 +46,8 @@ object ViewSpecHelper {
 
     lazy val getErrorSummaryBody: Elements = element.getElementsByClass("govuk-error-summary__body")
 
+    lazy val getErrorSummaryLink: Elements = element.getElementsByClass("govuk-error-summary__list").first().getElementsByTag("a")
+
     lazy val getFieldErrorMessage: Elements = element.getElementsByClass("govuk-error-message")
 
     lazy val getSubmitButton: Elements = element.getElementsByClass("govuk-button")

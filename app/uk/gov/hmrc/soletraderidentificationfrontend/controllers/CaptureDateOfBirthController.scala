@@ -22,7 +22,6 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureDateOfBirthForm.captureDateOfBirthForm
-import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.TimeMachine
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_date_of_birth_page
@@ -35,7 +34,6 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
                                              view: capture_date_of_birth_page,
                                              soleTraderIdentificationService: SoleTraderIdentificationService,
                                              val authConnector: AuthConnector,
-                                             timeMachine: TimeMachine,
                                              journeyService: JourneyService,
                                              messagesHelper: MessagesHelper
                                             )(implicit val config: AppConfig,
@@ -56,7 +54,7 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
             firstName,
             pageConfig = journeyConfig.pageConfig,
             formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-            form = captureDateOfBirthForm(timeMachine.now())
+            form = captureDateOfBirthForm()
           ))
         }
       }
@@ -65,7 +63,7 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        captureDateOfBirthForm(timeMachine.now()).bindFromRequest.fold(
+        captureDateOfBirthForm().bindFromRequest.fold(
           formWithErrors => {
             for {
               journeyConfig <- journeyService.getJourneyConfig(journeyId)
