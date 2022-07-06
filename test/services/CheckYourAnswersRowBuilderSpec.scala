@@ -79,49 +79,49 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
   )
 
   val testNinoRow = SummaryListRow(
-    key = Key(content = Text("National insurance number")),
+    key = Key(content = Text("National Insurance number")),
     value = Value(content = HtmlContent(testNino.grouped(2).mkString(" "))),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = routes.CaptureNinoController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("National insurance number")
+        visuallyHiddenText = Some("National Insurance number")
       )
     )))
   )
 
   val testNoNinoRow = SummaryListRow(
-    key = Key(content = Text("National insurance number")),
-    value = Value(content = HtmlContent("I do not have a National Insurance number")),
+    key = Key(content = Text("National Insurance number")),
+    value = Value(content = HtmlContent("There is no National Insurance number")),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = routes.CaptureNinoController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("National insurance number")
+        visuallyHiddenText = Some("National Insurance number")
       )
     )))
   )
 
   val testSautrRow = SummaryListRow(
-    key = Key(content = Text("Unique taxpayers reference number")),
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
     value = Value(content = HtmlContent(testSautr)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = routes.CaptureSautrController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique taxpayers reference number")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )
 
   val testNoSautrRow = SummaryListRow(
-    key = Key(content = Text("Unique taxpayers reference number")),
-    value = Value(content = HtmlContent("The business does not have a UTR")),
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
+    value = Value(content = HtmlContent("There is no UTR")),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = routes.CaptureSautrController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique taxpayers reference number")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )

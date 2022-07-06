@@ -113,9 +113,9 @@ object MessageLookup {
     object Error {
       val no_entry_address1 = "Enter the first line of the address"
       val no_entry_address2 = "Enter the second line of the address"
-      val too_many_characters_address = "Enter the address using 35 characters or less"
-      val invalid_characters_address = "Enter the address without special characters"
-      val invalid_characters_postcode = "Enter the postcode without special characters"
+      val too_many_characters_address = "The address must be 35 characters or fewer"
+      val invalid_characters_address = "The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops"
+      val invalid_characters_postcode = "The postcode must not include special characters"
       val non_uk_postcode = "Enter a postcode, like AA1 1AA"
       val no_entry_country = "Select a country"
     }
@@ -132,21 +132,21 @@ object MessageLookup {
     val details_line_3 = "The business does not have a UTR"
 
     object Error {
-      val invalidSautrEntered = "Enter a Unique Taxpayer Reference in the correct format"
+      val invalidSautrEntered = "Enter the Unique Taxpayer Reference in the correct format"
     }
 
   }
 
   object CaptureSaPostcode {
 
-    val title = "What is the postcode where the business is registered for Self Assessment? - Test Service - GOV.UK"
-    val heading = "What is the postcode where the business is registered for Self Assessment?"
+    val title = "What is the postcode used to register the business for Self Assessment? - Test Service - GOV.UK"
+    val heading = "What is the postcode used to register the business for Self Assessment?"
     val hint = "For example, AB1 2YZ"
     val no_postcodeLink = "The business does not have a Self Assessment postcode"
 
     object Error {
-      val invalid_sa_postcode = "Enter a UK postcode"
-      val no_entry_sa_postcode = "Enter a postcode"
+      val invalid_sa_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
+      val no_entry_sa_postcode = "Enter the postcode where the business is registered for Self Assessment"
     }
 
   }
@@ -163,7 +163,7 @@ object MessageLookup {
     object Error {
       val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
       val no_entry_tax_identifier = "Enter a tax identifier"
-      val invalid_length_tax_identifier = "Enter a tax identifier that is 60 characters or less"
+      val invalid_length_tax_identifier = "The tax identifier must be 60 characters or fewer"
       val no_entry_country = "Enter the name of the country that issued the tax identifier"
     }
 
@@ -219,11 +219,11 @@ object MessageLookup {
     val firstName = "First name"
     val lastName = "Last name"
     val dob = "Date of birth"
-    val nino = "National insurance number"
-    val sautr = "Unique taxpayers reference number"
+    val nino = "National Insurance number"
+    val sautr = "Unique Taxpayer Reference (UTR)"
     val address = "Home Address"
-    val noSautr = "The business does not have a UTR"
-    val noNino = "I do not have a National Insurance number"
+    val noSautr = "There is no UTR"
+    val noNino = "There is no National Insurance number"
     val saPostcode = "Self Assessment postcode"
     val overseasTaxIdentifier = "Overseas tax identifier"
 
