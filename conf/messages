@@ -22,6 +22,7 @@ app.common.yes                                              = Yes
 app.common.no                                               = No
 
 country.select                                              = Select a country
+country.noResult                                            = No results found
 
 ## Banner
 feedback.before                                             = This is a new service - your

@@ -36,6 +36,7 @@ app.common.yes                                              = Iawn
 app.common.no                                               = Na
 
 country.select                                              = Dewiswch wlad
+country.noResult                                            = Dim canlyniadau wedi’u darganfod
 
 ## Banner
 feedback.before                                             = Gwasanaeth newydd yw hwn – bydd eich
