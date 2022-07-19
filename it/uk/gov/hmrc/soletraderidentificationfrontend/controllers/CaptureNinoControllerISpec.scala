@@ -187,6 +187,27 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
       testCaptureNinoErrorMessages(result)
     }
 
+    "an incomplete nino is submitted" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AA111111")
+      }
+
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureNinoErrorMessages(result)
+    }
+
+
     "there is a form error and full name is defined" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
