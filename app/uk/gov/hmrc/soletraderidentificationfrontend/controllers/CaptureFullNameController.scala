@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureFullNameForm
@@ -42,43 +44,49 @@ class CaptureFullNameController @Inject()(mcc: MessagesControllerComponents,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId,authInternalId).map {
+            journeyConfig =>
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
 
-            Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureFullNameController.submit(journeyId),
-              form = captureFullNameForm.apply(),
-              label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
-            ))
-        }
+              Ok(view(
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureFullNameController.submit(journeyId),
+                form = captureFullNameForm.apply(),
+                label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
+              ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        captureFullNameForm.apply().bindFromRequest().fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureFullNameController.submit(journeyId),
-                  form = formWithErrors,
-                  label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
-                ))
-            },
-          fullName =>
-            soleTraderIdentificationService.storeFullName(journeyId, fullName).map {
-              _ => Redirect(routes.CaptureDateOfBirthController.show(journeyId))
-            }
-        )
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          captureFullNameForm.apply().bindFromRequest().fold(
+            formWithErrors =>
+              journeyService.getJourneyConfig(journeyId,authInternalId).map {
+                journeyConfig =>
+                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                  BadRequest(view(
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureFullNameController.submit(journeyId),
+                    form = formWithErrors,
+                    label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
+                  ))
+              },
+            fullName =>
+              soleTraderIdentificationService.storeFullName(journeyId, fullName).map {
+                _ => Redirect(routes.CaptureDateOfBirthController.show(journeyId))
+              }
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

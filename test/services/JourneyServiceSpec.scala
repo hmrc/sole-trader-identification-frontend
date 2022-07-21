@@ -16,13 +16,13 @@
 
 package services
 
+import com.mongodb.{MongoSocketReadException, ServerAddress}
 import connectors.mocks.MockJourneyConnector
 import helpers.TestConstants._
+import org.mongodb.scala.result.InsertOneResult
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers._
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.core.errors.GenericDriverException
 import repositories.mocks.MockJourneyConfigRepository
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.JourneyService
@@ -39,7 +39,7 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
   "createJourney" should {
     "return a journeyID and store the provided journey config" in {
       mockCreateJourney(response = Future.successful(testJourneyId))
-      mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.successful(mock[WriteResult]))
+      mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.successful(mock[InsertOneResult]))
 
       val result = await(TestService.createJourney(testJourneyConfig(), testInternalId))
 
@@ -51,7 +51,7 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
     "throw an exception" when {
       "create journey API returns an invalid response" in {
         mockCreateJourney(response = Future.failed(new InternalServerException("Invalid response returned from create journey API")))
-        mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.successful(mock[WriteResult]))
+        mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.successful(mock[InsertOneResult]))
 
         intercept[InternalServerException](
           await(TestService.createJourney(testJourneyConfig(), testInternalId))
@@ -61,9 +61,13 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
 
       "the journey config is not stored" in {
         mockCreateJourney(response = Future.successful(testJourneyId))
-        mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.failed(GenericDriverException("failed to insert")))
+        mockInsertJourneyConfig(
+          testJourneyId,
+          testInternalId,
+          testJourneyConfig())(response =
+          Future.failed(new MongoSocketReadException("Exception receiving message", new ServerAddress())))
 
-        intercept[GenericDriverException](
+        intercept[MongoSocketReadException](
           await(TestService.createJourney(testJourneyConfig(), testInternalId))
         )
         verifyCreateJourney()
@@ -75,23 +79,23 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
   "getJourneyConfig" should {
     "return the journey config for a specific journey id" when {
       "the journey id exists in the database" in {
-        mockFindById(testJourneyId)(Future.successful(Some(testJourneyConfig())))
+        mockFindJourneyConfig(testJourneyId, testInternalId)(Future.successful(Some(testJourneyConfig())))
 
-        val result = await(TestService.getJourneyConfig(testJourneyId))
+        val result = await(TestService.getJourneyConfig(testJourneyId, testInternalId))
 
         result mustBe testJourneyConfig()
-        verifyFindById(testJourneyId)
+        verifyFindJourneyConfig(testJourneyId, testInternalId)
       }
     }
 
     "throw an Internal Server Exception" when {
       "the journey config does not exist in the database" in {
-        mockFindById(testJourneyId)(Future.successful(None))
+        mockFindJourneyConfig(testJourneyId, testInternalId)(Future.successful(None))
 
         intercept[InternalServerException](
-          await(TestService.getJourneyConfig(testJourneyId))
+          await(TestService.getJourneyConfig(testJourneyId, testInternalId))
         )
-        verifyFindById(testJourneyId)
+        verifyFindJourneyConfig(testJourneyId, testInternalId)
       }
     }
   }

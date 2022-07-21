@@ -17,73 +17,70 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.repositories
 
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.BSONDocument
-import reactivemongo.play.json._
-import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository._
+import org.mongodb.scala.model.Indexes.ascending
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
+import org.mongodb.scala.result.{DeleteResult, InsertOneResult}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import java.util.concurrent.TimeUnit
 
 @Singleton
-class JourneyConfigRepository @Inject()(reactiveMongoComponent: ReactiveMongoComponent,
+class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
                                         appConfig: AppConfig)
-                                       (implicit ec: ExecutionContext) extends ReactiveRepository[JourneyConfig, String](
+                                       (implicit ec: ExecutionContext) extends PlayMongoRepository[JsObject](
   collectionName = "sole-trader-identification-frontend",
-  mongo = reactiveMongoComponent.mongoConnector.db,
-  domainFormat = journeyConfigMongoFormat,
-  idFormat = implicitly[Format[String]]
+  mongoComponent = mongoComponent,
+  domainFormat = implicitly[Format[JsObject]],
+  indexes = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds)),
+  extraCodecs = Seq(Codecs.playFormatCodec(journeyConfigMongoFormat))
 ) {
 
-  def insertJourneyConfig(journeyId: String, authInternalId: String, journeyConfig: JourneyConfig): Future[WriteResult] = {
-    val document = Json.obj(
+  def insertJourneyConfig(journeyId: String, authInternalId: String, journeyConfig: JourneyConfig): Future[InsertOneResult] = {
+
+    val document: JsObject = Json.obj(
       JourneyIdKey -> journeyId,
       AuthInternalIdKey -> authInternalId,
       CreationTimestampKey -> Json.obj("$date" -> Instant.now.toEpochMilli)
     ) ++ Json.toJsObject(journeyConfig)
 
-    collection.insert(true).one(document)
+    collection.insertOne(document).toFuture()
   }
 
-  def findJourneyConfig(journeyId: String, authInternalId: String): Future[Option[JourneyConfig]] =
-    collection.find(
-      selector = Json.obj(
-        JourneyIdKey -> journeyId,
-        AuthInternalIdKey -> authInternalId
-      ),
-      projection = Some(Json.obj(
-        JourneyIdKey -> 0,
-        AuthInternalIdKey -> 0
-      ))
-    ).one[JourneyConfig]
+  def findJourneyConfig(journeyId: String, authInternalId: String): Future[Option[JourneyConfig]] = {
 
-  private lazy val ttlIndex = Index(
-    Seq((CreationTimestampKey, IndexType.Ascending)),
-    name = Some("IncorporatedEntityInformationExpires"),
-    options = BSONDocument("expireAfterSeconds" -> appConfig.timeToLiveSeconds)
-  )
+    collection.find[JourneyConfig](
+      Filters.and(
+        Filters.equal(JourneyIdKey, journeyId),
+        Filters.equal(AuthInternalIdKey, authInternalId)
+      )
+    ).headOption
 
-  private def setIndex(): Unit = {
-    collection.indexesManager.drop(ttlIndex.name.get) onComplete {
-      _ => collection.indexesManager.ensure(ttlIndex)
-    }
   }
 
-  setIndex()
+  def count: Future[Long] = collection.countDocuments().toFuture()
 
-  override def drop(implicit ec: ExecutionContext): Future[Boolean] =
-    collection.drop(failIfNotFound = false).map { r =>
-      setIndex()
-      r
-    }
+  def removeJourneyConfig(journeyId: String, authInternalId: String): Future[DeleteResult] = {
+
+    collection.deleteOne(
+      Filters.and(
+        Filters.equal(JourneyIdKey, journeyId),
+        Filters.equal(AuthInternalIdKey, authInternalId)
+      )
+    ).toFuture()
+
+  }
+
+  def drop: Future[Unit] = collection.drop().toFuture.map(_ => Unit)
 
 }
+
 
 object JourneyConfigRepository {
   val JourneyIdKey = "_id"
@@ -91,4 +88,14 @@ object JourneyConfigRepository {
   val CreationTimestampKey = "creationTimestamp"
 
   implicit val journeyConfigMongoFormat: OFormat[JourneyConfig] = Json.format[JourneyConfig]
+
+  def timeToLiveIndex(timeToLiveDuration: Long): IndexModel = {
+    IndexModel(
+      keys = ascending(CreationTimestampKey),
+      indexOptions = IndexOptions()
+        .name("SoleTraderInformationExpires")
+        .expireAfter(timeToLiveDuration, TimeUnit.SECONDS)
+    )
+  }
+
 }

@@ -36,8 +36,8 @@ class JourneyService @Inject()(createJourneyConnector: CreateJourneyConnector,
       _ <- journeyConfigRepository.insertJourneyConfig(journeyId, authInternalId, journeyConfig)
     } yield journeyId
 
-  def getJourneyConfig(journeyId: String): Future[JourneyConfig] =
-    journeyConfigRepository.findById(journeyId).map {
+  def getJourneyConfig(journeyId: String, authInternalId: String): Future[JourneyConfig] =
+    journeyConfigRepository.findJourneyConfig(journeyId, authInternalId).map {
       case Some(journeyConfig) =>
         journeyConfig
       case None =>

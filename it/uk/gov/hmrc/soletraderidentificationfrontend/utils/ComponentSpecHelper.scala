@@ -29,8 +29,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{F
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.models.FeatureSwitch
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 trait ComponentSpecHelper extends AnyWordSpec with Matchers
   with CustomMatchers
   with WiremockHelper

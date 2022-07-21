@@ -27,8 +27,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyLabels, Trans
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, JourneyStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with SoleTraderIdentificationStub with AuthStub {
 
   "POST /sole-trader-identification/api/<typeOfJourney> for all journey types" should {
@@ -136,7 +134,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(testSoleTraderJourneyConfig)
       }
 
       "an optFullNamePageLabel field is provided" in {
@@ -151,7 +149,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
           .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
       "optional Welsh language labels are provided" in {
@@ -172,7 +170,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           pageConfig = pageConfig
         )
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
     }
@@ -214,7 +212,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
       }
 
       "an optFullNamePageLabel field is provided" in {
@@ -230,7 +228,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
       "an optional Welsh full name page label is provided" in {
@@ -251,7 +249,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = pageConfig)
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
     }
@@ -267,7 +265,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
       (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-      await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+      await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
 
     }
 
@@ -308,7 +306,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testIndividualJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testIndividualJourneyConfig)
       }
 
       "an optFullNamePageLabel field is provided" in {
@@ -324,7 +322,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = testIndividualPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedIndividualJourneyConfig)
       }
 
       "an optional Welsh service name is provided" in {
@@ -344,7 +342,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = pageConfig)
 
-        await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(expectedIndividualJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedIndividualJourneyConfig)
       }
     }
 
@@ -359,7 +357,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
       (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-      await(journeyConfigRepository.findById(testJourneyId)) mustBe Some(testIndividualJourneyConfig)
+      await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testIndividualJourneyConfig)
 
     }
 

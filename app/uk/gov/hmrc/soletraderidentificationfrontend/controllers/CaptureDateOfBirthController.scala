@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureDateOfBirthForm.captureDateOfBirthForm
@@ -41,51 +43,57 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        for {
-          journeyConfig <- journeyService.getJourneyConfig(journeyId)
-          firstName <- soleTraderIdentificationService
-            .retrieveFullName(journeyId)
-            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-        } yield {
-          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-          implicit val messages: Messages = remoteMessagesApi.preferred(request)
-          Ok(view(
-            firstName,
-            pageConfig = journeyConfig.pageConfig,
-            formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-            form = captureDateOfBirthForm()
-          ))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          for {
+            journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
+            firstName <- soleTraderIdentificationService
+              .retrieveFullName(journeyId)
+              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          } yield {
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
+            Ok(view(
+              firstName,
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureDateOfBirthController.submit(journeyId),
+              form = captureDateOfBirthForm()
+            ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        captureDateOfBirthForm().bindFromRequest.fold(
-          formWithErrors => {
-            for {
-              journeyConfig <- journeyService.getJourneyConfig(journeyId)
-              firstName <- soleTraderIdentificationService
-                .retrieveFullName(journeyId)
-                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-            } yield {
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              BadRequest(view(
-                firstName,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-                form = formWithErrors))
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          captureDateOfBirthForm().bindFromRequest.fold(
+            formWithErrors => {
+              for {
+                journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
+                firstName <- soleTraderIdentificationService
+                  .retrieveFullName(journeyId)
+                  .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+              } yield {
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(view(
+                  firstName,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureDateOfBirthController.submit(journeyId),
+                  form = formWithErrors))
+              }
             }
-          }
-          ,
-          dateOfBirth =>
-            soleTraderIdentificationService.storeDateOfBirth(journeyId, dateOfBirth).map {
-              _ => Redirect(routes.CaptureNinoController.show(journeyId))
-            }
-        )
+            ,
+            dateOfBirth =>
+              soleTraderIdentificationService.storeDateOfBirth(journeyId, dateOfBirth).map {
+                _ => Redirect(routes.CaptureNinoController.show(journeyId))
+              }
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

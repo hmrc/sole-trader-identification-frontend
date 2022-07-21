@@ -29,8 +29,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class BusinessVerificationControllerISpec extends ComponentSpecHelper
   with FeatureSwitching
   with AuthStub

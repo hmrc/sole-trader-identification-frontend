@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CannotConfirmBusinessErrorForm.cannotConfirmBusinessForm
@@ -43,49 +45,55 @@ class CannotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComp
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
-              form = cannotConfirmBusinessForm
-            ))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+            journeyConfig =>
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
+              Ok(view(
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
+                form = cannotConfirmBusinessForm
+              ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        cannotConfirmBusinessForm.bindFromRequest.fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
-                  form = formWithErrors
-                ))
-            },
-          continue =>
-            if (continue) {
-              for {
-                optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
-                _ <- if (optNino.isEmpty) trnService.createTrn(journeyId) //Create TRN at end of journey to avoid duplication
-                else Future.successful(Unit)
-                journeyConfig <- journeyService.getJourneyConfig(journeyId)
-              } yield Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-            } else {
-              soleTraderIdentificationService.removeAllData(journeyId).map {
-                _ => Redirect(routes.CaptureFullNameController.show(journeyId))
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          cannotConfirmBusinessForm.bindFromRequest.fold(
+            formWithErrors =>
+              journeyService.getJourneyConfig(journeyId, authInternalId).map {
+                journeyConfig =>
+                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                  BadRequest(view(
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
+                    form = formWithErrors
+                  ))
+              },
+            continue =>
+              if (continue) {
+                for {
+                  optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
+                  _ <- if (optNino.isEmpty) trnService.createTrn(journeyId) //Create TRN at end of journey to avoid duplication
+                  else Future.successful(Unit)
+                  journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
+                } yield Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+              } else {
+                soleTraderIdentificationService.removeAllData(journeyId).map {
+                  _ => Redirect(routes.CaptureFullNameController.show(journeyId))
+                }
               }
-            }
-        )
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
