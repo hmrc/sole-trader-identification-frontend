@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.services.JourneyService
@@ -33,23 +35,26 @@ import scala.concurrent.ExecutionContext
  * a Universal Taxpayer Reference, but one is found in their known facts.
  */
 @Singleton
-class CouldNotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerComponents,
-                                                        val authConnector: AuthConnector,
-                                                        journeyService: JourneyService,
-                                                        view: could_not_confirm_business_error_page,
-                                                        messagesHelper: MessagesHelper
-                                                       )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
-                                                       extends FrontendController(mcc) with AuthorisedFunctions {
+class CouldNotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComponents,
+                                                       val authConnector: AuthConnector,
+                                                       journeyService: JourneyService,
+                                                       view: could_not_confirm_business_error_page,
+                                                       messagesHelper: MessagesHelper
+                                                      )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
+  extends FrontendController(mcc) with AuthorisedFunctions {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised(){
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(pageConfig = journeyConfig.pageConfig, redirectLocation = routes.RetryJourneyController.tryAgain(journeyId)))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+            journeyConfig =>
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
+              Ok(view(pageConfig = journeyConfig.pageConfig, redirectLocation = routes.RetryJourneyController.tryAgain(journeyId)))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

@@ -19,14 +19,13 @@ package repositories.mocks
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.{reset, verify, when}
 import org.mockito.stubbing.OngoingStubbing
+import org.mongodb.scala.result.InsertOneResult
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
-import reactivemongo.api.ReadPreference
-import reactivemongo.api.commands.WriteResult
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MockJourneyConfigRepository extends MockitoSugar with BeforeAndAfterEach {
   self: Suite =>
@@ -41,7 +40,7 @@ trait MockJourneyConfigRepository extends MockitoSugar with BeforeAndAfterEach {
   def mockInsertJourneyConfig(journeyId: String,
                               internalId: String,
                               journeyConfig: JourneyConfig
-                             )(response: Future[WriteResult]): OngoingStubbing[_] = {
+                             )(response: Future[InsertOneResult]): OngoingStubbing[_] = {
     when(mockJourneyConfigRepository.insertJourneyConfig(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(internalId),
@@ -49,15 +48,14 @@ trait MockJourneyConfigRepository extends MockitoSugar with BeforeAndAfterEach {
     )).thenReturn(response)
   }
 
- def mockFindById(journeyId: String)
-                 (response: Future[Option[JourneyConfig]]): OngoingStubbing[_] = {
-    when(mockJourneyConfigRepository.findById(
+  def mockFindJourneyConfig(journeyId: String,
+                            authInternalId: String
+                           )(response: Future[Option[JourneyConfig]]): OngoingStubbing[_] = {
+    when(mockJourneyConfigRepository.findJourneyConfig(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.any[ReadPreference]
-    )(ArgumentMatchers.any[ExecutionContext])
-    ).thenReturn(response)
+      ArgumentMatchers.eq(authInternalId)
+    )).thenReturn(response)
   }
-
   def verifyInsertJourneyConfig(journeyId: String,
                                 internalId: String,
                                 journeyConfig: JourneyConfig): Unit =
@@ -67,10 +65,10 @@ trait MockJourneyConfigRepository extends MockitoSugar with BeforeAndAfterEach {
       ArgumentMatchers.eq(journeyConfig)
     )
 
-  def verifyFindById(journeyId: String): Unit =
-    verify(mockJourneyConfigRepository).findById(
+  def verifyFindJourneyConfig(journeyId: String, authInternalId: String): Unit =
+    verify(mockJourneyConfigRepository).findJourneyConfig(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.any[ReadPreference]
-    )(ArgumentMatchers.any[ExecutionContext])
+      ArgumentMatchers.eq(authInternalId)
+    )
 
 }

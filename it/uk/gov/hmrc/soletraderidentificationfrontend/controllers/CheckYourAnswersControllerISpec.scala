@@ -33,8 +33,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAu
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CheckYourAnswersViewTests
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class CheckYourAnswersControllerISpec extends ComponentSpecHelper
   with CheckYourAnswersViewTests
   with SoleTraderIdentificationStub

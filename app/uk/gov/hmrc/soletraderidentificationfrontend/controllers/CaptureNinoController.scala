@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{EnableNoNinoJourney, FeatureSwitching}
@@ -42,80 +44,89 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        for {
-          journeyConfig <- journeyService.getJourneyConfig(journeyId)
-          firstName <- soleTraderIdentificationService
-            .retrieveFullName(journeyId)
-            .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-        } yield {
-          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-          implicit val messages: Messages = remoteMessagesApi.preferred(request)
-          Ok(view(
-            firstName,
-            journeyId = journeyId,
-            pageConfig = journeyConfig.pageConfig,
-            formAction = routes.CaptureNinoController.submit(journeyId),
-            form = CaptureNinoForm.form,
-            noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
-          ))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          for {
+            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+            firstName <- soleTraderIdentificationService
+              .retrieveFullName(journeyId)
+              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          } yield {
+            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+            implicit val messages: Messages = remoteMessagesApi.preferred(request)
+            Ok(view(
+              firstName,
+              journeyId = journeyId,
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureNinoController.submit(journeyId),
+              form = CaptureNinoForm.form,
+              noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
+            ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        CaptureNinoForm.form.bindFromRequest().fold(
-          formWithErrors => {
-            for {
-              journeyConfig <- journeyService.getJourneyConfig(journeyId)
-              firstName <- soleTraderIdentificationService
-                .retrieveFullName(journeyId)
-                .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-            } yield {
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              BadRequest(view(
-                firstName,
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureNinoController.submit(journeyId),
-                form = formWithErrors,
-                noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
-              ))
-            }
-          }
-          ,
-          nino =>
-            for {
-              _ <- soleTraderIdentificationService.storeNino(journeyId, nino)
-              _ <- soleTraderIdentificationService.removeAddress(journeyId)
-              _ <- soleTraderIdentificationService.removeOverseasTaxIdentifiers(journeyId)
-              journeyConfig <- journeyService.getJourneyConfig(journeyId)
-            } yield
-              if (journeyConfig.pageConfig.enableSautrCheck) {
-                Redirect(routes.CaptureSautrController.show(journeyId))
-              } else {
-                Redirect(routes.CheckYourAnswersController.show(journeyId))
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          CaptureNinoForm.form.bindFromRequest().fold(
+            formWithErrors => {
+              for {
+                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+                firstName <- soleTraderIdentificationService
+                  .retrieveFullName(journeyId)
+                  .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+              } yield {
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(view(
+                  firstName,
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureNinoController.submit(journeyId),
+                  form = formWithErrors,
+                  noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
+                ))
               }
-        )
+            }
+            ,
+            nino =>
+              for {
+                _ <- soleTraderIdentificationService.storeNino(journeyId, nino)
+                _ <- soleTraderIdentificationService.removeAddress(journeyId)
+                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifiers(journeyId)
+                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              } yield
+                if (journeyConfig.pageConfig.enableSautrCheck) {
+                  Redirect(routes.CaptureSautrController.show(journeyId))
+                } else {
+                  Redirect(routes.CheckYourAnswersController.show(journeyId))
+                }
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
 
   def noNino(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).flatMap {
-          journeyConfig =>
-            soleTraderIdentificationService.removeNino(journeyId).map {
-              if (journeyConfig.pageConfig.enableSautrCheck)
-                _ => Redirect(routes.CaptureAddressController.show(journeyId))
-              else
-                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
-            }
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
+            journeyConfig =>
+              soleTraderIdentificationService.removeNino(journeyId).map {
+                if (journeyConfig.pageConfig.enableSautrCheck)
+                  _ => Redirect(routes.CaptureAddressController.show(journeyId))
+                else
+                  _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
+              }
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 }

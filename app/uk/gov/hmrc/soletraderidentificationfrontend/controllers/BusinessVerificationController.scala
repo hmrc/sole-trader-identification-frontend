@@ -17,6 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -36,20 +37,23 @@ class BusinessVerificationController @Inject()(mcc: MessagesControllerComponents
 
   def retrieveBusinessVerificationResult(journeyId: String): Action[AnyContent] = Action.async {
     implicit req =>
-      authorised() {
-        req.getQueryString("journeyId") match {
-          case Some(businessVerificationJourneyId) =>
-            for {
-              journeyConfig <- journeyService.getJourneyConfig(journeyId)
-              verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
-              _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
-              _ <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
-            } yield {
-              SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-            }
-          case None =>
-            throw new InternalServerException("Missing JourneyID from Business Verification callback")
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          req.getQueryString("journeyId") match {
+            case Some(businessVerificationJourneyId) =>
+              for {
+                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+                verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
+                _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
+                _ <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
+              } yield {
+                SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+              }
+            case None =>
+              throw new InternalServerException("Missing JourneyID from Business Verification callback")
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

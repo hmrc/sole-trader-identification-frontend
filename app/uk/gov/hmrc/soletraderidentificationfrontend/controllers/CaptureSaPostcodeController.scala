@@ -18,7 +18,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.FeatureSwitching
@@ -42,42 +44,48 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
-              journeyId = journeyId,
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-              form = CaptureSaPostcodeForm.form
-            ))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+            journeyConfig =>
+              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+              implicit val messages: Messages = remoteMessagesApi.preferred(request)
+              Ok(view(
+                journeyId = journeyId,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureSaPostcodeController.submit(journeyId),
+                form = CaptureSaPostcodeForm.form
+              ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        CaptureSaPostcodeForm.form.bindFromRequest().fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                  form = formWithErrors
-                ))
-            },
-          postcode =>
-            soleTraderIdentificationService.storeSaPostcode(journeyId, postcode).map {
-              _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
-            }
-        )
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          CaptureSaPostcodeForm.form.bindFromRequest().fold(
+            formWithErrors =>
+              journeyService.getJourneyConfig(journeyId, authInternalId).map {
+                journeyConfig =>
+                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                  BadRequest(view(
+                    journeyId = journeyId,
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureSaPostcodeController.submit(journeyId),
+                    form = formWithErrors
+                  ))
+              },
+            postcode =>
+              soleTraderIdentificationService.storeSaPostcode(journeyId, postcode).map {
+                _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+              }
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
