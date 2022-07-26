@@ -39,8 +39,7 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
   mongoComponent = mongoComponent,
   domainFormat = implicitly[Format[JsObject]],
   indexes = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds)),
-  extraCodecs = Seq(Codecs.playFormatCodec(journeyConfigMongoFormat)),
-  replaceIndexes = true
+  extraCodecs = Seq(Codecs.playFormatCodec(journeyConfigMongoFormat))
 ) {
 
   def insertJourneyConfig(journeyId: String, authInternalId: String, journeyConfig: JourneyConfig): Future[InsertOneResult] = {
