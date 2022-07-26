@@ -58,6 +58,8 @@ object ViewSpecHelper {
 
     lazy val getSummaryListRows: Elements = element.getElementsByClass("govuk-summary-list__row")
 
+    lazy val getRadioButtons: Elements = element.getElementsByClass("govuk-radios__input")
+
     def getSpan(id: String): Elements = element.select(s"""span[id=$id]""")
 
     def getLink(id: String): Elements = element.select(s"""a[id=$id]""")

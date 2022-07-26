@@ -80,6 +80,13 @@ sa-utr.details.line_2                                       = I cannot find the 
 sa-utr.details.line_3                                       = The business does not have a UTR
 sa-utr.error                                                = Enter the Unique Taxpayer Reference in the correct format
 
+## AB Testing SAUTR page
+new-sa-utr.title                                            = Does the applicant have a Unique Taxpayer Reference?
+new-sa-utr.heading                                          = Does {0} have a Unique Taxpayer Reference?
+new-sa-utr.line_1                                           = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. Your UTR helps us identify your business.
+new-sautr.label                                             = Unique Taxpayer Reference
+new-sautr.no-selection                                      = Select yes if there is a Unique Taxpayer Reference
+
 ## SA Postcode Page
 sa-postcode.title                                            = What is the postcode used to register the business for Self Assessment?
 sa-postcode.heading                                          = What is the postcode used to register the business for Self Assessment?

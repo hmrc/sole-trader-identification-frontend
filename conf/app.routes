@@ -19,6 +19,9 @@ GET         /:journeyId/sa-utr                           uk.gov.hmrc.soletraderi
 POST        /:journeyId/sa-utr                           uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSautrController.submit(journeyId: String)
 GET         /:journeyId/no-sa-utr                        uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSautrController.noSautr(journeyId: String)
 
+GET         /:journeyId/unique-taxpayer-reference-radio-buttons                           uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSautrNewController.show(journeyId: String)
+POST        /:journeyId/unique-taxpayer-reference-radio-buttons                           uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSautrNewController.submit(journeyId: String)
+
 GET         /:journeyId/self-assessment-postcode         uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSaPostcodeController.show(journeyId: String)
 POST        /:journeyId/self-assessment-postcode         uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSaPostcodeController.submit(journeyId: String)
 GET         /:journeyId/no-self-assessment-postcode      uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureSaPostcodeController.noSaPostcode(journeyId: String)
