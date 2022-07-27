@@ -94,6 +94,13 @@ sa-utr.details.line_2                                       = Ni allaf ddod o hy
 sa-utr.details.line_3                                       = Nid oes gan y busnes UTR
 sa-utr.error                                                = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y fformat cywir
 
+## AB Testing SAUTR page
+new-sa-utr.title                                            = A oes gan yr ymgeisydd Gyfeirnod Unigryw y Trethdalwr?
+new-sa-utr.heading                                          = A oes gan {0} Gyfeirnod Unigryw y Trethdalwr
+new-sa-utr.line_1                                           = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill ynghylch Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’. Mae Cyfeirnod Unigryw y Trethdalwr yn ein helpu i ddod o hyd i’r busnes
+new-sautr.label                                             = Cyfeirnod Unigryw y Trethdalwr
+new-sautr.no-selection                                      = Dewiswch ‘Iawn’ os oes Cyfeirnod Unigryw y Trethdalwr
+
 ## SA Postcode Page
 sa-postcode.title                                           = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad?
 sa-postcode.heading                                         = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad?
