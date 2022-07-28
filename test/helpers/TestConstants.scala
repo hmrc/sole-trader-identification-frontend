@@ -17,7 +17,8 @@
 package helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -51,6 +52,9 @@ object TestConstants {
   val testOverseasIdentifiers: Overseas = Overseas("134124532", "AL")
   val testDefaultServiceName: String = "Entity Validation Service"
   val testServiceName: String = "Test Service"
+
+  val testIrSAEnrolment: Enrolment = Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", testSautr)), "Activated", None)
+  val testEnrolments: Enrolments = Enrolments(Set(testIrSAEnrolment))
 
   val testPassedBusinessVerificationStatusJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)

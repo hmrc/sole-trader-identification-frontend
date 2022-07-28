@@ -21,10 +21,12 @@ import helpers.TestConstants._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import services.mocks.MockSoleTraderIdentificationService
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SaEnrolled
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NotEnoughInformationToMatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.AuditService
 
@@ -122,7 +124,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           result mustBe a[Unit]
 
           verifySendExplicitAuditSoleTraders()
-          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson(identifiersMatch = "true")
+          auditEventCaptor.getValue mustBe testSoleTraderAuditEventJson()
         }
         "there is an sautr and the journey config defines a calling service" in {
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails)))
@@ -191,6 +193,33 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
           verifySendExplicitAuditSoleTraders()
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNino(identifiersMatch = "true")
+        }
+        "there is a IR-SA enrolment with matching sautr" in {
+          val testEnrolledAuditEventJson: JsObject = Json.obj(
+            "callingService" -> testDefaultServiceName,
+            "businessType" -> "Sole Trader",
+            "firstName" -> testFirstName,
+            "lastName" -> testLastName,
+            "nino" -> testNino,
+            "dateOfBirth" -> testDateOfBirth,
+            "authenticatorResponse" -> Json.toJson(testIndividualDetails),
+            "userSAUTR" -> testSautr,
+            "isMatch" -> "true",
+            "VerificationStatus" -> "Enrolled",
+            "RegisterApiStatus" -> testRegistrationSuccess
+          )
+
+          mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails.copy(businessVerification = Some(SaEnrolled)))))
+          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
+          mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
+          mockRetrieveES20Response(testJourneyId)(Future.successful(None))
+
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
+
+          result mustBe a[Unit]
+
+          verifySendExplicitAuditSoleTraders()
+          auditEventCaptor.getValue mustBe testEnrolledAuditEventJson
         }
       }
       "the entity is a Sole Trader and there is no nino or sautr" in {

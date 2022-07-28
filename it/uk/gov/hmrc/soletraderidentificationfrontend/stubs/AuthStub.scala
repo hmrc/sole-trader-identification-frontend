@@ -26,6 +26,8 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
 trait AuthStub extends WireMockMethods {
 
   val authUrl = "/auth/authorise"
+  val IRSaEnrolmentKey = "IR-SA"
+  val IRSaReferenceKey = "UTR"
 
   def stubAuth[T](status: Int, body: T)(implicit writes: Writes[T]): StubMapping = {
     when(method = POST, uri = authUrl)
@@ -37,14 +39,24 @@ trait AuthStub extends WireMockMethods {
       .thenReturn(status = UNAUTHORIZED, headers = Map(HeaderNames.WWW_AUTHENTICATE -> s"""MDTP detail="MissingBearerToken""""))
   }
 
-  def successfulAuthResponse(): JsObject = Json.obj(
+  def successfulAuthResponse(enrolments: JsObject*): JsObject = Json.obj(
     "optionalCredentials" -> Json.obj(
       "providerId" -> testCredentialId,
       "providerType" -> testGGProviderId
     ),
     "groupIdentifier" -> testGroupId,
     "internalId" -> Some(testInternalId),
+    "allEnrolments" -> enrolments
+  )
 
+  def irSaEnrolment(utr: String): JsObject = Json.obj(
+    "key" -> IRSaEnrolmentKey,
+    "identifiers" -> Json.arr(
+      Json.obj(
+        "key" -> IRSaReferenceKey,
+        "value" -> utr
+      )
+    )
   )
 
 }
