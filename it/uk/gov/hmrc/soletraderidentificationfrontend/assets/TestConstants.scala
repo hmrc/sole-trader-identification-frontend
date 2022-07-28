@@ -58,6 +58,7 @@ object TestConstants {
   val testCountryName: String = "United Kingdom"
   val testSaPostcode: String = "AA00 0AA"
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
+  val testOverseasTaxIdentifier: String = "123456234"
 
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)

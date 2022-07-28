@@ -120,6 +120,21 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       status = status
     )
 
+  def stubStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
+      body = JsString(overseasTaxIdentifier)
+    ).thenReturn(
+      status = status
+    )
+
+  def verifyStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
+      optBody = Some(JsString(overseasTaxIdentifier).toString())
+    )
+
+
   def stubRetrieveSoleTraderDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/journey/$journeyId"
@@ -200,6 +215,14 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       body = body
     )
 
+  def stubRetrieveOverseasTaxIdentifier(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
+    when(method = GET,
+      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
   def stubRetrieveAddress(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/journey/$journeyId/address"
@@ -251,6 +274,14 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def stubRemoveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: String = ""): StubMapping =
     when(method = DELETE,
       uri = s"/sole-trader-identification/journey/$journeyId/overseas"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
+  def stubRemoveOverseasTaxIdentifier(journeyId: String)(status: Int, body: String = ""): StubMapping =
+    when(method = DELETE,
+      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers"
     ).thenReturn(
       status = status,
       body = body
@@ -360,5 +391,8 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
 
   def verifyRemoveAllData(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/sole-trader-identification/journey/$journeyId")
+
+  def verifyRemoveOverseasTaxIdentifier(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers")
 
 }

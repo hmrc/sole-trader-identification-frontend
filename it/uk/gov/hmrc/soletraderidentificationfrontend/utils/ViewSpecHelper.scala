@@ -86,11 +86,15 @@ object ViewSpecHelper {
 
     lazy val getBannerLink: String = getBanner.select(".govuk-link").attr("href")
 
+    lazy val getBackLinks: Elements = element.getElementsByClass("govuk-back-link")
+
     lazy val getBackLinkText: String = element.select(".govuk-back-link").text
 
     lazy val getTechnicalHelpLink: String = element.getElementsByClass("hmrc-report-technical-issue").attr("href")
 
     lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
+
+    lazy val getHints: Elements = element.getElementsByClass("govuk-hint")
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =

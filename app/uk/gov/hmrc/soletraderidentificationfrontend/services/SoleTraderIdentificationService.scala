@@ -84,6 +84,9 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[Overseas](journeyId, OverseasKey, taxIdentifiers)
 
+  def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeData(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
+
   def retrieveFullName(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[FullName]] =
     connector.retrieveSoleTraderDetails[FullName](journeyId, FullNameKey)
 
@@ -152,6 +155,9 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeSoleTraderDetails(journeyId, OverseasKey)
 
+  def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeSoleTraderDetails(journeyId, OverseasTaxIdentifierKey)
+
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
 }
@@ -171,4 +177,5 @@ object SoleTraderIdentificationService {
   val SaPostcodeKey: String = "saPostcode"
   val Es20DetailsKey: String = "es20Details"
   val OverseasKey: String = "overseas"
+  val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
 }
