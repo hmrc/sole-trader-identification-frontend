@@ -255,7 +255,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
     "the sautr check is enabled" should {
       "redirect to business verification url" when {
         "the provided details match what is held in the database" when {
-          "the user has a sautr and a nino" in {
+          "the user has a sautr and a nino with no IR-SA enrolment" in {
             await(journeyConfigRepository.insertJourneyConfig(
               journeyId = testJourneyId,
               authInternalId = testInternalId,
@@ -282,7 +282,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
             verifyAudit()
           }
-          "the user does not have a nino" in {
+          "the user does not have a nino or IR-SA enrolment" in {
             enable(EnableNoNinoJourney)
             await(journeyConfigRepository.insertJourneyConfig(
               journeyId = testJourneyId,
@@ -310,6 +310,34 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             }
 
             verifyStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+            verifyAudit()
+          }
+          "the user has an IR-SA enrolment that doesn't match" in {
+            val IrSAEnrolmentSautr = "1234567891"
+            await(journeyConfigRepository.insertJourneyConfig(
+              journeyId = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig = testSoleTraderJourneyConfig
+            ))
+            stubAuth(OK, successfulAuthResponse(irSaEnrolment(IrSAEnrolmentSautr)))
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+            stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+            stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+            stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+            stubRetrieveNino(testJourneyId)(OK, testNino)
+            stubRetrieveAddress(testJourneyId)(NOT_FOUND)
+            stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+            stubAudit()
+
+            val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+            result must have {
+              httpStatus(SEE_OTHER)
+              redirectUri(testBusinessVerificationRedirectUrl)
+            }
+
+            verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
             verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
             verifyAudit()
           }
@@ -353,7 +381,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
-
         "the sautr and nino are not provided" in {
           enable(EnableNoNinoJourney)
           enable(KnownFactsStub)
@@ -390,6 +417,35 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
+        }
+        "the user has an IR-SA enrolment with matching sautr" in {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          ))
+          stubAuth(OK, successfulAuthResponse(irSaEnrolment(testSautr)))
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+          stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+          stubStoreBusinessVerificationStatus(testJourneyId, SaEnrolled)(OK)
+          stubRegister(testNino, Some(testSautr), testRegime)(OK, testBackendSuccessfulRegistrationJson)
+          stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
+          stubAudit()
+
+          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri(testContinueUrl)
+          }
+
+          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+          verifyStoreBusinessVerificationStatus(testJourneyId, SaEnrolled)
+          verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
+          verifyAudit()
         }
       }
 

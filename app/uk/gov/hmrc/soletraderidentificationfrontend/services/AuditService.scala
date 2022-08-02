@@ -121,6 +121,7 @@ class AuditService @Inject()(appConfig: AppConfig,
                 case Some(BusinessVerificationFail) => "fail"
                 case Some(BusinessVerificationNotEnoughInformationToCallBV) | None => "Not Enough Information to call BV"
                 case Some(BusinessVerificationNotEnoughInformationToChallenge) => "Not Enough Information to challenge"
+                case Some(SaEnrolled) => "Enrolled"
               }
             }
 

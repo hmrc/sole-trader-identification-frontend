@@ -18,7 +18,8 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, internalId}
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -76,12 +77,12 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
+      authorised().retrieve(internalId and allEnrolments) {
+        case Some(authInternalId) ~ enrolments =>
           journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
             journeyConfig =>
               for {
-                (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig).map({
+                (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig, enrolments).map({
                   case StartBusinessVerification(businessVerificationUrl) => (businessVerificationUrl, DoNotAuditJourney)
                   case JourneyCompleted(continueUrl) => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
                   case SoleTraderDetailsMismatch(NinoNotFound) => (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
@@ -93,7 +94,7 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
                 Redirect(nextUrl)
               }
           }
-        case None =>
+        case None ~ _ =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
