@@ -175,6 +175,19 @@ object MessageLookup {
 
   }
 
+  object CaptureOverseasTaxIdentifier {
+
+    val title = "Does the business have an overseas tax identifier?"
+    val hint = "We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+
+    object Error {
+      val no_tax_identifier_selection = "Select yes if the business has an overseas tax identifier"
+      val no_entry_tax_identifier = "Enter the overseas tax identifier"
+      val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
+      val invalid_length_tax_identifier = "The overseas tax identifier must be 60 characters or fewer"
+    }
+  }
+
   object PersonalInformationError {
     val title = "We could not identify you on our records"
     val heading = "We could not identify you on our records"

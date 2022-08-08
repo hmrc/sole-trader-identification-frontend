@@ -117,6 +117,15 @@ tax-identifiers.field_1                                     = Nodwch ddynodydd t
 tax-identifiers.field_2                                     = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
 tax-identifiers.no_identifier_link                          = Dydw i ddim am ddarparu dynodydd
 
+## Overseas Tax Identifier Page
+tax-identifier.title                                        = Oes gan y busnes ddynodydd treth tramor?
+tax-identifier.line_1                                       = Efallai y byddwn yn defnyddio’r rhif hwn i’n helpu i ddod o hyd i’ch busnes. Gallai’r dynodydd treth fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio er mwyn gwirio manylion eich busnes.
+tax-identifier.field_1                                      = Dynodydd treth tramor
+error.no_tax_identifiers_selection                          = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
+error.no_tax_identifiers                                    = Nodwch y dynodydd treth tramor
+error.invalid_tax_identifiers                               = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
+error.invalid_tax_identifiers_length                        = Mae’n rhaid i’r dynodydd treth tramor fod yn 60 o gymeriadau neu lai
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Gwirio’ch atebion
 check-your-answers.heading                                  = Gwirio’ch atebion

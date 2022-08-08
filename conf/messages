@@ -103,6 +103,15 @@ tax-identifiers.field_1                                      = Enter a tax ident
 tax-identifiers.field_2                                      = Enter the name of the country that issued the tax identifier
 tax-identifiers.no_identifier_link                           = I do not want to provide an identifier
 
+## Overseas Tax Identifier Page
+tax-identifier.title                                         = Does the business have an overseas tax identifier?
+tax-identifier.line_1                                        = We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
+tax-identifier.field_1                                       = Overseas tax identifier
+error.no_tax_identifiers_selection                           = Select yes if the business has an overseas tax identifier
+error.no_tax_identifiers                                     = Enter the overseas tax identifier
+error.invalid_tax_identifiers                                = Enter a tax identifier that does not contain special characters
+error.invalid_tax_identifiers_length                         = The overseas tax identifier must be 60 characters or fewer
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers
