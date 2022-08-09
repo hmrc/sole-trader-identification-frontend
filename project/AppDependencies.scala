@@ -19,7 +19,6 @@ object AppDependencies {
     "com.typesafe.play" %% "play-test" % current % scope,
     "com.vladsch.flexmark" % "flexmark-all" % "0.36.8" % scope,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-test-play-28" % "0.68.0" % scope
-
   )
 
   val test: Seq[ModuleID] = Seq(
