@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.soletraderidentificationfrontend.forms
+package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
-import play.api.data.Form
-import play.api.data.Forms.text
-import play.api.data.validation.Constraint
-import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
 
-object CaptureOverseasTaxIdentifierCountryForm {
-  private val countryNotEntered: Constraint[String] = Constraint("country.not-entered")(
-    country => validate(
-      constraint = country.isEmpty,
-      errMsg = "error.tax_identifier_country"
+trait NinoInsightsStub extends WireMockMethods {
+
+  def stubNinoInsights(nino: String)(status: Int, body: JsObject): StubMapping = {
+    val jsonBody = Json.obj(
+      "nino" -> nino
     )
-  )
 
-  val form: Form[String] = {
-    Form("country" -> text.verifying(countryNotEntered))
+    when(method = POST, uri = "/sole-trader-identification/nino-insights", jsonBody)
+      .thenReturn(
+        status = status,
+        body = body
+      )
   }
 
 }

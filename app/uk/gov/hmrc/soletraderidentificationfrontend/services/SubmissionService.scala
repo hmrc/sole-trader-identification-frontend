@@ -32,13 +32,15 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
                                   businessVerificationService: BusinessVerificationService,
                                   createTrnService: CreateTrnService,
                                   registrationOrchestrationService: RegistrationOrchestrationService,
-                                  enrolmentService: EnrolmentService) extends FeatureSwitching {
+                                  enrolmentService: EnrolmentService,
+                                  ninoInsightsService: NinoInsightsService) extends FeatureSwitching {
 
   def submit(journeyId: String, journeyConfig: JourneyConfig, enrolments: Enrolments)(implicit hc: HeaderCarrier,
                                                                                       ec: ExecutionContext): Future[SubmissionResponse] =
     soleTraderIdentificationService.retrieveIndividualDetails(journeyId).flatMap {
       case Some(individualDetails: IndividualDetails) =>
         for {
+          _ <- if (individualDetails.optNino.nonEmpty) ninoInsightsService.ninoInsights(journeyId, individualDetails.optNino.get) else Future.successful()
           matchingResult <-
             if (individualDetails.optNino.isEmpty && !isEnabled(EnableOptionalNinoJourney))
               Future.failed(new IllegalStateException("[Submission Service] Unexpected state of Nino"))
