@@ -44,7 +44,6 @@ object TestConstants {
   val testGGProviderId: String = UUID.randomUUID().toString
   val testGroupId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
-  val testCorrelationId: String = UUID.randomUUID().toString
   val testTrn: String = "99A99999"
   val testAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), Some("AA1 1AA"), "GB")
   val testAddressWrongPostcodeFormat: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), Some("AA11AA"), "GB")
@@ -69,11 +68,9 @@ object TestConstants {
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
     "registrationStatus" -> "REGISTERED",
     "registeredBusinessPartnerId" -> testSafeId)
-
   def testFailedRegistrationJson(failures: JsArray): JsObject = Json.obj(
     "registrationStatus" -> "REGISTRATION_FAILED",
     "failures" -> failures)
-
   val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
 
   val testRegistrationFailure: List[Failure] = List(Failure("PARTY_TYPE_MISMATCH", "The remote endpoint has indicated there is Party Type mismatch"))
@@ -84,7 +81,6 @@ object TestConstants {
   )
 
   val testBackendSuccessfulRegistrationJson: JsObject = Json.obj("registration" -> testSuccessfulRegistrationJson)
-
   def testBackendFailedRegistrationJson(failures: JsArray): JsObject = Json.obj("registration" -> testFailedRegistrationJson(failures))
 
   val testDeskProServiceId: String = "vrs"
@@ -96,12 +92,6 @@ object TestConstants {
   val testFullNamePageLabel: String = "What is the name of the nominated partner?"
   val welshFullNamePageLabel: String = "Welsh " + testFullNamePageLabel
   val welshTestServiceName: String = "Welsh " + testServiceName
-
-  val testInsightsReturnBody: JsObject = Json.obj(
-    "ninoInsightsCorrelationId" -> testCorrelationId,
-    "code" -> 0,
-    "reason" -> "0 code"
-  )
 
   val testIndividualPageConfig: PageConfig = PageConfig(
     optServiceName = None,
@@ -141,8 +131,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsMismatch: SoleTraderDetails =
@@ -157,8 +146,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsNoBV: SoleTraderDetails = testSoleTraderDetails.copy(businessVerification = None)
@@ -175,8 +163,7 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsIndividualJourneyNoNino: SoleTraderDetails =
@@ -191,8 +178,7 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = None
+      optOverseas = None
     )
 
   val testIndividualDetails: IndividualDetails =
@@ -230,8 +216,7 @@ object TestConstants {
       "sautr" -> testSautr,
       "identifiersMatch" -> true,
       "businessVerification" -> testBusinessVerificationPassJson,
-      "registration" -> testSuccessfulRegistrationJson,
-      "reputation" -> testInsightsReturnBody
+      "registration" -> testSuccessfulRegistrationJson
     )
   }
 

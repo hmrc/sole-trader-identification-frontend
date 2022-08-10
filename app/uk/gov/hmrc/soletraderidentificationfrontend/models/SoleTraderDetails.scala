@@ -33,8 +33,7 @@ case class SoleTraderDetails(fullName: FullName,
                              businessVerification: Option[BusinessVerificationStatus],
                              registrationStatus: Option[RegistrationStatus],
                              optTrn: Option[String],
-                             optOverseas: Option[Overseas],
-                             optNinoInsights: Option[JsObject])
+                             optOverseas: Option[Overseas])
 
 object SoleTraderDetails {
 
@@ -50,8 +49,6 @@ object SoleTraderDetails {
   private val TrnKey = "trn"
   private val OverseasIdentifiersKey = "overseas"
   private val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
-  private val ReputationKey = "reputation"
-  private val CorrelationIdKey = "ninoInsightsCorrelationId"
 
   val reads: Reads[SoleTraderDetails] = (
     (JsPath \ FullNameKey).read[FullName] and
@@ -64,8 +61,7 @@ object SoleTraderDetails {
       (JsPath \ BusinessVerificationKey).readNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).readNullable[RegistrationStatus] and
       (JsPath \ TrnKey).readNullable[String] and
-      (JsPath \ OverseasIdentifiersKey).readNullable[Overseas] and
-      (JsPath \ ReputationKey).readNullable[JsObject]
+      (JsPath \ OverseasIdentifiersKey).readNullable[Overseas]
     ) (SoleTraderDetails.apply _)
 
   val writes: OWrites[SoleTraderDetails] = (
@@ -79,37 +75,27 @@ object SoleTraderDetails {
       (JsPath \ BusinessVerificationKey).writeNullable[BusinessVerificationStatus] and
       (JsPath \ RegistrationKey).writeNullable[RegistrationStatus] and
       (JsPath \ TrnKey).writeNullable[String] and
-      (JsPath \ OverseasIdentifiersKey).writeNullable[Overseas] and
-      (JsPath \ ReputationKey).writeNullable[JsObject]
+      (JsPath \ OverseasIdentifiersKey).writeNullable[Overseas]
     ) (unlift(SoleTraderDetails.unapply))
 
   implicit val format: OFormat[SoleTraderDetails] = OFormat(reads, writes)
 
-  def jsonWriterForCallingServices(soleTraderDetails: SoleTraderDetails): JsObject = {
-    val formattedBusinessVerification = soleTraderDetails.businessVerification
-      .map(businessVerification => {
-        val businessVerificationStatusForCallingServices: String = businessVerification match {
-          case BusinessVerificationNotEnoughInformationToCallBV |
-               BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationUnchallengedKey
-          case BusinessVerificationPass => BusinessVerificationPassKey
-          case BusinessVerificationFail => BusinessVerificationFailKey
-          case SaEnrolled => BusinessVerificationSaEnrolledKey
-        }
-        Json.obj(BusinessVerificationKey -> Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusForCallingServices))
-      })
-      .getOrElse(Json.obj())
-
-    val formattedIdentifiersMatch = Json.obj(IdentifiersMatchKey -> soleTraderDetails.identifiersMatch.toString.contains(SuccessfulMatchKey))
-
-    val formattedNinoInsights =
-      soleTraderDetails.optNinoInsights match {
-        case Some(ninoInsights) =>
-          val result = ninoInsights - CorrelationIdKey
-          Json.obj(ReputationKey -> result)
-        case None => Json.obj()
-      }
-
-    format.writes(soleTraderDetails) ++ formattedBusinessVerification ++ formattedIdentifiersMatch ++ formattedNinoInsights
-  }
+  val jsonWriterForCallingServices: Writes[SoleTraderDetails] = (soleTraderDetails: SoleTraderDetails) =>
+    format.writes(soleTraderDetails) ++ {
+      soleTraderDetails.businessVerification
+        .map(businessVerification => {
+          val businessVerificationStatusForCallingServices: String = businessVerification match {
+            case BusinessVerificationNotEnoughInformationToCallBV |
+                 BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationUnchallengedKey
+            case BusinessVerificationPass => BusinessVerificationPassKey
+            case BusinessVerificationFail => BusinessVerificationFailKey
+            case SaEnrolled => BusinessVerificationSaEnrolledKey
+          }
+          Json.obj(BusinessVerificationKey -> Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusForCallingServices))
+        })
+        .getOrElse(Json.obj())
+    } ++ {
+      Json.obj(IdentifiersMatchKey -> soleTraderDetails.identifiersMatch.toString.contains(SuccessfulMatchKey))
+    }
 
 }

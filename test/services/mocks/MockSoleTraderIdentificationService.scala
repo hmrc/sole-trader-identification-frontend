@@ -21,7 +21,6 @@ import org.mockito.Mockito._
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
@@ -199,20 +198,6 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     when(mockSoleTraderIdentificationService.storeTrn(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(trn)
-    )(ArgumentMatchers.any[HeaderCarrier])
-    ).thenReturn(response)
-
-  def mockStoreInsights(journeyId: String, insights: JsObject)
-                  (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeInsights(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(insights)
-    )(ArgumentMatchers.any[HeaderCarrier])
-    ).thenReturn(response)
-
-  def mockRetrieveInsights(journeyId: String)(response: Future[Option[JsObject]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveInsights(
-      ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

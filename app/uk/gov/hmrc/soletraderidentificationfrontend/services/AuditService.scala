@@ -131,11 +131,6 @@ class AuditService @Inject()(appConfig: AppConfig,
             case _ => "false"
           }
 
-          val reputationBlock = soleTraderRecord.optNinoInsights match {
-            case Some(insights) => Json.obj("ninoReputation" -> insights)
-            case None => Json.obj()
-          }
-
           Json.obj(
             "callingService" -> callingService,
             "businessType" -> "Sole Trader",
@@ -152,8 +147,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             overseasIdentifiersBlock ++
             trnBlock ++
             eS20Block ++
-            authenticatorResponseBlock ++
-            reputationBlock
+            authenticatorResponseBlock
         case _ =>
           throw new InternalServerException(s"Not enough information to audit sole trader journey for Journey ID $journeyId")
       }
@@ -180,7 +174,6 @@ class AuditService @Inject()(appConfig: AppConfig,
           case _ =>
             soleTraderIdentificationService.retrieveAuthenticatorFailureResponse(journeyId)
         }
-      optNinoInsights <- soleTraderIdentificationService.retrieveInsights(journeyId)
     } yield {
       val authenticatorResponseBlock =
         optAuthenticatorResponse match {
@@ -193,12 +186,6 @@ class AuditService @Inject()(appConfig: AppConfig,
         case Some(NotEnoughInformationToMatch) => "unmatchable"
         case _ => "false"
       }
-
-      val reputationBlock = optNinoInsights match {
-        case Some(insights) => Json.obj("ninoReputation" -> insights)
-        case None => Json.obj()
-      }
-
       optIndividualDetails match {
         case Some(IndividualDetails(firstName, lastName, dateOfBirth, optNino, None)) =>
           Json.obj(
@@ -208,8 +195,7 @@ class AuditService @Inject()(appConfig: AppConfig,
             "dateOfBirth" -> dateOfBirth,
             "isMatch" -> identifiersMatchStatus
           ) ++ authenticatorResponseBlock ++
-            ninoBlock(optNino) ++
-            reputationBlock
+            ninoBlock(optNino)
         case _ =>
           throw new InternalServerException(s"Not enough information to audit individual journey for Journey ID $journeyId")
       }

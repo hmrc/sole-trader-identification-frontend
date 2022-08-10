@@ -44,8 +44,7 @@ class SubmissionServiceSpec
     with MockCreateTrnService
     with MockRegistrationOrchestrationService
     with MockEnrolmentService
-    with FeatureSwitching
-    with MockNinoInsightsService {
+    with FeatureSwitching {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -55,7 +54,6 @@ class SubmissionServiceSpec
         val journeyConfigWithoutBV = testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, journeyConfigWithoutBV)(Future.successful(SuccessfulMatch))
         mockRegisterWithoutBusinessVerification(testJourneyId, testIndividualDetails.optNino, testIndividualDetails.optSautr, journeyConfigWithoutBV)(Future.successful(Registered(testSafeId)))
 
@@ -70,7 +68,6 @@ class SubmissionServiceSpec
         val journeyConfigWithoutBV = testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, journeyConfigWithoutBV)(Future.successful(SuccessfulMatch))
         mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, journeyConfigWithoutBV)(Future.successful(Registered(testSafeId)))
 
@@ -87,7 +84,6 @@ class SubmissionServiceSpec
         val journeyConfigWithoutBV = testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNinoNoSautr)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNinoNoSautr)(Future.successful(NotEnoughInformationToMatch))
         mockCreateTrn(testJourneyId)(Future.successful(testTrn))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
@@ -120,7 +116,6 @@ class SubmissionServiceSpec
         val journeyConfigWithoutBV = testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
 
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, journeyConfigWithoutBV)(Future.successful(DetailsMismatch))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
 
@@ -138,7 +133,6 @@ class SubmissionServiceSpec
       s"return StartBusinessVerification($testBusinessVerificationRedirectUrl)" when {
         "the user has a IR-SA enrolment without a matching sautr" in {
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-          mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
           mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true))(Future.successful(SuccessfulMatch))
           mockCheckSaEnrolment(testEnrolments, testSautr)(response = false)
           mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
@@ -151,7 +145,6 @@ class SubmissionServiceSpec
         }
         "the user has no IR-SA enrolment" in {
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-          mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
           mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testJourneyConfig(enableSautrCheck = true))(Future.successful(SuccessfulMatch))
           mockCheckSaEnrolment(testEnrolments, testSautr)(response = false)
           mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
@@ -167,7 +160,6 @@ class SubmissionServiceSpec
     "return JourneyCompleted" when {
       "Business Verification Journey Creation fails" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
         mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Left(NotEnoughEvidence)))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToChallenge)(Future.successful(SuccessfullyStored))
@@ -179,7 +171,6 @@ class SubmissionServiceSpec
       }
       "no sautr is provided" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
         mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)(Future.successful(Registered(testSafeId)))
@@ -191,7 +182,6 @@ class SubmissionServiceSpec
       "the user has a IR-SA enrolment with a matching sautr" when {
         "the user has been registered" in {
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-          mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
           mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
           mockCheckSaEnrolment(testEnrolments, testSautr)(response = true)
           mockStoreBusinessVerificationStatus(testJourneyId, SaEnrolled)(Future.successful(SuccessfullyStored))
@@ -209,7 +199,6 @@ class SubmissionServiceSpec
     "return SoleTraderDetailsMismatch" when {
       "the details received from Authenticator do not match" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testSoleTraderJourneyConfig)(Future.successful(DetailsMismatch))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
@@ -220,7 +209,6 @@ class SubmissionServiceSpec
       }
       "the nino is not found on Authenticator" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testSoleTraderJourneyConfig)(Future.successful(NinoNotFound))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
@@ -237,7 +225,6 @@ class SubmissionServiceSpec
       "the user has a IR-SA enrolment without a matching sautr" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
         mockCheckSaEnrolment(testEnrolments, testSautr)(response = false)
         mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
@@ -251,7 +238,6 @@ class SubmissionServiceSpec
       "the user has no IR-SA enrolment" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
         mockCheckSaEnrolment(testEnrolments, testSautr)(response = false)
         mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Right(BusinessVerificationJourneyCreated(testBusinessVerificationRedirectUrl))))
@@ -267,7 +253,6 @@ class SubmissionServiceSpec
       "Business Verification Journey Creation fails" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
         mockCreateBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)(Future.successful(Left(NotEnoughEvidence)))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
@@ -280,7 +265,6 @@ class SubmissionServiceSpec
       "no sautr is provided" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNinoNoSautr)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNinoNoSautr)(Future.successful(NotEnoughInformationToMatch))
         mockStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(Future.successful(SuccessfullyStored))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
@@ -297,7 +281,6 @@ class SubmissionServiceSpec
         "the user has been registered" in {
           enable(EnableOptionalNinoJourney)
           mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
-          mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
           mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(SuccessfulMatch))
           mockCheckSaEnrolment(testEnrolments, testSautr)(response = true)
           mockStoreBusinessVerificationStatus(testJourneyId, SaEnrolled)(Future.successful(SuccessfullyStored))
@@ -317,7 +300,6 @@ class SubmissionServiceSpec
       "the details received from ES20 do not match" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
-        mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
         mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(DetailsMismatch))
         mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
         mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
@@ -334,7 +316,6 @@ class SubmissionServiceSpec
   "for sole trader journey: the user does not have a sautr" should {
     "return JourneyCompleted" in {
       mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
-      mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
       mockMatchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testSoleTraderJourneyConfig)(Future.successful(SuccessfulMatch))
       mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
       mockRegisterWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig)(Future.successful(Registered(testSafeId)))
@@ -376,7 +357,6 @@ class SubmissionServiceSpec
   "for individual journey: the user's details do not match" should {
     "return a failed submission response" in {
       mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
-      mockNinoInsights(testJourneyId, testNino)(Future.successful(testInsightsReturnBody))
       mockMatchSoleTraderDetails(testJourneyId, testIndividualDetails, testIndividualJourneyConfig)(Future.successful(DetailsMismatch))
 
       val result: SubmissionResponse = await(TestService.submit(testJourneyId, testIndividualJourneyConfig, Enrolments(Set.empty)))
@@ -397,7 +377,6 @@ class SubmissionServiceSpec
     mockBusinessVerificationService,
     mockCreateTrnService,
     mockRegistrationOrchestrationService,
-    mockEnrolmentService,
-    mockNinoInsightsService
+    mockEnrolmentService
   )
 }

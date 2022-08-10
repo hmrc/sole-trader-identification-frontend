@@ -31,7 +31,6 @@ object TestConstants {
   val testJourneyId: String = UUID.randomUUID().toString
   val testSafeId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
-  val testCorrelationId: String = UUID.randomUUID().toString
   val testSautr: String = "1234567890"
   val testContinueUrl: String = "/test"
   val testBusinessVerificationRedirectUrl: String = "/business-verification-start"
@@ -69,12 +68,6 @@ object TestConstants {
   val testRegistrationFailed: String = "fail"
   val testRegistrationNotCalled: String = "not called"
 
-  val testInsightsReturnBody: JsObject = Json.obj(
-    "ninoInsightsCorrelationId" -> testCorrelationId,
-    "code" -> 0,
-    "reason" -> "0 code"
-  )
-
   val testSoleTraderDetails: SoleTraderDetails =
     SoleTraderDetails(
       fullName = testFullName,
@@ -87,8 +80,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsNoMatch: SoleTraderDetails =
@@ -103,8 +95,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsNoSautr: SoleTraderDetails =
@@ -119,8 +110,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   def testSoleTraderDetailsNoNino(optSautr: Option[String] = Some(testSautr)): SoleTraderDetails =
@@ -135,8 +125,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = Some(testTrn),
-      optOverseas = Some(testOverseasIdentifiers),
-      optNinoInsights = None
+      optOverseas = Some(testOverseasIdentifiers)
     )
 
   val testSoleTraderWithoutBVCheckDetails: SoleTraderDetails =
@@ -151,8 +140,7 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsRegistrationFailed: SoleTraderDetails =
@@ -167,8 +155,7 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(RegistrationFailed(testRegistrationFailure)),
       optTrn = None,
-      optOverseas = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optOverseas = None
     )
 
   val testSoleTraderDetailsNoNinoAndOverseas: SoleTraderDetails = testSoleTraderDetailsNoNino().copy(address = Some(testOverseasAddress))
@@ -240,8 +227,7 @@ object TestConstants {
     "dateOfBirth" -> testDateOfBirth,
     "nino" -> testNino,
     "isMatch" -> "true",
-    "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
-    "ninoReputation" -> testInsightsReturnBody
+    "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr)
   )
 
   val testIndividualSuccessfulWithCallingServiceAuditEventJson: JsObject =
@@ -275,8 +261,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "success",
-    "RegisterApiStatus" -> testRegistrationSuccess,
-    "ninoReputation" -> testInsightsReturnBody
+    "RegisterApiStatus" -> testRegistrationSuccess
   )
 
   def testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch: String = "false"): JsObject =
@@ -292,8 +277,7 @@ object TestConstants {
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
     "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "ninoReputation" -> testInsightsReturnBody
+    "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
   def testSoleTraderAuditEventJsonNoNino(identifiersMatch: String = "false"): JsObject = Json.obj(
@@ -343,8 +327,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "ninoReputation" -> testInsightsReturnBody
+    "RegisterApiStatus" -> testRegistrationNotCalled
   )
 
   def testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
@@ -358,8 +341,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "not requested",
-    "RegisterApiStatus" -> testRegistrationSuccess,
-    "ninoReputation" -> testInsightsReturnBody
+    "RegisterApiStatus" -> testRegistrationSuccess
   )
 
   def testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
@@ -373,8 +355,7 @@ object TestConstants {
     "userSAUTR" -> testSautr,
     "isMatch" -> identifiersMatch,
     "VerificationStatus" -> "success",
-    "RegisterApiStatus" -> testRegistrationFailed,
-    "ninoReputation" -> testInsightsReturnBody
+    "RegisterApiStatus" -> testRegistrationFailed
   )
 
   def testIndividualFailureAuditEventJson(isMatch: String): JsObject = Json.obj(
@@ -386,4 +367,5 @@ object TestConstants {
     "isMatch" -> isMatch,
     "authenticatorResponse" -> DetailsMismatch.toString
   )
+
 }
