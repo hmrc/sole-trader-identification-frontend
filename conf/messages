@@ -112,6 +112,10 @@ error.no_tax_identifiers                                     = Enter the oversea
 error.invalid_tax_identifiers                                = Enter a tax identifier that does not contain special characters
 error.invalid_tax_identifiers_length                         = The overseas tax identifier must be 60 characters or fewer
 
+## Overseas Tax Identifiers Country Page
+tax-identifiers-country.title                                = Which country issued the overseas tax identifier?
+tax-identifiers-country.heading                              = Which country issued the overseas tax identifier?
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers
@@ -186,3 +190,4 @@ error.no_tax_identifier                                     = Enter a tax identi
 error.invalid_tax_identifier                                = Enter a tax identifier that does not contain special characters
 error.invalid_tax_identifier_length                         = The tax identifier must be 60 characters or fewer
 error.no_tax_identifier_country                             = Enter the name of the country that issued the tax identifier
+error.tax_identifier_country                                = Enter the name of the country that issued the overseas tax identifier

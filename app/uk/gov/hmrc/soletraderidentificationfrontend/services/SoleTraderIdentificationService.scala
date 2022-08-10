@@ -88,6 +88,9 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
 
+  def storeOverseasTaxIdentifiersCountry(journeyId: String, country: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeData[String](journeyId, OverseasCountryKey, country)
+
   def storeInsights(journeyId: String, insights: JsObject)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[JsObject](journeyId, InsightsKey, insights)
 
@@ -186,4 +189,5 @@ object SoleTraderIdentificationService {
   val OverseasKey: String = "overseas"
   val InsightsKey: String = "reputation"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
+  val OverseasCountryKey: String = "country"
 }
