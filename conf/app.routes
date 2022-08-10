@@ -33,9 +33,6 @@ GET         /:journeyId/overseas-identifier              uk.gov.hmrc.soletraderi
 POST        /:journeyId/overseas-identifier              uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifiersController.submit(journeyId: String)
 GET         /:journeyId/no-overseas-identifier           uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifiersController.noOverseasTaxIdentifiers(journeyId: String)
 
-GET         /:journeyId/overseas-tax-identifier-country  uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierCountryController.show(journeyId: String)
-POST        /:journeyId/overseas-tax-identifier-country  uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierCountryController.submit(journeyId: String)
-
 GET         /:journeyId/check-your-answers-business      uk.gov.hmrc.soletraderidentificationfrontend.controllers.CheckYourAnswersController.show(journeyId: String)
 POST        /:journeyId/check-your-answers-business      uk.gov.hmrc.soletraderidentificationfrontend.controllers.CheckYourAnswersController.submit(journeyId: String)
 

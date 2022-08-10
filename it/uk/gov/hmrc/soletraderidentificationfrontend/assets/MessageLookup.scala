@@ -188,15 +188,6 @@ object MessageLookup {
     }
   }
 
-  object CaptureOverseasTaxIdentifiersCountry {
-    val title = "Which country issued the overseas tax identifier? - Entity Validation Service - GOV.UK"
-    val heading = "Which country issued the overseas tax identifier?"
-
-    object Error {
-      val no_entry_country = "Enter the name of the country that issued the overseas tax identifier"
-    }
-  }
-
   object PersonalInformationError {
     val title = "We could not identify you on our records"
     val heading = "We could not identify you on our records"
