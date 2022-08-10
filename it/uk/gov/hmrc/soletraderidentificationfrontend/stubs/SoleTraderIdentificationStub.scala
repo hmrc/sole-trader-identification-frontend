@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, WiremockHelper}
@@ -88,6 +88,13 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def stubStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(status: Int): StubMapping =
     when(method = PUT,
       uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch", body = JsString(identifiersMatch.toString)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubStoreNinoInsights(journeyId: String, insights: JsObject)(status: Int): StubMapping =
+    when(method = PUT,
+      uri = s"/sole-trader-identification/journey/$journeyId/reputation", body = insights
     ).thenReturn(
       status = status
     )
@@ -326,6 +333,14 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       body = JsString(identifiersMatch.toString)
     )
 
+  def stubRetrieveInsights(journeyId: String)(status: Int, insights: JsObject = Json.obj()): StubMapping =
+    when(method = GET,
+      uri = s"/sole-trader-identification/journey/$journeyId/reputation"
+    ).thenReturn(
+      status = status,
+      body = insights
+    )
+
   def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
     when(method = GET,
       uri = s"/sole-trader-identification/journey/$journeyId/registration"
@@ -374,6 +389,12 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def verifyStoreIdentifiersMatch(journeyId: String, expBody: JsValue): Unit =
     WiremockHelper.verifyPut(
       uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch",
+      optBody = Some(Json.stringify(expBody))
+    )
+
+  def verifyStoreNinoInsights(journeyId: String, expBody: JsObject): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/sole-trader-identification/journey/$journeyId/reputation",
       optBody = Some(Json.stringify(expBody))
     )
 

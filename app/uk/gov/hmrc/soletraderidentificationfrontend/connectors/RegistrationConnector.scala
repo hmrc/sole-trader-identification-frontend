@@ -23,10 +23,10 @@ import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RegistrationHttpParser.RegistrationHttpReads
 import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-
+@Singleton
 class RegistrationConnector @Inject()(httpClient: HttpClient,
                                       appConfig: AppConfig
                                      )(implicit ec: ExecutionContext) {

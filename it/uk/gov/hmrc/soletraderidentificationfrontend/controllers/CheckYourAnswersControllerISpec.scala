@@ -42,7 +42,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
   with WiremockHelper
   with CreateTrnStub
   with KnownFactsStub
-  with RegisterStub {
+  with RegisterStub
+  with NinoInsightsStub {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig)
@@ -263,6 +264,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             ))
             stubAuth(OK, successfulAuthResponse())
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+            stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+            stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
             stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
             stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
             stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -280,6 +283,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
             verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
             verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+            verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
             verifyAudit()
           }
           "the user does not have a nino or IR-SA enrolment" in {
@@ -322,6 +326,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             ))
             stubAuth(OK, successfulAuthResponse(irSaEnrolment(IrSAEnrolmentSautr)))
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+            stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+            stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
             stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
             stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
             stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -339,6 +345,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
             verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
             verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+            verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
             verifyAudit()
           }
         }
@@ -354,6 +361,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubAuth(OK, successfulAuthResponse())
 
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -379,6 +388,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)
           verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
         "the sautr and nino are not provided" in {
@@ -426,6 +436,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           ))
           stubAuth(OK, successfulAuthResponse(irSaEnrolment(testSautr)))
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -445,6 +457,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, SaEnrolled)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
           verifyAudit()
         }
       }
@@ -459,6 +472,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             ))
             stubAuth(OK, successfulAuthResponse())
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
+            stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+            stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
             stubMatch(testIndividualDetails)(UNAUTHORIZED, mismatchErrorJson)
             stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
             stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
@@ -483,6 +498,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
             verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
             verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
+            verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
             verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
           }
         }
@@ -532,6 +548,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           ))
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(FAILED_DEPENDENCY, Json.obj())
           stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, DeceasedCitizensDetails)(OK)
@@ -556,6 +574,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
           verifyStoreIdentifiersMatch(testJourneyId, JsString(DeceasedCitizensDetailsKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
           verifyAudit()
         }
       }
@@ -569,6 +588,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           ))
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(UNAUTHORIZED, notFoundErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
           stubStoreIdentifiersMatch(testJourneyId, NinoNotFound)(OK)
@@ -577,6 +598,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubAudit()
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> NinoNotFoundKey)).setRequiredScenarioState("auditing")
           stubRetrieveIdentifiersMatch(testJourneyId)(OK, NinoNotFound)
+          stubRetrieveInsights(testJourneyId)(OK, testInsightsReturnBody)
           stubRetrieveAuthenticatorFailureResponse(testJourneyId)(OK, "NinoNotFound")
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -593,6 +615,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
           verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotFoundKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
           verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
         }
       }
@@ -652,12 +675,15 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+        stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
         stubMatch(testIndividualDetailsNoSautr)(OK, successfulMatchJson(testIndividualDetailsNoSautr))
         stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)(OK)
         stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
         stubAudit()
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> SuccessfulMatchKey)).setRequiredScenarioState("auditing")
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveInsights(testJourneyId)(OK, testInsightsReturnBody)
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveNino(testJourneyId)(OK, testNino)
         stubRetrieveSautr(testJourneyId)(NOT_FOUND)
@@ -675,6 +701,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
         verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetailsNoSautr)
         verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+        verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
         verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
       "the user does not have a nino" in {
@@ -692,6 +719,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveNino(testJourneyId)(NOT_FOUND)
+        stubRetrieveInsights(testJourneyId)(NOT_FOUND)
         stubRetrieveSautr(testJourneyId)(NOT_FOUND)
         stubRetrieveIdentifiersMatch(testJourneyId)(OK, NotEnoughInformationToMatch)
         stubRetrieveAuthenticatorDetails(testJourneyId)(NOT_FOUND)
@@ -719,12 +747,15 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+        stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
         stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, mismatchErrorJson)
         stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
         stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
         stubAudit()
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> DetailsMismatchKey)).setRequiredScenarioState("auditing")
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveInsights(testJourneyId)(OK, testInsightsReturnBody)
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveNino(testJourneyId)(OK, testNino)
         stubRetrieveSautr(testJourneyId)(NOT_FOUND)
@@ -740,6 +771,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
         verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
         verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
+        verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
         verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
       "the provided details are for a deceased citizen" in {
@@ -750,12 +782,15 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+        stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
         stubMatch(testIndividualDetailsNoSautr)(FAILED_DEPENDENCY, Json.obj())
         stubStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)(OK)
         stubStoreIdentifiersMatch(testJourneyId, DeceasedCitizensDetails)(OK)
         stubAudit()
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> DeceasedCitizensDetailsKey)).setRequiredScenarioState("auditing")
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveInsights(testJourneyId)(OK, testInsightsReturnBody)
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveNino(testJourneyId)(OK, testNino)
         stubRetrieveSautr(testJourneyId)(NOT_FOUND)
@@ -771,6 +806,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
         verifyStoreAuthenticatorFailureResponse(testJourneyId, DeceasedCitizensDetails)
         verifyStoreIdentifiersMatch(testJourneyId, JsString(DeceasedCitizensDetailsKey))
+        verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
         verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
     }
@@ -784,12 +820,15 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr).setNewScenarioState("auditing")
+        stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+        stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
         stubMatch(testIndividualDetailsNoSautr)(UNAUTHORIZED, notFoundErrorJson)
         stubStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)(OK)
         stubStoreIdentifiersMatch(testJourneyId, NinoNotFound)(OK)
         stubAudit()
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr ++ Json.obj("identifiersMatch" -> NinoNotFoundKey)).setRequiredScenarioState("auditing")
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveInsights(testJourneyId)(OK, testInsightsReturnBody)
         stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
         stubRetrieveNino(testJourneyId)(OK, testNino)
         stubRetrieveSautr(testJourneyId)(NOT_FOUND)
@@ -805,6 +844,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
         verifyStoreAuthenticatorFailureResponse(testJourneyId, NinoNotFound)
         verifyStoreIdentifiersMatch(testJourneyId, JsString(NinoNotFoundKey))
+        verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
         verifyAuditTypeFor(auditTypeToBeFound = "IndividualIdentification")
       }
     }
@@ -822,6 +862,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -839,6 +881,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
 
           verifyRegister(testNino, Some(testSautr), testRegime)
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
           verifyAudit()
         }
       }
@@ -855,6 +898,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
           stubMatch(testIndividualDetails)(UNAUTHORIZED, mismatchErrorJson)
           stubStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(OK)
           stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
@@ -871,6 +916,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           verifyStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyStoreIdentifiersMatch(testJourneyId, JsString(DetailsMismatchKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
 
           verifyAudit()
         }

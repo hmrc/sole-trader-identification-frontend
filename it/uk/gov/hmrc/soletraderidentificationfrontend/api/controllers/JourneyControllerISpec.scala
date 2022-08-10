@@ -134,7 +134,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(testSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig)
       }
 
       "an optFullNamePageLabel field is provided" in {
@@ -149,7 +149,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
           .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
       "optional Welsh language labels are provided" in {
@@ -170,7 +170,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           pageConfig = pageConfig
         )
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
     }
@@ -212,7 +212,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
       }
 
       "an optFullNamePageLabel field is provided" in {
@@ -228,7 +228,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           .copy(businessVerificationCheck = false)
           .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId,testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
       }
 
       "an optional Welsh full name page label is provided" in {
@@ -381,6 +381,25 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
   "GET /api/journey/:journeyId" should {
     "return captured data" when {
       "the journeyId exists and the identifiers match" in {
+        val testEndDetailsJson: JsObject = {
+          Json.obj("fullName" -> Json.obj(
+            "firstName" -> testFirstName,
+            "lastName" -> testLastName
+          ),
+            "dateOfBirth" -> testDateOfBirth,
+            "nino" -> testNino,
+            "saPostcode" -> testSaPostcode,
+            "sautr" -> testSautr,
+            "identifiersMatch" -> true,
+            "businessVerification" -> testBusinessVerificationPassJson,
+            "registration" -> testSuccessfulRegistrationJson,
+            "reputation" -> Json.obj(
+              "code" -> 0,
+              "reason" -> "0 code"
+            )
+          )
+        }
+
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
@@ -390,7 +409,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
-        result.json mustBe testSoleTraderDetailsJson
+        result.json mustBe testEndDetailsJson
       }
 
       "the journeyId exists and the identifiers do not match" when {
@@ -500,6 +519,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             "registration" -> Json.obj(
               "registrationStatus" -> "REGISTERED",
               "registeredBusinessPartnerId" -> testSafeId
+            ),
+            "reputation" -> Json.obj(
+              "code" -> 0,
+              "reason" -> "0 code"
             )
           )
         }

@@ -47,6 +47,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
+        mockRetrieveInsights(testJourneyId)(Future.successful(Some(testInsightsReturnBody)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
 
@@ -60,6 +61,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
+        mockRetrieveInsights(testJourneyId)(Future.successful(Some(testInsightsReturnBody)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfigWithCallingService))
 
@@ -73,18 +75,20 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr)))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(DetailsMismatch)))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(Some(DetailsMismatch.toString)))
+        mockRetrieveInsights(testJourneyId)(Future.successful(Some(testInsightsReturnBody)))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
 
         result mustBe a[Unit]
 
         verifySendExplicitAuditIndividuals()
-        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "false")
+        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "false") ++ Json.obj("ninoReputation" -> testInsightsReturnBody)
       }
 
       "the entity is an individual and there is no NINO (non nino in the event)" in {
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoSautr.copy(optNino = None))))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(NotEnoughInformationToMatch)))
+        mockRetrieveInsights(testJourneyId)(Future.successful(None))
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
 
@@ -101,6 +105,7 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(None))
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(None))
         mockRetrieveAuthenticatorFailureResponse(testJourneyId)(Future.successful(None))
+        mockRetrieveInsights(testJourneyId)(Future.successful(None))
 
         intercept[InternalServerException](
           await(TestService.auditJourney(testJourneyId, testIndividualJourneyConfig))
@@ -117,7 +122,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
-
 
           val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -145,7 +149,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
-
 
           val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfigWithBVCheckDisabled))
 
@@ -206,7 +209,8 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
             "userSAUTR" -> testSautr,
             "isMatch" -> "true",
             "VerificationStatus" -> "Enrolled",
-            "RegisterApiStatus" -> testRegistrationSuccess
+            "RegisterApiStatus" -> testRegistrationSuccess,
+            "ninoReputation" -> testInsightsReturnBody
           )
 
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails.copy(businessVerification = Some(SaEnrolled)))))
