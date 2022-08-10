@@ -126,6 +126,10 @@ error.no_tax_identifiers                                    = Nodwch y dynodydd 
 error.invalid_tax_identifiers                               = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
 error.invalid_tax_identifiers_length                        = Mae’n rhaid i’r dynodydd treth tramor fod yn 60 o gymeriadau neu lai
 
+## Overseas Tax Identifiers Country Page
+tax-identifiers-country.title                               = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
+tax-identifiers-country.heading                             = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Gwirio’ch atebion
 check-your-answers.heading                                  = Gwirio’ch atebion
@@ -200,3 +204,5 @@ error.no_tax_identifier                                     = Nodwch ddynodydd t
 error.invalid_tax_identifier                                = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
 error.invalid_tax_identifier_length                         = Mae’n rhaid i’r dynodydd treth fod yn 60 o gymeriadau neu lai.
 error.no_tax_identifier_country                             = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
+error.tax_identifier_country                                = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth tramor
+

@@ -84,7 +84,6 @@ object TestConstants {
   )
 
   val testBackendSuccessfulRegistrationJson: JsObject = Json.obj("registration" -> testSuccessfulRegistrationJson)
-
   def testBackendFailedRegistrationJson(failures: JsArray): JsObject = Json.obj("registration" -> testFailedRegistrationJson(failures))
 
   val testDeskProServiceId: String = "vrs"
