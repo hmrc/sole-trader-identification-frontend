@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.controllers
 
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.SoleTraderIdentificationConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetails
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetails.jsonWriterForCallingServices
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -36,7 +37,7 @@ class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: 
       authorised() {
         soleTraderIdentificationConnector.retrieveSoleTraderDetails(journeyId).map {
           case Some(journeyData) =>
-            Ok(SoleTraderDetails.jsonWriterForCallingServices(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
+            Ok(Json.toJson(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase)))(jsonWriterForCallingServices))
           case None =>
             NotFound
         }

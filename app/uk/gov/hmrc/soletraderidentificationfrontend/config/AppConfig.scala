@@ -133,9 +133,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
         }
       case None => throw new InternalServerException(s"Country list file $fileName cannot be found")
     }
-  }
 
-  lazy val insightsUrl: String = s"$backendUrl/sole-trader-identification/nino-insights"
+  }
 
 }
 

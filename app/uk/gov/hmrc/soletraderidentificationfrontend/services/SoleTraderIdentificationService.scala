@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
-import play.api.libs.json.JsObject
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.SoleTraderIdentificationConnector
@@ -88,11 +87,8 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
 
-  def storeInsights(journeyId: String, insights: JsObject)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeData[JsObject](journeyId, InsightsKey, insights)
-
-  def retrieveInsights(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[JsObject]] =
-    connector.retrieveSoleTraderDetails[JsObject](journeyId, InsightsKey)
+  def storeOverseasTaxIdentifiersCountry(journeyId: String, country: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeData[String](journeyId, OverseasCountryKey, country)
 
   def retrieveFullName(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[FullName]] =
     connector.retrieveSoleTraderDetails[FullName](journeyId, FullNameKey)
@@ -184,6 +180,6 @@ object SoleTraderIdentificationService {
   val SaPostcodeKey: String = "saPostcode"
   val Es20DetailsKey: String = "es20Details"
   val OverseasKey: String = "overseas"
-  val InsightsKey: String = "reputation"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
+  val OverseasCountryKey: String = "country"
 }
