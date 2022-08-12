@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.RemoveSoleTraderDetailsHttpParser.SuccessfullyRemoved
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
@@ -212,6 +213,12 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
 
   def mockRetrieveInsights(journeyId: String)(response: Future[Option[JsObject]]): OngoingStubbing[_] =
     when(mockSoleTraderIdentificationService.retrieveInsights(
+      ArgumentMatchers.eq(journeyId)
+    )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
+
+  def mockRemoveInsights(journeyId: String)(response: Future[SuccessfullyRemoved.type]): OngoingStubbing[_] =
+    when(mockSoleTraderIdentificationService.removeInsights(
       ArgumentMatchers.eq(journeyId)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
