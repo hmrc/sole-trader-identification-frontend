@@ -79,7 +79,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
         )
       }
     }
@@ -135,7 +135,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
         )
       }
     }

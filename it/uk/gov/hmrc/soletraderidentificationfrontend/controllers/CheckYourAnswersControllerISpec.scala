@@ -79,7 +79,9 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
         stubRetrieveAddress(testJourneyId)(NOT_FOUND)
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -125,7 +127,9 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoSautr)
         stubRetrieveAddress(testJourneyId)(NOT_FOUND)
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -159,7 +163,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
       }
     }
 
-    "the applicant does not have a nino but has an address" should {
+    "the applicant does not have a nino but has an address and Overseas Tax Identifier details" should {
       lazy val result: WSResponse = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -171,6 +175,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino)
         stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
@@ -182,7 +188,55 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
       }
 
       "return a view which" should {
-        testCheckYourAnswersNoNinoView(result, testJourneyId)
+        testCheckYourAnswersNoNinoWithOverseasTaxIdentifierView(result, testJourneyId)
+      }
+
+      "redirect to sign in page" when {
+        "the user is UNAUTHORISED" in {
+          stubAuthFailure()
+          stubAudit()
+
+          lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
+
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri("/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fcheck-your-answers-business" +
+              "&origin=sole-trader-identification-frontend"
+            )
+          }
+
+          verifyAudit()
+        }
+      }
+    }
+
+    "the applicant does not have a nino and Overseas Tax Identifier details" should {
+      lazy val result: WSResponse = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubAudit()
+        stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino)
+        stubRetrieveAddress(testJourneyId)(OK, testAddressJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
+      }
+
+      "return OK" in {
+        result.status mustBe OK
+
+        verifyAudit()
+      }
+
+      "return a view which" should {
+        testCheckYourAnswersNoNinoWithoutOverseasTaxIdentifierView(result, testJourneyId)
       }
 
       "redirect to sign in page" when {
@@ -217,7 +271,9 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr)
         stubRetrieveAddress(testJourneyId)(NOT_FOUND)
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -297,6 +353,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino)
             stubRemoveInsights(testJourneyId)(NO_CONTENT)
             stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+            stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+            stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
             stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
             stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponse)
             stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
@@ -404,6 +462,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNinoNoSautr).setNewScenarioState("auditing")
           stubRemoveInsights(testJourneyId)(NO_CONTENT)
           stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+          stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
           stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
           stubStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(OK)
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
@@ -516,6 +576,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
             stubRemoveInsights(testJourneyId)(NO_CONTENT)
             stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
+            stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+            stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
             stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
             stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseWithoutNino)
             stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
@@ -636,6 +698,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
           stubRemoveInsights(testJourneyId)(NO_CONTENT)
           stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
+          stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+          stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
           stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
           stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
           stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)
@@ -940,6 +1004,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
         stubRemoveInsights(testJourneyId)(NO_CONTENT)
         stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
         stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)

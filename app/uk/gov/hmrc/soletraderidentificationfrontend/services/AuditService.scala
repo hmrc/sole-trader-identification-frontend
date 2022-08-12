@@ -105,13 +105,14 @@ class AuditService @Inject()(appConfig: AppConfig,
               case _ => Json.obj()
             }
 
-          val overseasIdentifiersBlock =
-            soleTraderRecord.optOverseas match {
-              case Some(overseas) => Json.obj(
-                "overseasTaxIdentifier" -> overseas.taxIdentifier,
-                "overseasTaxIdentifierCountry" -> overseas.country)
-              case _ => Json.obj()
-            }
+          val overseasIdentifiersBlock: JsObject = (soleTraderRecord.optOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
+            case (Some(taxIdentifier), Some(country)) => Json.obj(
+                "overseasTaxIdentifier" -> taxIdentifier,
+                "overseasTaxIdentifierCountry" -> country
+              )
+            case (None, None) => Json.obj()
+            case _ => throw new InternalServerException("Error: Invalid tax identifier and country")
+          }
 
           val businessVerificationStatus: String =
             if (!journeyConfig.businessVerificationCheck) "not requested"

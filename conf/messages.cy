@@ -145,6 +145,9 @@ check-your-answers.sa_postcode                              = Cod post Hunanases
 check-your-answers.no_sa_postcode                           = Nid oes gan y busnes god post Hunanasesiad
 check-your-answers.tax_identifiers                          = Dynodydd treth tramor
 check-your-answers.no_tax-identifiers                       = Dydw i ddim am ddarparu dynodydd
+check-your-answers.tax_identifier                           = Dynodydd treth tramor
+check-your-answers.tax_identifier_yes                       = Iawn, {0}
+check-your-answers.tax_identifier_country                   = Y wlad a gyhoeddodd y dynodydd treth tramor
 
 ## Details Not Found Page
 details-not-found-page.title                                = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion

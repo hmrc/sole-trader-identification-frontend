@@ -81,7 +81,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
               },
             postcode =>
               soleTraderIdentificationService.storeSaPostcode(journeyId, postcode).map {
-                _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+                _ => Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
               }
           )
         case None =>
@@ -93,7 +93,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         soleTraderIdentificationService.removeSaPostcode(journeyId).map {
-          _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+          _ => Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
         }
       }
   }

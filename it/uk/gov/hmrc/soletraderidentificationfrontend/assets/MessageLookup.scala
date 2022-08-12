@@ -254,6 +254,7 @@ object MessageLookup {
     val noNino = "There is no National Insurance number"
     val saPostcode = "Self Assessment postcode"
     val overseasTaxIdentifier = "Overseas tax identifier"
+    val overseasTaxIdentifierCountry = "Country of overseas tax identifier"
 
   }
 

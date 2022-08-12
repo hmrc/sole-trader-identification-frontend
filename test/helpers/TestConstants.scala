@@ -51,6 +51,8 @@ object TestConstants {
   val testOverseasAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), None, "US")
   val testSaPostcode: String = "AA1 1AA"
   val testOverseasIdentifiers: Overseas = Overseas("134124532", "AL")
+  val testOverseasIdentifier: String = "134124532"
+  val testOverseasIdentifierCountry: String = "AL"
   val testDefaultServiceName: String = "Entity Validation Service"
   val testServiceName: String = "Test Service"
 
@@ -87,7 +89,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -103,7 +106,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -119,7 +123,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -135,7 +140,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = Some(testTrn),
-      optOverseas = Some(testOverseasIdentifiers),
+      optOverseasTaxIdentifier = Some(testOverseasIdentifier),
+      optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
       optNinoInsights = None
     )
 
@@ -151,7 +157,8 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -167,7 +174,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(RegistrationFailed(testRegistrationFailure)),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 

@@ -131,6 +131,9 @@ check-your-answers.sa_postcode                              = Self Assessment po
 check-your-answers.no_sa_postcode                           = The business does not have a Self Assessment postcode
 check-your-answers.tax_identifiers                          = Overseas tax identifier
 check-your-answers.no_tax-identifiers                       = I do not want to provide an identifier
+check-your-answers.tax_identifier_country                   = Country of overseas tax identifier
+check-your-answers.tax_identifier_yes                       = Yes, {0}
+check-your-answers.tax_identifier                           = Overseas tax identifier
 
 ## Details Not Found Page
 details-not-found-page.title                                = The details you entered did not match our records
