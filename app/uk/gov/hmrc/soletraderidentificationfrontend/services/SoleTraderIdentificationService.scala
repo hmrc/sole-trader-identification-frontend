@@ -168,6 +168,9 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeSoleTraderDetails(journeyId, OverseasTaxIdentifierKey)
 
+  def removeInsights(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeSoleTraderDetails(journeyId, InsightsKey)
+
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
 }

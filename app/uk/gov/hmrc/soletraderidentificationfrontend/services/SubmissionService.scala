@@ -40,7 +40,8 @@ class SubmissionService @Inject()(soleTraderMatchingService: SoleTraderMatchingS
     soleTraderIdentificationService.retrieveIndividualDetails(journeyId).flatMap {
       case Some(individualDetails: IndividualDetails) =>
         for {
-          _ <- if (individualDetails.optNino.nonEmpty) ninoInsightsService.ninoInsights(journeyId, individualDetails.optNino.get) else Future.successful()
+          _ <- if (individualDetails.optNino.nonEmpty) ninoInsightsService.ninoInsights(journeyId, individualDetails.optNino.get)
+          else soleTraderIdentificationService.removeInsights(journeyId)
           matchingResult <-
             if (individualDetails.optNino.isEmpty && !isEnabled(EnableOptionalNinoJourney))
               Future.failed(new IllegalStateException("[Submission Service] Unexpected state of Nino"))
