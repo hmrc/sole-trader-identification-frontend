@@ -18,12 +18,14 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 
 import play.api.i18n.Messages
 import play.api.mvc.Call
+import uk.gov.hmrc.govukfrontend.views.Aliases
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, IndividualDetails, Overseas}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, IndividualDetails}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.formatDate
 
 import javax.inject.{Inject, Singleton}
@@ -35,7 +37,8 @@ class CheckYourAnswersRowBuilder @Inject()() {
                            individualDetails: IndividualDetails,
                            optAddress: Option[Address],
                            optSaPostcode: Option[String],
-                           optOverseasTaxId: Option[Overseas],
+                           optOverseasTaxId: Option[String],
+                           optOverseasTaxIdCountry: Option[String],
                            enableSautrCheck: Boolean
                           )(implicit messages: Messages, config: AppConfig): Seq[SummaryListRow] = {
 
@@ -92,19 +95,17 @@ class CheckYourAnswersRowBuilder @Inject()() {
       None
     }
 
-    val overseasIdentifiersRow = if (individualDetails.optNino.isEmpty && enableSautrCheck) {
-      Some(buildSummaryRow(
-        messages("check-your-answers.tax_identifiers"),
-        optOverseasTaxId match {
-          case Some(overseasTaxId) =>
-            Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country, messages.lang.code)).mkString("<br>")
-          case None => messages("check-your-answers.no_tax-identifiers")
-        },
-        routes.CaptureOverseasTaxIdentifiersController.show(journeyId)
-      ))
-    } else {
-      None
-    }
+    val overseasTaxIdRow: Seq[Aliases.SummaryListRow] =
+      if (individualDetails.optNino.isEmpty && enableSautrCheck) {
+        (optOverseasTaxId, optOverseasTaxIdCountry)match{
+
+          case (Some(overseasTaxId), Some(overseasCountry)) => Seq(
+            createOverseasTaxIdProvidedRow(journeyId, overseasTaxId), createOverseasTaxIdCountryRow(journeyId, overseasCountry)
+          )
+          case (None, None) => Seq(createOverseasTaxIdNotProvidedRow(journeyId))
+          case _ => throw new InternalServerException("Error: Invalid tax identifier and country")
+        }
+      }else Seq()
 
     val addressRow = optAddress.map {
       address =>
@@ -125,7 +126,7 @@ class CheckYourAnswersRowBuilder @Inject()() {
         )
     }
 
-    Seq(firstNameRow, lastNameRow, dateOfBirthRow, ninoRow) ++ addressRow ++ sautrRow ++ saPostcodeRow ++ overseasIdentifiersRow
+    Seq(firstNameRow, lastNameRow, dateOfBirthRow, ninoRow) ++ addressRow ++ sautrRow ++ saPostcodeRow ++ overseasTaxIdRow
 
   }
 
@@ -140,6 +141,30 @@ class CheckYourAnswersRowBuilder @Inject()() {
       )
     )))
   )
+
+  private def createOverseasTaxIdCountryRow(journeyId: String, country: String)
+                                           (implicit messages: Messages, appConfig: AppConfig): Aliases.SummaryListRow =
+    buildSummaryRow(
+      key = messages("check-your-answers.tax_identifier_country"),
+      value = appConfig.getCountryName(country, messages.lang.code),
+      changeLink = routes.CaptureOverseasTaxIdentifierCountryController.show(journeyId)
+    )
+
+
+  private def createOverseasTaxIdProvidedRow(journeyId: String, overseasTaxIdentifier: String)
+                                            (implicit messages: Messages, appConfig: AppConfig): Aliases.SummaryListRow =
+    buildSummaryRow(
+      key = messages("check-your-answers.tax_identifier"),
+      value = messages("check-your-answers.tax_identifier_yes", overseasTaxIdentifier),
+      changeLink = routes.CaptureOverseasTaxIdentifierController.show(journeyId)
+    )
+
+  private def createOverseasTaxIdNotProvidedRow(journeyId: String)(implicit messages: Messages): Aliases.SummaryListRow =
+    buildSummaryRow(
+      key = messages("check-your-answers.tax_identifier"),
+      value = messages("app.common.no"),
+      changeLink = routes.CaptureOverseasTaxIdentifierController.show(journeyId)
+    )
 }
 
 

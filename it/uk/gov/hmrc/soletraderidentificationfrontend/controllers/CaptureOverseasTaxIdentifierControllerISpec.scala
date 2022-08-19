@@ -29,7 +29,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
   with SoleTraderIdentificationStub
   with CaptureOverseasTaxIdentifierViewTests {
 
-  "GET /overseas-identifiers" when {
+  "GET /overseas-identifier" when {
 
     "displayed" should {
 
@@ -40,7 +40,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers")
+        get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
       }
 
       "return OK" in {
@@ -58,12 +58,12 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
       "redirect the user to the sign on page" in {
         stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers")
+        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifiers" +
+            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
             "&origin=sole-trader-identification-frontend"
           )
         )
@@ -72,7 +72,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
   }
 
-  "POST /overseas-identifiers" when {
+  "POST /overseas-identifier" when {
 
     "the user selects 'Yes' and the tax identifier is correctly formatted" should {
 
@@ -85,12 +85,15 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)(OK)
 
-        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> testOverseasTaxIdentifier)
 
-        //TODO redirect to Country page and uncomment below verifyStoreOverseasTaxIdentifier
-       // verifyStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureOverseasTaxIdentifierCountryController.show(testJourneyId).url)
+        )
+         verifyStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)
       }
 
     }
@@ -106,8 +109,9 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse())
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
 
-        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "No",
           "tax-identifier" -> "")
 
@@ -132,7 +136,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         stubAuth(OK, successfulAuthResponse())
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers")("tax-identifier-radio" -> "", "tax-identifier" -> "")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "", "tax-identifier" -> "")
       }
 
       "return a bad request" in {
@@ -152,7 +156,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "")
       }
@@ -174,7 +178,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "1234$5566434")
       }
@@ -196,7 +200,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "1234567890123456789012345678901234567890123456789012345678901")
       }
@@ -214,14 +218,14 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
+        lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> testOverseasTaxIdentifier)
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifiers" +
+            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
             "&origin=sole-trader-identification-frontend"
           )
         )

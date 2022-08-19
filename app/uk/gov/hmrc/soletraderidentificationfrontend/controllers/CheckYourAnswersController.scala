@@ -58,9 +58,10 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
               .map(_.getOrElse(throw new InternalServerException(s"Individual details not found for journeyId: $journeyId")))
             optAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
             optSaPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
-            optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifiers(journeyId)
+            optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxId(journeyId)
+            optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdCountry(journeyId)
             summaryRows = rowBuilder.buildSummaryListRows(
-              journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, journeyConfig.pageConfig.enableSautrCheck)
+              journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, optOverseasTaxIdCountry, journeyConfig.pageConfig.enableSautrCheck)
           } yield {
             val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
             implicit val messages: Messages = remoteMessagesApi.preferred(request)

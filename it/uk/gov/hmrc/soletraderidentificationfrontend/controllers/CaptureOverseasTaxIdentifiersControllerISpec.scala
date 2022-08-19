@@ -28,7 +28,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
   with AuthStub
   with SoleTraderIdentificationStub {
 
-  "GET /overseas-identifier" should {
+  "GET /overseas-identifiers" should {
     lazy val result = {
       await(journeyConfigRepository.insertJourneyConfig(
         journeyId = testJourneyId,
@@ -36,7 +36,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         journeyConfig = testIndividualJourneyConfig
       ))
       stubAuth(OK, successfulAuthResponse())
-      get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
+      get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers")
     }
 
     "return OK" in {
@@ -50,12 +50,12 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
     "redirect to sign in page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
+        lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers")
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
+            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifiers" +
             "&origin=sole-trader-identification-frontend"
           )
         )
@@ -63,7 +63,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
     }
   }
 
-  "POST /overseas-identifier" when {
+  "POST /overseas-identifiers" when {
     "the tax identifiers are correctly formatted" should {
       "redirect to Check Your Answers" in {
         await(journeyConfigRepository.insertJourneyConfig(
@@ -74,7 +74,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubStoreOverseasTaxIdentifiers(testJourneyId, testOverseasTaxIdentifiers)(OK)
 
-        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
+        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
         )("tax-identifier" -> "134124532",
           "country" -> "AL")
 
@@ -92,7 +92,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
         )("tax-identifier" -> "",
           "country" -> "")
       }
@@ -112,7 +112,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
         )("tax-identifier" -> "134124532$$$",
           "country" -> "AL")
       }
@@ -132,7 +132,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifiers"
         )("tax-identifier" -> "13412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453",
           "country" -> "AL")
       }
@@ -145,7 +145,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
     }
   }
 
-  "GET /no-overseas-identifier" should {
+  "GET /no-overseas-identifiers" should {
     "redirect to CYA page" when {
       "the overseas identifiers are successfully removed" in {
         await(journeyConfigRepository.insertJourneyConfig(

@@ -60,6 +60,7 @@ object TestConstants {
   val testSaPostcode: String = "AA00 0AA"
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testOverseasTaxIdentifier: String = "123456234"
+  val testOverseasTaxIdentifierCountry: String = "AL"
 
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
@@ -140,7 +141,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationPass),
       registrationStatus = Some(Registered(testSafeId)),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -156,7 +158,8 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -174,7 +177,8 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = Some(testInsightsReturnBody)
     )
 
@@ -190,7 +194,8 @@ object TestConstants {
       businessVerification = None,
       registrationStatus = None,
       optTrn = None,
-      optOverseas = None,
+      optOverseasTaxIdentifier = None,
+      optOverseasTaxIdentifierCountry = None,
       optNinoInsights = None
     )
 

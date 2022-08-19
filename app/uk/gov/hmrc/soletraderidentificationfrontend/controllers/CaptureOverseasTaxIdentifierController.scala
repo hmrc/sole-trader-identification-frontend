@@ -80,10 +80,11 @@ class CaptureOverseasTaxIdentifierController @Inject()(mcc: MessagesControllerCo
               case Some(overseasTaxIdentifier) => for {
                 _ <- soleTraderIdentificationService.storeOverseasTaxIdentifier(journeyId, overseasTaxIdentifier)
               } yield {
-                NotImplemented // TODO Navigate to country page
+                Redirect(routes.CaptureOverseasTaxIdentifierCountryController.show(journeyId))
               }
               case None => for {
                 _ <- soleTraderIdentificationService.removeOverseasTaxIdentifier(journeyId)
+                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)
               } yield {
                 Redirect(routes.CheckYourAnswersController.show(journeyId))
               }
