@@ -49,7 +49,6 @@ object SoleTraderDetails {
   private val BusinessVerificationKey = "businessVerification"
   private val RegistrationKey = "registration"
   private val TrnKey = "trn"
-  private val OverseasIdentifiersKey = "overseas"
   private val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
   private val ReputationKey = "reputation"
   private val CorrelationIdKey = "ninoInsightsCorrelationId"
@@ -70,15 +69,13 @@ object SoleTraderDetails {
         businessVerification <- (json \ BusinessVerificationKey).validateOpt[BusinessVerificationStatus]
         registrationStatus <- (json \ RegistrationKey).validateOpt[RegistrationStatus]
         optTrnKey <- (json \ TrnKey).validateOpt[String]
-        optOverseas <- (json \ OverseasIdentifiersKey).validateOpt[Overseas]
         optOverseasTaxId <- (json \ OverseasTaxIdentifierKey).validateOpt[String]
         optOverseasTaxIdCountry <- (json \ OverseasCountryKey).validateOpt[String]
         reputationKey <- (json \ ReputationKey).validateOpt[JsObject]
       } yield {
         val (overseasTaxId, overseasTaxIdCountry) = determineOverseasTaxIdentifierDetails(
           optOverseasTaxId,
-          optOverseasTaxIdCountry,
-          optOverseas
+          optOverseasTaxIdCountry
         )
         SoleTraderDetails(fullName, dateOfBirthKey, optNino, optAddress, optSaPostcode,
           optSaUtr, identifiersMatch, businessVerification, registrationStatus, optTrnKey,
@@ -183,14 +180,10 @@ object SoleTraderDetails {
   }
 
   private def determineOverseasTaxIdentifierDetails(optOverseasTaxId: Option[String],
-                                                    optOverseasTaxIdCountry: Option[String],
-                                                    optOverseas: Option[Overseas]): (Option[String], Option[String]) =
+                                                    optOverseasTaxIdCountry: Option[String]): (Option[String], Option[String]) =
     (optOverseasTaxId, optOverseasTaxIdCountry) match {
       case (Some(identifier), Some(country)) => (Some(identifier), Some(country))
-      case (None, None) => optOverseas match {
-        case Some(overseas) => (Some(overseas.taxIdentifier), Some(overseas.country))
-        case None => (None, None)
-      }
+      case (None, None) => (None, None)
       case _ => throw new InternalServerException("Error: Invalid combination of tax identifier and country")
     }
 

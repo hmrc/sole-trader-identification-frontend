@@ -29,10 +29,6 @@ GET         /:journeyId/no-self-assessment-postcode      uk.gov.hmrc.soletraderi
 GET         /:journeyId/overseas-identifier              uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierController.show(journeyId: String)
 POST        /:journeyId/overseas-identifier              uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierController.submit(journeyId: String)
 
-GET         /:journeyId/overseas-identifiers              uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifiersController.show(journeyId: String)
-POST        /:journeyId/overseas-identifiers              uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifiersController.submit(journeyId: String)
-GET         /:journeyId/no-overseas-identifier           uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifiersController.noOverseasTaxIdentifiers(journeyId: String)
-
 GET         /:journeyId/overseas-tax-identifier-country  uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierCountryController.show(journeyId: String)
 POST        /:journeyId/overseas-tax-identifier-country  uk.gov.hmrc.soletraderidentificationfrontend.controllers.CaptureOverseasTaxIdentifierCountryController.submit(journeyId: String)
 

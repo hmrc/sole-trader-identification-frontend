@@ -95,14 +95,6 @@ sa-postcode.no.postcodeLink                                  = The business does
 sa-postcode.invalid.format.error                             = Enter the postcode in the correct format, for example, AB1 2YZ
 error.no_entry_sa-postcode                                   = Enter the postcode where the business is registered for Self Assessment
 
-## Overseas Tax Identifiers Page
-tax-identifiers.title                                        = What is the business’s overseas tax identifier?
-tax-identifiers.heading                                      = What is the business’s overseas tax identifier?
-tax-identifiers.line_1                                       = We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
-tax-identifiers.field_1                                      = Enter a tax identifier
-tax-identifiers.field_2                                      = Enter the name of the country that issued the tax identifier
-tax-identifiers.no_identifier_link                           = I do not want to provide an identifier
-
 ## Overseas Tax Identifier Page
 tax-identifier.title                                         = Does the business have an overseas tax identifier?
 tax-identifier.line_1                                        = We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
@@ -115,6 +107,7 @@ error.invalid_tax_identifiers_length                         = The overseas tax 
 ## Overseas Tax Identifiers Country Page
 tax-identifiers-country.title                                = Which country issued the overseas tax identifier?
 tax-identifiers-country.heading                              = Which country issued the overseas tax identifier?
+error.tax_identifier_country                                 = Enter the name of the country that issued the overseas tax identifier
 
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
@@ -189,8 +182,3 @@ error.invalid_characters_postcode                           = The postcode must 
 error.non_uk_postcode                                       = Enter a postcode, like AA1 1AA
 error.no_entry_country                                      = Select a country
 error.no_selection                                          = Select yes if you want to continue registering with the details you provided
-error.no_tax_identifier                                     = Enter a tax identifier
-error.invalid_tax_identifier                                = Enter a tax identifier that does not contain special characters
-error.invalid_tax_identifier_length                         = The tax identifier must be 60 characters or fewer
-error.no_tax_identifier_country                             = Enter the name of the country that issued the tax identifier
-error.tax_identifier_country                                = Enter the name of the country that issued the overseas tax identifier
