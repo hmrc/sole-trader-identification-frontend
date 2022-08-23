@@ -97,7 +97,9 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
               for {
                 _ <- soleTraderIdentificationService.storeNino(journeyId, nino)
                 _ <- soleTraderIdentificationService.removeAddress(journeyId)
-                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifiers(journeyId)
+                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifier(journeyId)
+                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)
+                _ <- soleTraderIdentificationService.removeSaPostcode(journeyId)
                 journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
               } yield
                 if (journeyConfig.pageConfig.enableSautrCheck) {

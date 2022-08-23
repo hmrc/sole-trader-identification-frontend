@@ -116,7 +116,9 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
-        stubRemoveOverseasTaxIdentifiers(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
+        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> testNino)
@@ -135,7 +137,9 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
-        stubRemoveOverseasTaxIdentifiers(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
+        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> testNino)

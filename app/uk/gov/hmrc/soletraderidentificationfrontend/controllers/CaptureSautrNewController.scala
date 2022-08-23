@@ -110,7 +110,7 @@ class CaptureSautrNewController @Inject()(mcc: MessagesControllerComponents,
                   case Some(_) =>
                     Redirect(routes.CheckYourAnswersController.show(journeyId))
                   case None =>
-                    Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+                    Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
                 }
             }
           )

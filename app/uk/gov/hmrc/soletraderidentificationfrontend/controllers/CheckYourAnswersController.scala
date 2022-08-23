@@ -58,8 +58,8 @@ class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
               .map(_.getOrElse(throw new InternalServerException(s"Individual details not found for journeyId: $journeyId")))
             optAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
             optSaPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
-            optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxId(journeyId)
-            optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdCountry(journeyId)
+            optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
+            optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
             summaryRows = rowBuilder.buildSummaryListRows(
               journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, optOverseasTaxIdCountry, journeyConfig.pageConfig.enableSautrCheck)
           } yield {

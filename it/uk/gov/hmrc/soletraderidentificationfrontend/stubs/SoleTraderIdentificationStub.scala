@@ -120,13 +120,6 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       status = status
     )
 
-  def stubStoreOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseas", body = Json.toJson(taxIdentifiers)
-    ).thenReturn(
-      status = status
-    )
-
   def stubStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(status: Int): Unit =
     when(method = PUT,
       uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
@@ -221,13 +214,6 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
       body = JsString(body)
     )
 
-  def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseas"
-    ).thenReturn(
-      status = status,
-      body = body
-    )
 
   def stubRetrieveOverseasTaxIdentifier(journeyId: String)(status: Int, overseasTaxIdentifier: String = ""): StubMapping =
     when(method = GET,
@@ -296,14 +282,6 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def stubRemoveInsights(journeyId: String)(status: Int, body: String = ""): StubMapping =
     when(method = DELETE,
       uri = s"/sole-trader-identification/journey/$journeyId/reputation"
-    ).thenReturn(
-      status = status,
-      body = body
-    )
-
-  def stubRemoveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseas"
     ).thenReturn(
       status = status,
       body = body

@@ -109,14 +109,6 @@ sa-postcode.no.postcodeLink                                 = Nid oes gan y busn
 sa-postcode.invalid.format.error                            = Nodwch y cod post yn y fformat cywir, er enghraifft, AB1 2YZ
 error.no_entry_sa-postcode                                  = Nodwch y cod post lle mae’r busnes wedi’i gofrestru ar gyfer Hunanasesiad
 
-## Overseas Tax Identifiers Page
-tax-identifiers.title                                       = Beth yw dynodydd treth tramor y busnes?
-tax-identifiers.heading                                     = Beth yw dynodydd treth tramor y busnes?
-tax-identifiers.line_1                                      = Efallai y byddwn yn defnyddio’r rhif hwn i’n helpu i ddod o hyd i’ch busnes. Gallai’r dynodydd treth fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio er mwyn gwirio manylion eich busnes.
-tax-identifiers.field_1                                     = Nodwch ddynodydd treth
-tax-identifiers.field_2                                     = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
-tax-identifiers.no_identifier_link                          = Dydw i ddim am ddarparu dynodydd
-
 ## Overseas Tax Identifier Page
 tax-identifier.title                                        = Oes gan y busnes ddynodydd treth tramor?
 tax-identifier.line_1                                       = Efallai y byddwn yn defnyddio’r rhif hwn i’n helpu i ddod o hyd i’ch busnes. Gallai’r dynodydd treth fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio er mwyn gwirio manylion eich busnes.
@@ -129,6 +121,7 @@ error.invalid_tax_identifiers_length                        = Mae’n rhaid i’
 ## Overseas Tax Identifiers Country Page
 tax-identifiers-country.title                               = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
 tax-identifiers-country.heading                             = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
+error.tax_identifier_country                                = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth tramor
 
 ## Check Your Answers Page
 check-your-answers.title                                    = Gwirio’ch atebion
@@ -203,9 +196,3 @@ error.invalid_characters_postcode                           = Ni ddylid cynnwys 
 error.non_uk_postcode                                       = Nodwch god post, megis AA1 1AA
 error.no_entry_country                                      = Dewiswch wlad
 error.no_selection                                          = Dewiswch ‘Iawn’ os hoffech barhau i gofrestru gyda’r manylion a roesoch
-error.no_tax_identifier                                     = Nodwch ddynodydd treth
-error.invalid_tax_identifier                                = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
-error.invalid_tax_identifier_length                         = Mae’n rhaid i’r dynodydd treth fod yn 60 o gymeriadau neu lai.
-error.no_tax_identifier_country                             = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
-error.tax_identifier_country                                = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth tramor
-

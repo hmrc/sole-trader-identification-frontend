@@ -82,9 +82,6 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeTrn(journeyId: String, trn: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[String](journeyId, TrnKey, trn)
 
-  def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeData[Overseas](journeyId, OverseasKey, taxIdentifiers)
-
   def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
 
@@ -141,36 +138,11 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, SaPostcodeKey)
 
-  def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
-    connector.retrieveSoleTraderDetails[Overseas](journeyId, OverseasKey)
-
   def retrieveOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, OverseasTaxIdentifierKey)
 
   def retrieveOverseasTaxIdentifierCountry(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, OverseasCountryKey)
-
-  def retrieveOverseasTaxId(journeyId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[String]] = {
-
-    retrieveOverseasTaxIdentifier(journeyId).flatMap {
-      case Some(overseasTaxIdentifier) => Future.successful(Some(overseasTaxIdentifier))
-      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
-        case Some(oldOverseasTaxId) => Some(oldOverseasTaxId.taxIdentifier)
-        case None => None
-      }
-    }
-  }
-
-  def retrieveOverseasTaxIdCountry(journeyId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[String]] = {
-
-    retrieveOverseasTaxIdentifierCountry(journeyId).flatMap {
-      case Some(overseasTaxIdCountry) => Future.successful(Some(overseasTaxIdCountry))
-      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
-        case Some(oldOverseasTaxIdCountry) => Some(oldOverseasTaxIdCountry.country)
-        case None => None
-      }
-    }
-  }
 
   def retrieveES20Details(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[KnownFactsResponse]] =
     connector.retrieveSoleTraderDetails[KnownFactsResponse](journeyId, Es20DetailsKey)
@@ -189,9 +161,6 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
 
   def removeAddress(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeSoleTraderDetails(journeyId, AddressKey)
-
-  def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
-    connector.removeSoleTraderDetails(journeyId, OverseasKey)
 
   def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeSoleTraderDetails(journeyId, OverseasTaxIdentifierKey)
@@ -220,7 +189,6 @@ object SoleTraderIdentificationService {
   val TrnKey: String = "trn"
   val SaPostcodeKey: String = "saPostcode"
   val Es20DetailsKey: String = "es20Details"
-  val OverseasKey: String = "overseas"
   val InsightsKey: String = "reputation"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
   val OverseasCountryKey: String = "country"

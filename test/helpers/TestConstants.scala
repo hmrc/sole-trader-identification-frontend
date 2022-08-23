@@ -50,7 +50,6 @@ object TestConstants {
   val testAddressWrongPostcodeFormat: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), Some("AA11AA"), "GB")
   val testOverseasAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), None, "US")
   val testSaPostcode: String = "AA1 1AA"
-  val testOverseasIdentifiers: Overseas = Overseas("134124532", "AL")
   val testOverseasIdentifier: String = "134124532"
   val testOverseasIdentifierCountry: String = "AL"
   val testDefaultServiceName: String = "Entity Validation Service"
@@ -318,8 +317,8 @@ object TestConstants {
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseUK,
     "SAPostcode" -> testSaPostcode,
-    "overseasTaxIdentifier" -> testOverseasIdentifiers.taxIdentifier,
-    "overseasTaxIdentifierCountry" -> testOverseasIdentifiers.country
+    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
   )
 
   def testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch: String = "false"): JsObject = Json.obj(
@@ -336,8 +335,8 @@ object TestConstants {
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseOverseas,
     "SAPostcode" -> testSaPostcode,
-    "overseasTaxIdentifier" -> testOverseasIdentifiers.taxIdentifier,
-    "overseasTaxIdentifierCountry" -> testOverseasIdentifiers.country
+    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
   )
 
   def testSoleTraderFailureAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(

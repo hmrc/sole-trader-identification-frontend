@@ -81,7 +81,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -129,7 +128,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -177,7 +175,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -225,7 +222,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -273,7 +269,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         get(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -355,7 +350,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
             stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
             stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-            stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
             stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponse)
             stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
             stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))(OK)
@@ -464,7 +458,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
           stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
           stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
           stubStoreIdentifiersMatch(testJourneyId, NotEnoughInformationToMatch)(OK)
           stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
           stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
@@ -578,7 +571,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
             stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
             stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-            stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
             stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseWithoutNino)
             stubStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(OK)
             stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, None))(OK)
@@ -700,7 +692,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
           stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
           stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
           stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
           stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)
           stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, Some(testNinoRecordedByKnownFacts)))(OK)
@@ -1006,7 +997,6 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
         stubRetrieveOverseasTaxIdentifierCountry(testJourneyId)(OK, testOverseasTaxIdentifierCountry)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
         stubGetEacdKnownFacts(testSautr)(OK, testKnownFactsResponseNino(testNinoRecordedByKnownFacts))
         stubStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(OK)
         stubStoreES20Details(testJourneyId, KnownFactsResponse(Some(testSaPostcode), None, Some(testNinoRecordedByKnownFacts)))(OK)
