@@ -76,12 +76,12 @@ object CaptureAddressForm {
   def apply(): Form[Address] = {
     Form(
       mapping(
-        "address1" -> optText.toText.verifying(address1NotEntered andThen addressInvalid andThen addressTooManyCharacters),
-        "address2" -> optText.toText.verifying(address2NotEntered andThen addressInvalid andThen addressTooManyCharacters),
-        "address3" -> optional(text.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "address4" -> optional(text.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "address5" -> optional(text.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "postcode" -> optional(text.verifying(postcodeInvalid)),
+        "address1" -> optText.toTrimmedText.verifying(address1NotEntered andThen addressInvalid andThen addressTooManyCharacters),
+        "address2" -> optText.toTrimmedText.verifying(address2NotEntered andThen addressInvalid andThen addressTooManyCharacters),
+        "address3" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        "address4" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        "address5" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        "postcode" -> optional(optText.toTrimmedText.verifying(postcodeInvalid)),
         "country" -> optText.toText.verifying(countryNotEntered)
       )(Address.apply)(Address.unapply)
     )
