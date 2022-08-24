@@ -81,7 +81,7 @@ object CaptureAddressForm {
         "address3" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
         "address4" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
         "address5" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "postcode" -> optional(optText.toTrimmedText.verifying(postcodeInvalid)),
+        "postcode" -> optional(text.verifying(postcodeInvalid)),
         "country" -> optText.toText.verifying(countryNotEntered)
       )(Address.apply)(Address.unapply)
     )
