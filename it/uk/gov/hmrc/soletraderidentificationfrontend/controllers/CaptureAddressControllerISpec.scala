@@ -21,7 +21,7 @@ import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.EnableNoNinoJourney
-import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, FullName}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureAddressViewTests
@@ -98,6 +98,47 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         )
       }
     }
+
+    "the form has leading/trailing whitespaces in address lines" should {
+      "remove whitespaces, redirect to the Capture Sautr page and store the data in the backend" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+
+        enable(EnableNoNinoJourney)
+        stubAuth(OK, successfulAuthResponse())
+
+        stubStoreAddress(testJourneyId, testAddress)(status = OK)
+
+        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
+          "address1" -> s"  $testAddress1   ",
+          "address2" -> s"  $testAddress2   ",
+          "address3" -> s"  $testAddress3   ",
+          "address4" -> s"  $testAddress4   ",
+          "address5" -> s"  $testAddress5   ",
+          "postcode" -> testPostcode,
+          "country" -> testCountry
+        )
+
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureSautrController.show(testJourneyId).url)
+        )
+
+        verifyStoreAddress(testJourneyId, Address(
+          testAddress1,
+          testAddress2,
+          Some(testAddress3),
+          Some(testAddress4),
+          Some(testAddress5),
+          Some(testPostcode),
+          testCountry
+        ))
+      }
+    }
+
     "the form is missing the first line of the address" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(

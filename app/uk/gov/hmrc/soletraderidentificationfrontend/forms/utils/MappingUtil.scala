@@ -30,6 +30,12 @@ object MappingUtil {
         x => Some(x)
       )
 
+    def toTrimmedText: Mapping[String] =
+      mapping.transform(
+        x => x.map(_.trim).getOrElse(""),
+        x => Some(x.trim)
+      )
+
     def toBoolean: Mapping[Boolean] = mapping.transform(
       {
         case Some("true") => true
