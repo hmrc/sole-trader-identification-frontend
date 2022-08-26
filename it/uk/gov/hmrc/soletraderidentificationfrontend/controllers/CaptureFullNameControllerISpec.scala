@@ -104,6 +104,30 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
       }
     }
 
+    "first name and/or last name contain leading/trailing whitespaces" should {
+      "remove whitespaces, redirect to the Capture Date of Birth page and store trimmed values in the backend" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubStoreFullName(testJourneyId, FullName(testFirstName, testLastName))(status = OK)
+
+        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
+          "first-name" -> s"   $testFirstName   ",
+          "last-name" -> s"   $testLastName   "
+        )
+
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureDateOfBirthController.show(testJourneyId).url)
+        )
+
+        verifyStoreFullName(testJourneyId, FullName(testFirstName, testLastName))
+      }
+    }
+
     "the whole form is missing" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
