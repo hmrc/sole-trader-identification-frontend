@@ -17,8 +17,8 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.text
 import play.api.data.validation.Constraint
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
 
 object CaptureOverseasTaxIdentifierCountryForm {
@@ -30,7 +30,7 @@ object CaptureOverseasTaxIdentifierCountryForm {
   )
 
   val form: Form[String] = {
-    Form("country" -> text.verifying(countryNotEntered))
+    Form("country" -> optText.toText.verifying(countryNotEntered))
   }
 
 }
