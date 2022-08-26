@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.config
 
-import play.api.{Configuration, Environment}
 import play.api.libs.json.Json
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{AuthenticatorStub, BusinessVerificationStub, FeatureSwitching, KnownFactsStub}
@@ -25,7 +25,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
 
 import java.io.IOException
 import javax.inject.{Inject, Singleton}
-import org.apache.commons.io.IOUtils
 import scala.collection.JavaConverters.asScalaBufferConverter
 
 @Singleton
@@ -102,13 +101,13 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   private lazy val countriesListInWelsh: Map[String, Country] = getCountryList("/countries_cy.json")
 
-  def getCountryListByLanguage(code: String = "en"): Map[String, Country] = if(code == "cy") countriesListInWelsh else countriesListInEnglish
+  def getCountryListByLanguage(code: String = "en"): Map[String, Country] = if (code == "cy") countriesListInWelsh else countriesListInEnglish
 
   private lazy val orderedCountryListInEnglish: Seq[Country] = countriesListInEnglish.values.toSeq.sortBy(_.name)
 
-  private lazy val orderedCountryListInWelsh: Seq[Country] =  countriesListInWelsh.values.toSeq.sortBy(_.name)
+  private lazy val orderedCountryListInWelsh: Seq[Country] = countriesListInWelsh.values.toSeq.sortBy(_.name)
 
-  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if(code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
+  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if (code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
 
   def getCountryName(countryCode: String, langCode: String = "en"): String = getCountryListByLanguage(langCode).get(countryCode) match {
     case Some(Country(_, name)) =>
@@ -117,7 +116,7 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
       throw new InternalServerException("Invalid country code")
   }
 
-  def getCountryList(fileName: String) : Map[String, Country] = {
+  def getCountryList(fileName: String): Map[String, Country] = {
 
     environment.resourceAsStream(fileName) match {
       case Some(countriesStream) =>
@@ -125,9 +124,9 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
           Json.parse(countriesStream).as[Map[String, Country]]
         } finally {
           try {
-            IOUtils.close(countriesStream)
+            countriesStream.close()
           } catch {
-            case ex : IOException =>
+            case ex: IOException =>
               throw new InternalServerException(s"I/O exception raised on closing file $fileName : ${ex.getMessage}")
           }
         }
