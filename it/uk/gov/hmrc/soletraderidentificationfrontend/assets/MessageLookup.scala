@@ -118,6 +118,7 @@ object MessageLookup {
       val invalid_characters_postcode = "The postcode must not include special characters"
       val non_uk_postcode = "Enter a postcode, like AA1 1AA"
       val no_entry_country = "Select a country"
+      val no_postcode_GB = "Enter your postcode"
     }
 
   }

@@ -198,4 +198,20 @@ trait CaptureAddressViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_entry_country
     }
   }
+
+  def testCaptureAddressErrorMessageNoPostcodeGB(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.no_postcode_GB
+    }
+    "correctly display the field error" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_postcode_GB
+    }
+  }
 }

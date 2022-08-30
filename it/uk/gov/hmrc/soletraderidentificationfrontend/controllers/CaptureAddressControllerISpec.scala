@@ -301,6 +301,33 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
       }
       testCaptureAddressErrorMessageNoEntryCountry(result)
     }
+    "the form has GB selected but no postcode entered" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testSoleTraderJourneyConfig
+        ))
+        enable(EnableNoNinoJourney)
+        stubAuth(OK, successfulAuthResponse())
+        stubStoreAddress(testJourneyId, testAddress)(status = OK)
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/address")(
+          "address1" -> testAddress1,
+          "address2" -> testAddress2,
+          "address3" -> testAddress3,
+          "address4" -> testAddress4,
+          "address5" -> testAddress5,
+          "postcode" -> "",
+          "country" -> "GB"
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+      testCaptureAddressErrorMessageNoPostcodeGB(result)
+    }
 
     "there is a form error and customer full name exists" should {
       lazy val result = {
@@ -326,7 +353,6 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
       }
       testTitleAndHeadingInTheErrorView(result)
     }
-
     "there is a form error and customer full name does NOT exist" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(

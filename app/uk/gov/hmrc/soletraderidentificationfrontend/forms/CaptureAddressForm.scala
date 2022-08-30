@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.forms
 
-import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.format.Formatter
 import play.api.data.validation.Constraint
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
@@ -30,6 +31,14 @@ object CaptureAddressForm {
 
   val addressRegex: Regex = "([A-Za-z0-9]([-'.& ]{0,1}[A-Za-z0-9 ]+)*[A-Za-z0-9]?)$".r
   val postCodeRegex: Regex = """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$""".r
+
+  private val addressLine1Key = "address1"
+  private val addressLine2Key = "address2"
+  private val addressLine3Key = "address3"
+  private val addressLine4Key = "address4"
+  private val addressLine5Key = "address5"
+  private val postcodeKey = "postcode"
+  private val countryKey = "country"
 
   val address1NotEntered: Constraint[String] = Constraint("address1.not-entered")(
     address1 => validate(
@@ -73,16 +82,33 @@ object CaptureAddressForm {
     )
   )
 
+  def postcodeFormatter(): Formatter[Option[String]] = new Formatter[Option[String]] {
+    def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+      val postcode = data.getOrElse(postcodeKey, "")
+      val optCountry = data.get(countryKey)
+      if (postcode.isEmpty) {
+        optCountry match {
+          case Some("GB") => Left(Seq(FormError(postcodeKey, "error.uk_no_postcode")))
+          case _ => Right(None)
+        }
+      }
+      else if (postcode.toUpperCase matches postCodeRegex.regex) Right(Some(postcode))
+      else Left(Seq(FormError(postcodeKey, "error.invalid_characters_postcode")))
+    }
+
+    override def unbind(key: String, value: Option[String]): Map[String, String] = Map(key -> value.getOrElse(""))
+  }
+
   def apply(): Form[Address] = {
     Form(
       mapping(
-        "address1" -> optText.toTrimmedText.verifying(address1NotEntered andThen addressInvalid andThen addressTooManyCharacters),
-        "address2" -> optText.toTrimmedText.verifying(address2NotEntered andThen addressInvalid andThen addressTooManyCharacters),
-        "address3" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "address4" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "address5" -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
-        "postcode" -> optional(text.verifying(postcodeInvalid)),
-        "country" -> optText.toText.verifying(countryNotEntered)
+        addressLine1Key -> optText.toTrimmedText.verifying(address1NotEntered andThen addressInvalid andThen addressTooManyCharacters),
+        addressLine2Key -> optText.toTrimmedText.verifying(address2NotEntered andThen addressInvalid andThen addressTooManyCharacters),
+        addressLine3Key -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        addressLine4Key -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        addressLine5Key -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
+        postcodeKey -> of[Option[String]](postcodeFormatter()),
+        countryKey -> optText.toText.verifying(countryNotEntered)
       )(Address.apply)(Address.unapply)
     )
   }
