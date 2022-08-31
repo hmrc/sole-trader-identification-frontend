@@ -39,11 +39,10 @@ class CaptureFullNameForm {
 
   private val firstNameInvalid: Constraint[String] = Constraint("first_name.invalid")(
     firstName => validateNot(
-      constraint = validName(firstName.capitalize.trim),
+      constraint = validName(firstName.capitalize),
       errMsg = "error.invalid_first_name"
     )
   )
-
 
   private val lastNameNotEntered: Constraint[String] = Constraint("last_name.not_entered")(
     lastName => validate(
@@ -54,17 +53,16 @@ class CaptureFullNameForm {
 
   private val lastNameInvalid: Constraint[String] = Constraint("last_name.invalid")(
     lastName => validateNot(
-      constraint = validName(lastName.capitalize.trim),
+      constraint = validName(lastName.capitalize),
       errMsg = "error.invalid_last_name"
     )
   )
 
-
   def apply(): Form[FullName] = {
     Form(
       mapping(
-        "first-name" -> optText.toText.verifying(firstNameNotEntered andThen firstNameInvalid),
-        "last-name" -> optText.toText.verifying(lastNameNotEntered andThen lastNameInvalid)
+        "first-name" -> optText.toTrimmedText.verifying(firstNameNotEntered andThen firstNameInvalid),
+        "last-name" -> optText.toTrimmedText.verifying(lastNameNotEntered andThen lastNameInvalid)
       )(FullName.apply)(FullName.unapply)
     )
   }
