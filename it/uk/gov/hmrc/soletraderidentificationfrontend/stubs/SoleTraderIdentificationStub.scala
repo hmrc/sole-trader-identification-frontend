@@ -435,4 +435,9 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
     WiremockHelper.verifyPut(
       uri = s"/sole-trader-identification/journey/$journeyId/address",
       optBody = Some(Json.toJson(address).toString()))
+
+  def verifyStoreFullName(journeyId: String, fullName: FullName): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/sole-trader-identification/journey/$journeyId/fullName",
+      optBody = Some(Json.toJson(fullName).toString()))
 }
