@@ -193,6 +193,7 @@ error.no_entry_address2                                     = Nodwch ail linell 
 error.too_many_characters_address                           = Mae’n rhaid i’r cyfeiriad fod yn 35 o gymeriadau neu lai
 error.invalid_characters_address                            = Mae’n rhaid i’r cyfeiriad gynnwys y llythrennau a i z, rhifau a chymeriadau arbennig megis cysylltnodau, dyfynodau ac atalnodau llawn yn unig
 error.invalid_characters_postcode                           = Ni ddylid cynnwys cymeriadau arbennig yn y cod post
+error.uk_no_postcode                                        = Nodwch y cod post
 error.non_uk_postcode                                       = Nodwch god post, megis AA1 1AA
 error.no_entry_country                                      = Dewiswch wlad
 error.no_selection                                          = Dewiswch ‘Iawn’ os hoffech barhau i gofrestru gyda’r manylion a roesoch

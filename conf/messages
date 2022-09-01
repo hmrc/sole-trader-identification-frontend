@@ -179,6 +179,7 @@ error.no_entry_address2                                     = Enter the second l
 error.too_many_characters_address                           = The address must be 35 characters or fewer
 error.invalid_characters_address                            = The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops
 error.invalid_characters_postcode                           = The postcode must not include special characters
+error.uk_no_postcode                                        = Enter your postcode
 error.non_uk_postcode                                       = Enter a postcode, like AA1 1AA
 error.no_entry_country                                      = Select a country
 error.no_selection                                          = Select yes if you want to continue registering with the details you provided
