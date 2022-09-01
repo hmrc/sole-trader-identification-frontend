@@ -178,7 +178,7 @@ object MessageLookup {
   object CaptureOverseasTaxIdentifier {
 
     val title = "Does the business have an overseas tax identifier?"
-    val hint = "We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+    val hint = "This may help us identify the business. It could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify the business details."
 
     object Error {
       val no_tax_identifier_selection = "Select yes if the business has an overseas tax identifier"

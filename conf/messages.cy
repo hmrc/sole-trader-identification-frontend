@@ -111,7 +111,7 @@ error.no_entry_sa-postcode                                  = Nodwch y cod post 
 
 ## Overseas Tax Identifier Page
 tax-identifier.title                                        = Oes gan y busnes ddynodydd treth tramor?
-tax-identifier.line_1                                       = Efallai y byddwn yn defnyddio’r rhif hwn i’n helpu i ddod o hyd i’ch busnes. Gallai’r dynodydd treth fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio er mwyn gwirio manylion eich busnes.
+tax-identifier.hint                                         = Gallai hyn ein helpu i wybod pa fusnes sydd dan sylw. Gallai hyn fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio i gadarnhau manylion y busnes.
 tax-identifier.field_1                                      = Dynodydd treth tramor
 error.no_tax_identifiers_selection                          = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
 error.no_tax_identifiers                                    = Nodwch y dynodydd treth tramor
