@@ -56,8 +56,9 @@ date-of-birth.field_1_hint                                  = For example, 27 3 
 enter-nino.title                                            = What is applicant’s National Insurance number?
 enter-nino.heading                                          = What is {0}’s National Insurance number?
 enter-nino.line_1                                           = It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.
-enter-nino.invalid.format.error                             = Enter a National Insurance number in the correct format
+enter-nino.invalid.format.error                             = Enter the National Insurance number in the correct format
 enter-nino.no.nino                                          = I do not have a National Insurance number
+enter-nino.not.entered.error                                = Enter the National Insurance number
 
 ## Address Page
 enter-address.title                                         = Enter applicant’s home address
@@ -78,7 +79,8 @@ sa-utr.line_2                                               = I do not have a Un
 sa-utr.details.line_1                                       = Your UTR helps us identify your business
 sa-utr.details.line_2                                       = I cannot find the UTR
 sa-utr.details.line_3                                       = The business does not have a UTR
-sa-utr.error                                                = Enter the Unique Taxpayer Reference in the correct format
+sa-utr.incorrect.format.error                               = Enter the Unique Taxpayer Reference in the correct format
+sa-utr.not.entered.error                                    = Enter the Unique Taxpayer Reference
 
 ## AB Testing SAUTR page
 new-sa-utr.title                                            = Does the applicant have a Unique Taxpayer Reference?
@@ -92,8 +94,8 @@ sa-postcode.title                                            = What is the postc
 sa-postcode.heading                                          = What is the postcode used to register the business for Self Assessment?
 sa-postcode.hint                                             = For example, AB1 2YZ
 sa-postcode.no.postcodeLink                                  = The business does not have a Self Assessment postcode
-sa-postcode.invalid.format.error                             = Enter the postcode in the correct format, for example, AB1 2YZ
-error.no_entry_sa-postcode                                   = Enter the postcode where the business is registered for Self Assessment
+sa-postcode.invalid.format.error                             = Enter the postcode in the correct format
+error.no_entry_sa-postcode                                   = Enter the postcode used to register the business for Self Assessment
 
 ## Overseas Tax Identifier Page
 tax-identifier.title                                         = Does the business have an overseas tax identifier?
@@ -101,7 +103,7 @@ tax-identifier.hint                                          = This may help us 
 tax-identifier.field_1                                       = Overseas tax identifier
 error.no_tax_identifiers_selection                           = Select yes if the business has an overseas tax identifier
 error.no_tax_identifiers                                     = Enter the overseas tax identifier
-error.invalid_tax_identifiers                                = Enter a tax identifier that does not contain special characters
+error.invalid_tax_identifiers                                = The overseas tax identifier must only include numbers and the letters a to z
 error.invalid_tax_identifiers_length                         = The overseas tax identifier must be 60 characters or fewer
 
 ## Overseas Tax Identifiers Country Page
@@ -172,14 +174,15 @@ error.neither_day_nor_month_entered                         = The date of birth 
 error.neither_day_nor_year_entered                          = The date of birth must include a day and a year
 error.neither_month_nor_year_entered                        = The date of birth must include a month and a year
 error.invalid_dob_future                                    = The date of birth must be in the past
-error.invalid_age                                           = You must be at least 16 years of age
+error.invalid_age                                           = They must be at least 16 years of age
 error.invalid_date                                          = Enter the date of birth in the correct format
+error.not_real_date                                         = Enter a real date
 error.no_entry_address1                                     = Enter the first line of the address
 error.no_entry_address2                                     = Enter the second line of the address
 error.too_many_characters_address                           = The address must be 35 characters or fewer
 error.invalid_characters_address                            = The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops
-error.invalid_characters_postcode                           = The postcode must not include special characters
-error.uk_no_postcode                                        = Enter your postcode
+error.invalid_characters_postcode                           = Enter the postcode in the correct format, for example, AB1 2YZ
+error.uk_no_postcode                                        = Enter the postcode
 error.non_uk_postcode                                       = Enter a postcode, like AA1 1AA
-error.no_entry_country                                      = Select a country
+error.no_entry_country                                      = Enter a country
 error.no_selection                                          = Select yes if you want to continue registering with the details you provided

@@ -70,8 +70,9 @@ date-of-birth.field_1_hint                                  = Er enghraifft, 27 
 enter-nino.title                                            = Beth yw rhif Yswiriant Gwladol yr ymgeisydd?
 enter-nino.heading                                          = Beth yw rhif Yswiriant Gwladol {0}?
 enter-nino.line_1                                           = Mae hwn ar y cerdyn Yswiriant Gwladol, llythyr ynghylch budd-daliadau, slip cyflog neu P60. Er enghraifft, ‘QQ 12 34 56 C’.
-enter-nino.invalid.format.error                             = Nodwch rif Yswiriant Gwladol yn y fformat cywir
+enter-nino.invalid.format.error                             = Nodwch y rhif Yswiriant Gwladol yn y fformat cywir
 enter-nino.no.nino                                          = Does dim rhif Yswiriant Gwladol gen i
+enter-nino.not.entered.error                                = Nodwch y rhif Yswiriant Gwladol
 
 ## Address Page
 enter-address.title                                         = Nodwch gyfeiriad cartref yr ymgeisydd
@@ -92,7 +93,8 @@ sa-utr.line_2                                               = Nid oes gennyf Gyf
 sa-utr.details.line_1                                       = Mae’ch UTR yn ein helpu i ddod o hyd i’ch busnes
 sa-utr.details.line_2                                       = Ni allaf ddod o hyd i’r UTR
 sa-utr.details.line_3                                       = Nid oes gan y busnes UTR
-sa-utr.error                                                = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y fformat cywir
+sa-utr.incorrect.format.error                               = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y fformat cywir
+sa-utr.not.entered.error                                    = Nodwch Gyfeirnod Unigryw y Trethdalwr
 
 ## AB Testing SAUTR page
 new-sa-utr.title                                            = A oes gan yr ymgeisydd Gyfeirnod Unigryw y Trethdalwr?
@@ -106,8 +108,8 @@ sa-postcode.title                                           = Beth yw’r cod po
 sa-postcode.heading                                         = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad?
 sa-postcode.hint                                            = Er enghraifft, AB1 2YZ
 sa-postcode.no.postcodeLink                                 = Nid oes gan y busnes god post Hunanasesiad
-sa-postcode.invalid.format.error                            = Nodwch y cod post yn y fformat cywir, er enghraifft, AB1 2YZ
-error.no_entry_sa-postcode                                  = Nodwch y cod post lle mae’r busnes wedi’i gofrestru ar gyfer Hunanasesiad
+sa-postcode.invalid.format.error                            = Nodwch y cod post yn y fformat cywir
+error.no_entry_sa-postcode                                  = Nodwch y cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad
 
 ## Overseas Tax Identifier Page
 tax-identifier.title                                        = Oes gan y busnes ddynodydd treth tramor?
@@ -115,7 +117,7 @@ tax-identifier.hint                                         = Gallai hyn ein hel
 tax-identifier.field_1                                      = Dynodydd treth tramor
 error.no_tax_identifiers_selection                          = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
 error.no_tax_identifiers                                    = Nodwch y dynodydd treth tramor
-error.invalid_tax_identifiers                               = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
+error.invalid_tax_identifiers                               = Mae’n rhaid i’r dynodydd treth tramor gynnwys rhifau a’r llythrennau a i z yn unig
 error.invalid_tax_identifiers_length                        = Mae’n rhaid i’r dynodydd treth tramor fod yn 60 o gymeriadau neu lai
 
 ## Overseas Tax Identifiers Country Page
@@ -186,14 +188,15 @@ error.neither_day_nor_month_entered                         = Mae’n rhaid i’
 error.neither_day_nor_year_entered                          = Mae’n rhaid i’r dyddiad geni gynnwys diwrnod a blwyddyn
 error.neither_month_nor_year_entered                        = Mae’n rhaid i’r dyddiad geni gynnwys mis a blwyddyn
 error.invalid_dob_future                                    = Mae’n rhaid i’r dyddiad geni fod yn y gorffennol
-error.invalid_age                                           = Mae’n rhaid i chi fod yn 16 oed o leiaf
+error.invalid_age                                           = Mae’n rhaid iddynt fod yn 16 oed o leiaf
 error.invalid_date                                          = Nodwch y dyddiad geni yn y fformat cywir
+error.not_real_date                                         = Nodwch ddyddiad go iawn
 error.no_entry_address1                                     = Nodwch linell gyntaf y cyfeiriad
 error.no_entry_address2                                     = Nodwch ail linell y cyfeiriad
 error.too_many_characters_address                           = Mae’n rhaid i’r cyfeiriad fod yn 35 o gymeriadau neu lai
 error.invalid_characters_address                            = Mae’n rhaid i’r cyfeiriad gynnwys y llythrennau a i z, rhifau a chymeriadau arbennig megis cysylltnodau, dyfynodau ac atalnodau llawn yn unig
-error.invalid_characters_postcode                           = Ni ddylid cynnwys cymeriadau arbennig yn y cod post
+error.invalid_characters_postcode                           = Nodwch y cod post yn y fformat cywir, er enghraifft, AB1 2YZ
 error.uk_no_postcode                                        = Nodwch y cod post
 error.non_uk_postcode                                       = Nodwch god post, megis AA1 1AA
-error.no_entry_country                                      = Dewiswch wlad
+error.no_entry_country                                      = Nodwch wlad
 error.no_selection                                          = Dewiswch ‘Iawn’ os hoffech barhau i gofrestru gyda’r manylion a roesoch
