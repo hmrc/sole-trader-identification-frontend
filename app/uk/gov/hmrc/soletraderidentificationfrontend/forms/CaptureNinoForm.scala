@@ -18,16 +18,31 @@ package uk.gov.hmrc.soletraderidentificationfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.validation.Constraint
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
 
 import scala.util.matching.Regex
 
 object CaptureNinoForm {
-  val ninoErrorKey: String = "enter-nino.invalid.format.error"
   val ninoRegex: Regex = "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}[A-D]$".r
+
+  val ninoNotEntered: Constraint[String] = Constraint("nino.not-entered")(
+    nino => validate(
+      constraint = nino.isEmpty,
+      errMsg = "enter-nino.not.entered.error"
+    )
+  )
+
+  val ninoIncorrectFormat: Constraint[String] = Constraint("nino.incorrect-format")(
+    nino => validateNot(
+      constraint = nino.toUpperCase.matches(ninoRegex.regex),
+      errMsg = "enter-nino.invalid.format.error"
+    )
+  )
 
   val form: Form[String] =
     Form(
-      "nino" -> text.verifying(ninoErrorKey, _.toUpperCase.matches(ninoRegex.regex))
+      "nino" -> text.verifying(ninoNotEntered andThen ninoIncorrectFormat)
     )
-
 }

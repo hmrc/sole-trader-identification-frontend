@@ -24,9 +24,9 @@ import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.TimeMachine
 
 import java.time.LocalDate
 import scala.util.Try
+import scala.util.control.Exception._
 
 object CaptureDateOfBirthForm {
-
   val dateKey = "date-of-birth"
 
   val missingDayErrorMsg = "error.no_day_entered_dob"
@@ -38,6 +38,7 @@ object CaptureDateOfBirthForm {
 
   val missingDateErrorMsg = "error.no_entry_dob"
   val invalidDateErrorMsg = "error.invalid_date"
+  val notRealDateErrorMsg = "error.not_real_date"
   val futureDateErrorMsg = "error.invalid_dob_future"
   val invalidAgeErrorKey = "error.invalid_age"
 
@@ -50,14 +51,13 @@ object CaptureDateOfBirthForm {
     val timeMachine: TimeMachine = new TimeMachine()
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+      val day = data.getOrElse(dayKey, "")
+      val month = data.getOrElse(monthKey, "")
+      val year = data.getOrElse(yearKey, "")
 
-      val dayExists = data.getOrElse(dayKey, "").nonEmpty
-      val monthExists = data.getOrElse(monthKey, "").nonEmpty
-      val yearExists = data.getOrElse(yearKey, "").nonEmpty
+      val dateExists = Seq(day, month, year).forall(_.nonEmpty)
 
-      val dateExists = dayExists && monthExists && yearExists
-
-      if (dateExists) determineDate(data) else manageMissingData(dayExists, monthExists, yearExists)
+      if (dateExists) determineDate((day, month, year)) else manageMissingData(day.nonEmpty, month.nonEmpty, year.nonEmpty)
     }
 
     override def unbind(key: String, value: LocalDate): Map[String, String] = Map(
@@ -66,23 +66,17 @@ object CaptureDateOfBirthForm {
       yearKey -> value.getYear.toString
     )
 
-    private def determineDate(data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+    private def determineDate(inputValues: (String, String, String)): Either[Seq[FormError], LocalDate] = {
+      val (day, month, year) = inputValues
 
-      val inputDate = Try(
-        for {
-          day <- data.get(dayKey).map(Integer.parseInt)
-          month <- data.get(monthKey).map(Integer.parseInt)
-          year <- data.get(yearKey).map(Integer.parseInt).filter(_ > 1900)
-        } yield LocalDate.of(year, month, day)
-      ).getOrElse(None)
-
-      inputDate match {
-        case None => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
+      parseDate(day, month, year) match {
+        case None if !isInputNumerical(inputValues) => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
+        case None => Left(Seq(FormError(dayKey, notRealDateErrorMsg)))
+        case Some(date) if date.getYear <= 1900 => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
         case Some(date) if date.isAfter(timeMachine.now()) => Left(Seq(FormError(dayKey, futureDateErrorMsg)))
         case Some(date) if invalidAge(date) => Left(Seq(FormError(dayKey, invalidAgeErrorKey)))
         case Some(date) => Right(date)
       }
-
     }
 
     private def manageMissingData(dayExists: Boolean, monthExists: Boolean, yearExists: Boolean): Either[Seq[FormError], LocalDate] = {
@@ -107,6 +101,16 @@ object CaptureDateOfBirthForm {
       dateOfBirth.isAfter(timeMachine.now().minusYears(minAge))
     }
 
+    private def parseDate(day: String, month: String, year: String): Option[LocalDate] = Try(
+      for {
+        d <- allCatch.opt(day.toInt)
+        m <- allCatch.opt(month.toInt)
+        y <- allCatch.opt(year.toInt)
+      } yield LocalDate.of(y, m, d)
+    ).getOrElse(None)
+
+    private def isInputNumerical(inputValues: (String, String, String)): Boolean =
+      Seq(inputValues._1, inputValues._2, inputValues._3).forall(_.map(_.isDigit).forall(identity))
   }
 
   def captureDateOfBirthForm(): Form[LocalDate] = Form(

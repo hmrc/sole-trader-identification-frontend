@@ -28,7 +28,7 @@ object CaptureSautrNewForm {
   val radioKey: String = "optSautr"
   val sautrValueKey: String = "sa-utr"
 
-  val sautrErrorKey: String = "sa-utr.error"
+  val sautrErrorKey: String = "sa-utr.incorrect.format.error"
   val sautrRadioMissingKey: String = "new-sautr.no-selection"
 
   def sautrMapping(radioError: String, sautrError: String): Formatter[Option[String]] = new Formatter[Option[String]] {
