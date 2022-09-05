@@ -157,7 +157,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
       testCaptureDateOfBirthErrorMessageFutureDate(result)
     }
 
-    "an invalid date is submitted" should {
+    "not real date is submitted" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -169,6 +169,27 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
           "date-of-birth-day" -> "31",
           "date-of-birth-month" -> "02",
+          "date-of-birth-year" -> "2020"
+        )
+      }
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+      testCaptureDateOfBirthErrorMessageNotRealDate(result)
+    }
+
+    "an invalid date is submitted" should {
+      lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testIndividualJourneyConfig
+        ))
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
+          "date-of-birth-day" -> "31",
+          "date-of-birth-month" -> "O2", //0 => O
           "date-of-birth-year" -> "2020"
         )
       }

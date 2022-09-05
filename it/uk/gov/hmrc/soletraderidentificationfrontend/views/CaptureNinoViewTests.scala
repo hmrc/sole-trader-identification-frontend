@@ -131,7 +131,7 @@ trait CaptureNinoViewTests {
     }
   }
 
-  def testCaptureNinoErrorMessages(result: => WSResponse): Unit = {
+  def testCaptureNinoErrorNoNino(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "have the correct title" in {
@@ -140,11 +140,28 @@ trait CaptureNinoViewTests {
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.invalidNinoEntered
+      doc.getErrorSummaryBody.text mustBe messages.Error.nino_not_entered
     }
 
     "correctly display the field errors" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidNinoEntered
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.nino_not_entered
+    }
+  }
+
+  def testCaptureNinoErrorIncorrectFormat(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.invalid_nino_entered
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalid_nino_entered
     }
   }
 

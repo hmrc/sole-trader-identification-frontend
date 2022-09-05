@@ -26,7 +26,7 @@ object DateHelper {
   private val missingMonthErrorMessages: Seq[String] = Seq(missingMonthErrorMsg, missingDayAndMonthErrorMsg, missingMonthAndYearErrorMsg)
   private val missingYearErrorMessages: Seq[String] = Seq(missingYearErrorMsg, missingDayAndYearErrorMsg, missingMonthAndYearErrorMsg)
 
-  private val wholeDateErrorMessages: Seq[String] = Seq(missingDateErrorMsg, invalidDateErrorMsg, futureDateErrorMsg, invalidAgeErrorKey)
+  private val wholeDateErrorMessages: Seq[String] = Seq(missingDateErrorMsg, invalidDateErrorMsg, futureDateErrorMsg, invalidAgeErrorKey, notRealDateErrorMsg)
 
   def addDayErrorClass(form: Form[_]): String = addErrorClass(missingDayErrorMessages, form)
 

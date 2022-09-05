@@ -88,11 +88,28 @@ trait CaptureSautrViewTests {
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.invalidSautrEntered
+      doc.getErrorSummaryBody.text mustBe messages.Error.invalid_sautr_entered
     }
 
     "correctly display the field errors" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidSautrEntered
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalid_sautr_entered
+    }
+  }
+
+  def testCaptureSautrErrorNoSaturEntered(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.no_sautr_entered
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_sautr_entered
     }
   }
 

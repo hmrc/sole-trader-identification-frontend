@@ -177,6 +177,33 @@ trait CaptureDateOfBirthViewTests {
     }
   }
 
+  def testCaptureDateOfBirthErrorMessageNotRealDate(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe Base.Error.error + messages.title
+    }
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.notRealDate
+    }
+
+    "correctly define link to erroneous input" in {
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+    }
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.notRealDate
+    }
+    "assign error class to date input components" in {
+      println(doc.body())
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+    }
+  }
+
   def testCaptureDateOfBirthErrorMessageInvalidDate(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
@@ -197,12 +224,11 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidDate
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include("govuk-input--error")
     }
   }
-
   def testCaptureDateOfBirthErrorMessageInvalidAge(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 

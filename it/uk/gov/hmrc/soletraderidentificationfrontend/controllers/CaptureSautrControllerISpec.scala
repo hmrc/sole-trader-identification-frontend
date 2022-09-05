@@ -128,7 +128,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
 
-      testCaptureSautrErrorMessages(result)
+      testCaptureSautrErrorNoSaturEntered(result)
     }
 
     "an invalid sautr is submitted" should {
