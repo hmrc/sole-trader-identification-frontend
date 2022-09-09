@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
-import play.api.test.Helpers.{NO_CONTENT, OK, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.KnownFactsStub
-import uk.gov.hmrc.soletraderidentificationfrontend.models.KnownFactsResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsResponse, KnownFactsNoContentError}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.KnownFactsStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
@@ -39,7 +39,7 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(Some(testSaPostcode), None, None)
+          result mustBe Right(KnownFactsResponse(Some(testSaPostcode), None, None))
 
           verifyGetEacdKnownFactsFromStub(testSautr)
         }
@@ -49,7 +49,7 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(Some(testSaPostcode), None, Some(testNino))
+          result mustBe Right(KnownFactsResponse(Some(testSaPostcode), None, Some(testNino)))
 
           verifyGetEacdKnownFactsFromStub(testSautr)
         }
@@ -59,14 +59,26 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(None, Some(true), None)
+          result mustBe Right(KnownFactsResponse(None, Some(true), None))
+
+          verifyGetEacdKnownFactsFromStub(testSautr)
+        }
+      }
+      "return a known facts error" when {
+        "the known facts service returns no content for a SA Utr" in {
+          enable(KnownFactsStub)
+          stubGetEacdKnownFactsFromStub(testSautr)(NO_CONTENT)
+
+          val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
+
+          result mustBe Left(KnownFactsNoContentError)
 
           verifyGetEacdKnownFactsFromStub(testSautr)
         }
       }
       "throw an exception" in {
         enable(KnownFactsStub)
-        stubGetEacdKnownFactsFromStub(testSautr)(NO_CONTENT)
+        stubGetEacdKnownFactsFromStub(testSautr)(INTERNAL_SERVER_ERROR)
 
         intercept[InternalServerException](await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr)))
       }
@@ -79,7 +91,7 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(Some(testSaPostcode), None, None)
+          result mustBe Right(KnownFactsResponse(Some(testSaPostcode), None, None))
 
           verifyGetEacdKnownFacts(testSautr)
         }
@@ -89,7 +101,7 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(Some(testSaPostcode), None, Some(testNino))
+          result mustBe Right(KnownFactsResponse(Some(testSaPostcode), None, Some(testNino)))
 
           verifyGetEacdKnownFacts(testSautr)
         }
@@ -99,14 +111,26 @@ class RetrieveKnownFactsConnectorISpec extends ComponentSpecHelper with KnownFac
 
           val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
 
-          result mustBe KnownFactsResponse(None, Some(true), None)
+          result mustBe Right(KnownFactsResponse(None, Some(true), None))
+
+          verifyGetEacdKnownFacts(testSautr)
+        }
+      }
+      "return a known facts error" when {
+        "the known facts service returns no content for a SA Utr" in {
+          disable(KnownFactsStub)
+          stubGetEacdKnownFacts(testSautr)(NO_CONTENT)
+
+          val result = await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr))
+
+          result mustBe Left(KnownFactsNoContentError)
 
           verifyGetEacdKnownFacts(testSautr)
         }
       }
       "throw an exception" in {
         disable(KnownFactsStub)
-        stubGetEacdKnownFacts(testSautr)(NO_CONTENT)
+        stubGetEacdKnownFacts(testSautr)(INTERNAL_SERVER_ERROR)
 
         intercept[InternalServerException](await(retrieveKnownFactsConnector.retrieveKnownFacts(testSautr)))
       }

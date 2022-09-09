@@ -362,6 +362,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(NOT_FOUND)
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/address")(

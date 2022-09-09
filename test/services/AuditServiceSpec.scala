@@ -27,7 +27,7 @@ import services.mocks.MockSoleTraderIdentificationService
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SaEnrolled
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NotEnoughInformationToMatch, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, KnownFactsNoContent, NotEnoughInformationToMatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.AuditService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -196,6 +196,18 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
 
           verifySendExplicitAuditSoleTraders()
           auditEventCaptor.getValue mustBe testSoleTraderAuditEventJsonNoNino(identifiersMatch = "true")
+        }
+        "there is not a nino and the known facts call returns no content" in {
+          mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetailsNoNinoKnownFactsNoContent())))
+          mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(KnownFactsNoContent)))
+          mockRetrieveES20Response(testJourneyId)(Future.successful(None))
+
+          val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
+
+          result mustBe a[Unit]
+
+          verifySendExplicitAuditSoleTraders()
+          auditEventCaptor.getValue mustBe testSoleTraderAuditEventNoNinoKnownFactsNoContent()
         }
         "there is a IR-SA enrolment with matching sautr" in {
           val testEnrolledAuditEventJson: JsObject = Json.obj(

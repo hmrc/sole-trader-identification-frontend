@@ -19,7 +19,7 @@ package helpers
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, KnownFactsNoContent, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -139,6 +139,23 @@ object TestConstants {
       businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus = Some(RegistrationNotCalled),
       optTrn = Some(testTrn),
+      optOverseasTaxIdentifier = Some(testOverseasIdentifier),
+      optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
+      optNinoInsights = None
+    )
+
+  def testSoleTraderDetailsNoNinoKnownFactsNoContent(optSautr: Option[String] = Some(testSautr)): SoleTraderDetails =
+    SoleTraderDetails(
+      fullName = testFullName,
+      dateOfBirth = testDateOfBirth,
+      optNino = None,
+      address = Some(testAddress),
+      optSaPostcode = Some(testSaPostcode),
+      optSautr = optSautr,
+      identifiersMatch = KnownFactsNoContent,
+      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus = Some(RegistrationNotCalled),
+      optTrn = None,
       optOverseasTaxIdentifier = Some(testOverseasIdentifier),
       optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
       optNinoInsights = None
@@ -316,6 +333,22 @@ object TestConstants {
     "RegisterApiStatus" -> testRegistrationNotCalled,
     "TempNI" -> testTrn,
     "ES20Response" -> testKnownFactsResponseUK,
+    "SAPostcode" -> testSaPostcode,
+    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
+  )
+
+  def testSoleTraderAuditEventNoNinoKnownFactsNoContent(identifiersMatch: String = "false"): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Sole Trader",
+    "firstName" -> testFirstName,
+    "lastName" -> testLastName,
+    "dateOfBirth" -> testDateOfBirth,
+    "address" -> testAddress,
+    "userSAUTR" -> testSautr,
+    "isMatch" -> identifiersMatch,
+    "VerificationStatus" -> "Not Enough Information to call BV",
+    "RegisterApiStatus" -> testRegistrationNotCalled,
     "SAPostcode" -> testSaPostcode,
     "overseasTaxIdentifier" -> testOverseasIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry

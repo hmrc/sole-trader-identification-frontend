@@ -446,6 +446,43 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         }
       }
 
+      "the journey identifier exists for a sole trader with no nino whose Sa utr is not recognized" when {
+        "return identifiers match 'false' if the user opts to continue their journey" in {
+
+          val expectedJourneyDataJson: JsObject = {
+            Json.obj("fullName" -> Json.obj(
+              "firstName" -> testFirstName,
+              "lastName" -> testLastName
+            ),
+              "dateOfBirth" -> testDateOfBirth,
+              "address" -> testAddress,
+              "sautr" -> testSautr,
+              "saPostcode" -> testSaPostcode,
+              "overseas" -> Json.obj(
+                "taxIdentifier" -> testOverseasTaxIdentifier,
+                "country" -> testOverseasTaxIdentifierCountry
+              ),
+              "identifiersMatch" -> false,
+              "businessVerification" -> testBusinessVerificationUnchallengedJson,
+              "registration" -> testRegistrationNotCalledJson,
+              "trn" -> testTrn
+            )
+          }
+
+          stubAuth(OK, successfulAuthResponse())
+          stubRetrieveSoleTraderDetails(testJourneyId)(
+            status = OK,
+            body = testSoleTraderDetailsJsonNoNinoKnownFactsNoContent(testBusinessVerificationNotEnoughInfoToCallJson)
+          )
+
+          lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          result.json mustBe expectedJourneyDataJson
+        }
+      }
+
       "the journeyId exists for an individual with a nino" when {
 
         val testExpectedRetrievedJourneyDataJson: JsObject = {

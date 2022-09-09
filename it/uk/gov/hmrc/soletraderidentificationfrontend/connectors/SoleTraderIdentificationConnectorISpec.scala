@@ -54,6 +54,8 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
           ("NotEnoughInformationToMatch", NotEnoughInformationToMatch),
           ("DetailsMismatch", DetailsMismatch),
           ("NinoNotDeclaredButFound", NinoNotDeclaredButFound),
+          ("NinoNotFound", NinoNotFound),
+          ("KnownFactsNoContent", KnownFactsNoContent),
           ("DeceasedCitizensDetails", DeceasedCitizensDetails)
         )
 

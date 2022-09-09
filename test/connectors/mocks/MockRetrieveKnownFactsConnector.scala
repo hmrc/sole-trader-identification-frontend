@@ -23,7 +23,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RetrieveKnownFactsConnector
-import uk.gov.hmrc.soletraderidentificationfrontend.models.KnownFactsResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsResponse, KnownFactsResponseError}
 
 import scala.concurrent.Future
 
@@ -37,7 +37,7 @@ trait MockRetrieveKnownFactsConnector extends MockitoSugar with BeforeAndAfterEa
     reset(mockRetrieveKnownFactsConnector)
   }
 
-  def mockRetrieveKnownFacts(sautr: String)(response: Future[KnownFactsResponse]): OngoingStubbing[_] = {
+  def mockRetrieveKnownFacts(sautr: String)(response: Future[Either[KnownFactsResponseError, KnownFactsResponse]]): OngoingStubbing[_] = {
     when(mockRetrieveKnownFactsConnector.retrieveKnownFacts(
       ArgumentMatchers.eq(sautr)
     )(ArgumentMatchers.any[HeaderCarrier])

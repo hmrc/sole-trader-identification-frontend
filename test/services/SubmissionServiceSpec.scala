@@ -28,7 +28,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVer
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{FeatureSwitching, EnableNoNinoJourney => EnableOptionalNinoJourney}
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.RemoveSoleTraderDetailsHttpParser.SuccessfullyRemoved
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NinoNotFound, NotEnoughInformationToMatch, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, NinoNotFound, NotEnoughInformationToMatch, SuccessfulMatch, KnownFactsNoContent}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services.SubmissionService
 
@@ -315,7 +315,7 @@ class SubmissionServiceSpec
       }
     }
 
-    "return SoleTraderDetailsMismatch" when {
+    "return SoleTraderDetailsMismatch(DetailsMismatch)" when {
       "the details received from ES20 do not match" in {
         enable(EnableOptionalNinoJourney)
         mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
@@ -329,6 +329,24 @@ class SubmissionServiceSpec
         result mustBe SoleTraderDetailsMismatch(DetailsMismatch)
 
         verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
+        verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
+      }
+    }
+    "return SoleTraderDetailsMismatch(KnownFactsNoContent)" when {
+      "the ES20 service returns no content" in {
+        enable(EnableOptionalNinoJourney)
+        mockRetrieveIndividualDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
+        mockRemoveInsights(testJourneyId)(Future.successful(SuccessfullyRemoved))
+        mockMatchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino)(Future.successful(KnownFactsNoContent))
+        mockStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(Future.successful(SuccessfullyStored))
+        mockStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)(Future.successful(SuccessfullyStored))
+
+        val result = await(TestService.submit(testJourneyId, testSoleTraderJourneyConfig, testEnrolments))
+
+        result mustBe SoleTraderDetailsMismatch(KnownFactsNoContent)
+
+        verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
+        verifyStoreRegistrationResponse(testJourneyId, RegistrationNotCalled)
       }
     }
   }
