@@ -597,6 +597,41 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
             verifyAudit()
           }
         }
+        "the user does not have a nino" when {
+          "the known facts service returns no content" in {
+            enable(EnableNoNinoJourney)
+            await(journeyConfigRepository.insertJourneyConfig(
+              journeyId = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig = testSoleTraderJourneyConfig
+            ))
+            stubAuth(OK, successfulAuthResponse())
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino).setNewScenarioState("auditing")
+            stubRemoveInsights(testJourneyId)(NO_CONTENT)
+            stubRetrieveSaPostcode(testJourneyId)(OK, testPostcode)
+            stubGetEacdKnownFacts(testSautr)(NO_CONTENT)
+            stubStoreIdentifiersMatch(testJourneyId, KnownFactsNoContent)(OK)
+            stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)(OK)
+            stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+            stubAudit()
+            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJsonNoNino ++ Json.obj("identifiersMatch" -> KnownFactsNoContentKey))
+              .setRequiredScenarioState("auditing")
+            stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
+            stubRetrieveIdentifiersMatch(testJourneyId)(OK, KnownFactsNoContent)
+
+            val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+            result must have {
+              httpStatus(SEE_OTHER)
+              redirectUri(routes.CannotConfirmBusinessErrorController.show(testJourneyId).url)
+            }
+
+            verifyStoreIdentifiersMatch(testJourneyId, JsString(KnownFactsNoContentKey))
+            verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
+            verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+            verifyAudit()
+          }
+        }
         "the provided details are for a deceased citizen" in {
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,

@@ -70,7 +70,7 @@ trait BusinessVerificationStub extends WireMockMethods {
                                                             journeyConfig: JourneyConfig,
                                                             uriToPostTo: String
                                                            )(status: Int,
-                                                             body: JsObject = Json.obj()): StubMapping = {
+                                                             body: JsObject): StubMapping = {
 
     val pageTitle: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
 

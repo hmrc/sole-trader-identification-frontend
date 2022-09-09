@@ -19,7 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.services
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.{AuthenticatorConnector, RetrieveKnownFactsConnector}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig, KnownFactsResponse}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{IndividualDetails, JourneyConfig, KnownFactsResponse, KnownFactsNoContentError}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,23 +75,24 @@ class SoleTraderMatchingService @Inject()(authenticatorConnector: AuthenticatorC
         }
         else {
           retrieveKnownFactsConnector.retrieveKnownFacts(individualDetails.optSautr.get).flatMap {
-            case KnownFacts@KnownFactsResponse(_, _, Some(_)) =>
+            case Right(KnownFacts@KnownFactsResponse(_, _, Some(_))) =>
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
                 _ => NinoNotDeclaredButFound
               )
-            case KnownFacts@KnownFactsResponse(Some(retrievePostcode), _, _)
+            case Right(KnownFacts@KnownFactsResponse(Some(retrievePostcode), _, _))
               if optUserPostcode.exists(userPostcode => userPostcode filterNot (_.isWhitespace) equalsIgnoreCase (retrievePostcode filterNot (_.isWhitespace))) =>
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
                 _ => SuccessfulMatch
               )
-            case KnownFacts@KnownFactsResponse(_, Some(true), _) if optUserPostcode.isEmpty =>
+            case Right(KnownFacts@KnownFactsResponse(_, Some(true), _)) if optUserPostcode.isEmpty =>
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
                 _ => SuccessfulMatch
               )
-            case KnownFacts@KnownFactsResponse(_, _, _) =>
+            case Right(KnownFacts@KnownFactsResponse(_, _, _)) =>
               soleTraderIdentificationService.storeES20Details(journeyId, KnownFacts).map(
                 _ => DetailsMismatch
               )
+            case Left(KnownFactsNoContentError) => Future.successful(KnownFactsNoContent)
           }
         }
       _ <- soleTraderIdentificationService.storeIdentifiersMatch(journeyId, matchingResponse)

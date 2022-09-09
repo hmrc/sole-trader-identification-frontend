@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.assets
 
 import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, SuccessfulMatch}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, KnownFactsNoContentKey, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
@@ -27,7 +27,8 @@ import java.util.UUID
 object TestConstants {
 
   val testJourneyId: String = UUID.randomUUID().toString
-  val testDateOfBirth: LocalDate = LocalDate.now().minusYears(17)
+  val testMinAge: Int = 17
+  val testDateOfBirth: LocalDate = LocalDate.now().minusYears(testMinAge)
   val testFirstName: String = "John"
   val testLastName: String = "Smith"
   val testFullName: FullName = FullName(testFirstName, testLastName)
@@ -64,7 +65,9 @@ object TestConstants {
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
-  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
+  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject =
+    Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
+  val testBusinessVerificationUnchallengedJson: JsObject = Json.obj(BusinessVerificationStatusKey -> "UNCHALLENGED")
 
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
     "registrationStatus" -> "REGISTERED",
@@ -250,6 +253,24 @@ object TestConstants {
       "identifiersMatch" -> "DetailsMismatch",
       "businessVerification" -> bvStatus,
       "registration" -> testRegistrationNotCalledJson
+    )
+  }
+
+  def testSoleTraderDetailsJsonNoNinoKnownFactsNoContent(bvStatus: JsObject): JsObject = {
+    Json.obj("fullName" -> Json.obj(
+      "firstName" -> testFirstName,
+      "lastName" -> testLastName
+    ),
+      "dateOfBirth" -> testDateOfBirth,
+      "address" -> testAddressJson,
+      "sautr" -> testSautr,
+      "saPostcode" -> testSaPostcode,
+      "overseasTaxIdentifiers" -> testOverseasTaxIdentifier,
+      "country" -> testOverseasTaxIdentifierCountry,
+      "identifiersMatch" -> KnownFactsNoContentKey,
+      "businessVerification" -> bvStatus,
+      "registration" -> testRegistrationNotCalledJson,
+      "trn" -> testTrn
     )
   }
 

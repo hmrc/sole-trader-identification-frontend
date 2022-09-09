@@ -42,3 +42,8 @@ object KnownFactsResponse {
   val format: OFormat[KnownFactsResponse] = OFormat(reads, writes)
 
 }
+
+
+sealed trait KnownFactsResponseError
+
+case object KnownFactsNoContentError extends KnownFactsResponseError
