@@ -74,7 +74,4 @@ class DateHelperSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite 
     }
 
   }
-
-
-
 }

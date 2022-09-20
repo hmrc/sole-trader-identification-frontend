@@ -95,11 +95,11 @@ trait CaptureSautrNewViewTests {
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.invalidSautrEntered
+      doc.getErrorSummaryBody.text mustBe messages.Error.invalid_sautr_entered
     }
 
     "correctly display the field errors" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidSautrEntered
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalid_sautr_entered
     }
   }
 

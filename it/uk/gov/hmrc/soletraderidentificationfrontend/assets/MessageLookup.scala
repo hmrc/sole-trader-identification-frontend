@@ -74,8 +74,9 @@ object MessageLookup {
     object Error {
       val noDobEntered = "Enter the date of birth"
       val invalidDate = "Enter the date of birth in the correct format"
+      val notRealDate = "Enter a real date"
       val futureDate = "The date of birth must be in the past"
-      val invalidAge = "You must be at least 16 years of age"
+      val invalidAge = "They must be at least 16 years of age"
       val missingDay = "The date of birth must include a day"
       val missingMonth = "The date of birth must include a month"
       val missingYear = "The date of birth must include a year"
@@ -94,7 +95,8 @@ object MessageLookup {
     val no_nino = "I do not have a National Insurance number"
 
     object Error {
-      val invalidNinoEntered = "Enter a National Insurance number in the correct format"
+      val nino_not_entered = "Enter the National Insurance number"
+      val invalid_nino_entered = "Enter the National Insurance number in the correct format"
     }
 
   }
@@ -115,10 +117,10 @@ object MessageLookup {
       val no_entry_address2 = "Enter the second line of the address"
       val too_many_characters_address = "The address must be 35 characters or fewer"
       val invalid_characters_address = "The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops"
-      val invalid_characters_postcode = "The postcode must not include special characters"
+      val invalid_characters_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
       val non_uk_postcode = "Enter a postcode, like AA1 1AA"
-      val no_entry_country = "Select a country"
-      val no_postcode_GB = "Enter your postcode"
+      val no_entry_country = "Enter a country"
+      val no_postcode_GB = "Enter the postcode"
     }
 
   }
@@ -138,7 +140,8 @@ object MessageLookup {
     val new_label = "Unique Taxpayer Reference"
 
     object Error {
-      val invalidSautrEntered = "Enter the Unique Taxpayer Reference in the correct format"
+      val no_sautr_entered = "Enter the Unique Taxpayer Reference"
+      val invalid_sautr_entered = "Enter the Unique Taxpayer Reference in the correct format"
       val new_no_selection = "Select yes if there is a Unique Taxpayer Reference"
     }
 
@@ -152,8 +155,9 @@ object MessageLookup {
     val no_postcodeLink = "The business does not have a Self Assessment postcode"
 
     object Error {
-      val invalid_sa_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
-      val no_entry_sa_postcode = "Enter the postcode where the business is registered for Self Assessment"
+      val sa_postcode_no_entered = "Enter the postcode used to register the business for Self Assessment"
+      val invalid_sa_postcode = "Enter the postcode in the correct format"
+      val no_entry_sa_postcode = "Enter the postcode used to register the business for Self Assessment"
     }
 
   }
@@ -184,7 +188,7 @@ object MessageLookup {
     object Error {
       val no_tax_identifier_selection = "Select yes if the business has an overseas tax identifier"
       val no_entry_tax_identifier = "Enter the overseas tax identifier"
-      val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
+      val invalid_tax_identifier = "The overseas tax identifier must only include numbers and the letters a to z"
       val invalid_length_tax_identifier = "The overseas tax identifier must be 60 characters or fewer"
     }
   }

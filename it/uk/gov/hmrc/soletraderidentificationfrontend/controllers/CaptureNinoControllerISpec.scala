@@ -168,7 +168,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
 
-      testCaptureNinoErrorMessages(result)
+      testCaptureNinoErrorNoNino(result)
     }
 
     "an invalid nino is submitted" should {
@@ -188,7 +188,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
 
-      testCaptureNinoErrorMessages(result)
+      testCaptureNinoErrorIncorrectFormat(result)
     }
 
     "an incomplete nino is submitted" should {
@@ -208,7 +208,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         result.status mustBe BAD_REQUEST
       }
 
-      testCaptureNinoErrorMessages(result)
+      testCaptureNinoErrorIncorrectFormat(result)
     }
 
 

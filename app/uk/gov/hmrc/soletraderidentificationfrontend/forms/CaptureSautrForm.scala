@@ -18,16 +18,31 @@ package uk.gov.hmrc.soletraderidentificationfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.validation.Constraint
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
 
 import scala.util.matching.Regex
 
 object CaptureSautrForm {
-  val sautrErrorKey: String = "sa-utr.error"
   val sautrRegex: Regex = "[0-9]{10}".r
+
+  val saUtrNotEntered: Constraint[String] = Constraint("sa-utr.not-entered")(
+    saUtr => validate(
+      constraint = saUtr.isEmpty,
+      errMsg = "sa-utr.not.entered.error"
+    )
+  )
+
+  val saUtrIncorrectFormat: Constraint[String] = Constraint("sa-utr.incorrect-format")(
+    saUtr => validateNot(
+      constraint = saUtr.toUpperCase.matches(sautrRegex.regex),
+      errMsg = "sa-utr.incorrect.format.error"
+    )
+  )
 
   val form: Form[String] =
     Form(
-      "sa-utr" -> text.verifying(sautrErrorKey, _.matches(sautrRegex.regex))
+      "sa-utr" -> text.verifying(saUtrNotEntered andThen saUtrIncorrectFormat)
     )
-
 }
