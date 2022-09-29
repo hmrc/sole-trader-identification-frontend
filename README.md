@@ -1,14 +1,15 @@
-
 # Sole Trader Identification Frontend
 
 This is a Scala/Play frontend to allow Sole Traders to provide their information to HMRC.
 
 ### How to run the service
-1. Make sure any dependent services are running using the following service-manager command `sm --start SOLE_TRADER_IDENTIFICATION_ALL -r`
+
+1. Make sure any dependent services are running using the following service-manager
+   command `sm --start SOLE_TRADER_IDENTIFICATION_ALL -r`
 2. Stop the frontend in service manager using `sm --stop SOLE_TRADER_IDENTIFICATION_FRONTEND`
 3. Run the frontend locally using
-`sbt 'run 9717 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'`
-   
+   `sbt 'run 9717 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'`
+
 ## Testing
 
 ---
@@ -20,19 +21,21 @@ See [TestREADME](TestREADME.md) for more information about test data and endpoin
 
 ---
 Creates a new journey for a Sole Trader, storing the journeyConfig against the journeyId.
+
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
-
-labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
-If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
-used for the undefined properties.
+The property labels enables custom welsh and english translations for the full name page label and service name to be
+provided by the calling service. If the property is not defined, the service name in english will default to the value
+defined by the property optServiceName and the service name in welsh will default to the service default. If "
+optServiceName" is not defined the service name in english will be the service default `Entity Validation Service`. The
+above behaviour will apply also if the property is present, but one or both of the nested properties "en" and "cy" are
+not defined. optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting
+journey page.
 
 All other fields must be provided.
 
-The businessVerificationCheck field allows the calling service to bypass the verification and 
-continue to register where a successful match is found. By default "businessVerificationCheck" will be true.
+The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
+a successful match is found. By default "businessVerificationCheck" will be true.
 
 All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
 
@@ -47,11 +50,15 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "optFullNamePageLabel" : "What is the name of the nominated partner?",
     "regime" : "VATC",
     "labels" : {
-                 "cy" : {
-                   "optFullNamePageLabel" : "Full name page label translated into welsh",
-                   "optServiceName" : "Service name translated into welsh"
-                   }
-               }
+      "cy" : {
+       "optFullNamePageLabel" : "Full name page label translated into welsh",
+       "optServiceName" : "Service name translated into welsh"
+      },
+      "en" : {
+       "optFullNamePageLabel" : "Full name page label translated into english",
+       "optServiceName" : "Service name translated into english"
+      }
+    }
 }
 ```
 
@@ -59,14 +66,16 @@ All URLs provided must be relative, apart from locally, where localhost is allow
 
 ---
 Creates a new journey for an Individual, storing the journeyConfig against the journeyId.
+
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
-
-labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
-If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
-used for the undefined fields.
+The property labels enables custom welsh and english translations for the full name page label and service name to be
+provided by the calling service. If the property is not defined, the service name in english will default to the value
+defined by the property optServiceName and the service name in welsh will default to the service default. If "
+optServiceName" is not defined the service name in english will be the service default `Entity Validation Service`. The
+above behaviour will apply also if the property is present, but one or both of the nested properties "en" and "cy" are
+not defined. optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting
+journey page.
 
 All other fields must be provided.
 
@@ -82,15 +91,20 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "optFullNamePageLabel" : "What is the name of the nominated partner?",
     "regime" : "VATC",
     "labels" : {
-                 "cy" : {
-                   "optFullNamePageLabel" : "Full name page label translated into welsh",
-                   "optServiceName" : "Service name translated into welsh"
-                   }
-               }
+      "cy" : {
+       "optFullNamePageLabel" : "Full name page label translated into welsh",
+       "optServiceName" : "Service name translated into welsh"
+      },
+      "en" : {
+       "optFullNamePageLabel" : "Full name page label translated into english",
+       "optServiceName" : "Service name translated into english"
+      }
+    }
 }
 ```
 
 #### Response:
+
 Status: **Created(201)**
 
 Example Response body:
@@ -103,10 +117,13 @@ Example Response body:
 
 ---
 Retrieves all the journey data that is stored against a specific journeyID.
+
 #### Request:
+
 A valid journeyId must be sent in the URI
 
 #### Response:
+
 Status:
 
 | Expected Response                       | Reason                         |
@@ -115,6 +132,7 @@ Status:
 | ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```  |
 
 Example response body for the Sole Trader Flow:
+
 ```
 {
     "firstName": "John",
@@ -134,6 +152,7 @@ Example response body for the Sole Trader Flow:
 ```
 
 Example response body for the Sole Trader Flow where the Registration failed:
+
 ```
 {
     "firstName": "John",
@@ -158,6 +177,7 @@ Example response body for the Sole Trader Flow where the Registration failed:
 ```
 
 Example response body for the Individual Flow:
+
 ```
 {
     "firstName": "John",
@@ -169,26 +189,29 @@ Example response body for the Individual Flow:
 ```
 
 ### POST /sole-trader-identification/api/journey
+
 ### Deprecated - use POST /sole-trader-identification/api/sole-trader-journey instead
 
 ---
 Creates a new journey for a Sole Trader, storing the journeyConfig against the journeyId.
+
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting journey page.
+The property labels enables custom welsh and english translations for the full name page label and service name to be
+provided by the calling service. If the property is not defined, the service name in english will default to the value
+defined by the property optServiceName and the service name in welsh will default to the service default. If "
+optServiceName" is not defined the service name in english will be the service default `Entity Validation Service`. The
+above behaviour will apply also if the property is present, but one or both of the nested properties "en" and "cy" are
+not defined. optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting
+journey page.
 
-labels enables custom welsh translations for the full name page label and service name to be provided by the calling service.
-If the labels property is omitted or present, but the "cy" property is not fully defined, the service's default values will be
-used for the undefined fields.
-
-The enableSautrCheck field allows the calling service to decide whether to ask the user to provide
-an SAUTR that will be verified. By default "enableSautrCheck" will be false.
+The enableSautrCheck field allows the calling service to decide whether to ask the user to provide an SAUTR that will be
+verified. By default "enableSautrCheck" will be false.
 
 All other fields must be provided.
 
-The businessVerificationCheck field allows the calling service to bypass the verification and
-continue to register where a successful match is found. By default "businessVerificationCheck" will be true.
+The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
+a successful match is found. By default "businessVerificationCheck" will be true.
 
 All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
 
@@ -203,14 +226,19 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "optFullNamePageLabel" : "What is the name of the nominated partner?"
     "regime" : "VATC",
     "labels" : {
-                 "cy" : {
-                   "optFullNamePageLabel" : "Full name page label translated into welsh",
-                   "optServiceName" : "Service name translated into welsh"
-                   }
-               }
+      "cy" : {
+       "optFullNamePageLabel" : "Full name page label translated into welsh",
+       "optServiceName" : "Service name translated into welsh"
+      },
+      "en" : {
+       "optFullNamePageLabel" : "Full name page label translated into english",
+       "optServiceName" : "Service name translated into english"
+      }
+    }
 }
 ```
 
 ### License
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+This code is open source software licensed under
+the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
