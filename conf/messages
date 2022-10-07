@@ -69,6 +69,7 @@ enter-address.line_3                                        = Address line 3 (op
 enter-address.line_4                                        = Address line 4 (optional)
 enter-address.line_5                                        = Address line 5 (optional)
 enter-address.postcode                                      = Postcode
+enter-address.hint                                          = You only need to enter a postcode if the address is in the United Kingdom
 enter-address.country                                       = Country
 
 ## SA-UTR Page

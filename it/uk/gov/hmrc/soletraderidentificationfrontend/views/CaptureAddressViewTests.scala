@@ -89,8 +89,12 @@ trait CaptureAddressViewTests {
       doc.getLabelElement.get(2).text mustBe messages.line_3
       doc.getLabelElement.get(3).text mustBe messages.line_4
       doc.getLabelElement.get(4).text mustBe messages.line_5
-      doc.getLabelElement.get(5).text mustBe messages.postcode
-      doc.getLabelElement.get(6).text mustBe messages.country
+      doc.getLabelElement.get(5).text mustBe messages.country
+      doc.getLabelElement.get(6).text mustBe messages.postcode
+    }
+
+    "have postcode field with the correct hint text" in {
+      doc.getHintText mustBe messages.postcode_hint
     }
 
     "have a save and confirm button" in {

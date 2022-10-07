@@ -83,6 +83,7 @@ enter-address.line_3                                        = Cyfeiriad – llin
 enter-address.line_4                                        = Cyfeiriad – llinell 4 (dewisol)
 enter-address.line_5                                        = Cyfeiriad – llinell 5 (dewisol)
 enter-address.postcode                                      = Cod post
+enter-address.hint                                          = Dim ond os yw’r cyfeiriad yn y Deyrnas Unedig y mae angen i chi nodi cod post
 enter-address.country                                       = Gwlad
 
 ## SA UTR Page
