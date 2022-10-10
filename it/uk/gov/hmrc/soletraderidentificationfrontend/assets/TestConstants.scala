@@ -111,7 +111,8 @@ object TestConstants {
     signOutUrl = testSignOutUrl,
     enableSautrCheck = false,
     accessibilityUrl = testAccessibilityUrl,
-    optFullNamePageLabel = None
+    optFullNamePageLabel = None,
+    labels = None
   )
 
   val testSoleTraderPageConfig: PageConfig = testIndividualPageConfig.copy(enableSautrCheck = true)

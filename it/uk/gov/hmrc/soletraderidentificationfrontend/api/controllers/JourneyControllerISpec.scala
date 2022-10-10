@@ -23,7 +23,7 @@ import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyLabels, TranslationLabels}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyLabels
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, JourneyStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
@@ -164,7 +164,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         )
 
         val pageConfig = testSoleTraderPageConfig.copy(
-          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), Some(welshTestServiceName)))))
+          labels = Some(JourneyLabels(Some(welshTestServiceName),None,Some(welshFullNamePageLabel),None)))
 
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
           pageConfig = pageConfig
@@ -243,7 +243,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         )
 
         val pageConfig = testSoleTraderPageConfig.copy(
-          labels = Some(JourneyLabels(welsh = TranslationLabels(Some(welshFullNamePageLabel), None))))
+          labels = Some(JourneyLabels(None, None, Some(welshFullNamePageLabel), None)))
 
         val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
           .copy(businessVerificationCheck = false)
@@ -336,7 +336,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         )
 
         val pageConfig = testIndividualPageConfig.copy(
-          labels = Some(JourneyLabels(welsh = TranslationLabels(None, Some(welshTestServiceName)))))
+          labels = Some(JourneyLabels(optWelshServiceName = Some(welshTestServiceName), None, None, None)))
 
         val expectedIndividualJourneyConfig = testIndividualJourneyConfig
           .copy(businessVerificationCheck = false)

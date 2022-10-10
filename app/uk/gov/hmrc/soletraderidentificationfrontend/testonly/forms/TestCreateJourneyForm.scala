@@ -21,7 +21,7 @@ import play.api.data.Forms.{boolean, mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig}
 
 object TestCreateJourneyForm {
 
@@ -86,36 +86,32 @@ object TestCreateJourneyForm {
       regime -> text.verifying(regimeEmpty),
       welshFullNamePageLabel -> optText,
       welshServiceName -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl,fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
+    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
       JourneyConfig.apply(
         continueUrl,
         businessVerificationCheck,
         PageConfig(
-          serviceName,
           deskProServiceId,
           signOutUrl,
           enableSautrCheck,
           accessibilityUrl,
-          fullNamePageLabel,
-          welshFullNamePageLabel,
-          welshServiceName
+          JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
         ),
         regime
       )
     )(journeyConfig =>
-      Some(
+      Some((
         journeyConfig.continueUrl,
         journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.optServiceName,
+        journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
         journeyConfig.pageConfig.deskProServiceId,
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel,
+        journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
         journeyConfig.regime,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
-      )
-    ))
+        journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
+        journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
+      ))))
   }
 
 
@@ -137,32 +133,28 @@ object TestCreateJourneyForm {
         continueUrl,
         businessVerificationCheck,
         PageConfig(
-          serviceName,
           deskProServiceId,
           signOutUrl,
           enableSautrCheck,
           accessibilityUrl,
-          fullNamePageLabel,
-          welshFullNamePageLabel,
-          welshServiceName
+          JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
         ),
         regime
       )
     )(journeyConfig =>
-      Some(
+      Some((
         journeyConfig.continueUrl,
         journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.optServiceName,
+        journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
         journeyConfig.pageConfig.deskProServiceId,
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.enableSautrCheck,
         journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.optFullNamePageLabel,
+        journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
         journeyConfig.regime,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optFullNamePageLabel else None,
-        if(journeyConfig.pageConfig.labels.isDefined) journeyConfig.pageConfig.labels.get.welsh.optServiceName else None
-      )
-    ))
+        journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
+        journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
+      ))))
   }
 
 }

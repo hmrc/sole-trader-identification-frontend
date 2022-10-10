@@ -21,6 +21,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyLabels
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
 class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPatienceConfiguration with Eventually {
@@ -63,6 +64,16 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPati
       await(repo.count) mustBe 1
     }
 
+    "successfully insert a journeyConfig with JourneyLabels" in {
+      val toBePersisted = testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(labels = Some(JourneyLabels(
+        Some("testWelshServiceName"),
+        Some("testEnglishServiceName"),
+        Some("testWelshFullName"),
+        Some("testEnglishFullName"),
+      ))))
+
+      await(repo.insertJourneyConfig(testJourneyId, testInternalId, toBePersisted))
+    }
   }
 
 }

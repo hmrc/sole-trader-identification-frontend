@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.services
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
@@ -56,7 +56,11 @@ class AuditService @Inject()(appConfig: AppConfig,
       (optSoleTraderRecord, optES20Response, optIdentifiersMatch, optAuthenticatorResponse) match {
         case (Some(soleTraderRecord), optES20Response, Some(identifiersMatch), optAuthenticatorResponse) =>
 
-          val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+          val callingService: String = journeyConfig.pageConfig.labels
+            .flatMap(_.optEnglishServiceName)
+            .getOrElse(journeyConfig.pageConfig.optServiceName
+              .getOrElse(appConfig.defaultServiceName)
+            )
 
           val registrationStatusBlock =
             soleTraderRecord.registrationStatus match {
@@ -107,9 +111,9 @@ class AuditService @Inject()(appConfig: AppConfig,
 
           val overseasIdentifiersBlock: JsObject = (soleTraderRecord.optOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
             case (Some(taxIdentifier), Some(country)) => Json.obj(
-                "overseasTaxIdentifier" -> taxIdentifier,
-                "overseasTaxIdentifierCountry" -> country
-              )
+              "overseasTaxIdentifier" -> taxIdentifier,
+              "overseasTaxIdentifierCountry" -> country
+            )
             case (None, None) => Json.obj()
             case _ => throw new InternalServerException("Error: Invalid tax identifier and country")
           }
@@ -138,7 +142,7 @@ class AuditService @Inject()(appConfig: AppConfig,
           }
 
           Json.obj(
-            "callingService" -> callingService,
+            "callingService" -> JsString(callingService),
             "businessType" -> "Sole Trader",
             "firstName" -> soleTraderRecord.fullName.firstName,
             "lastName" -> soleTraderRecord.fullName.lastName,
@@ -168,7 +172,11 @@ class AuditService @Inject()(appConfig: AppConfig,
   private def auditIndividualJourney(journeyId: String, journeyConfig: JourneyConfig)
                                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
-    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+    val callingService: String = journeyConfig.pageConfig.labels
+      .flatMap(_.optEnglishServiceName)
+      .getOrElse(journeyConfig.pageConfig.optServiceName
+        .getOrElse(appConfig.defaultServiceName)
+      )
 
     val individualAudit: Future[JsObject] = for {
       optIndividualDetails <- soleTraderIdentificationService.retrieveIndividualDetails(journeyId)
@@ -203,7 +211,7 @@ class AuditService @Inject()(appConfig: AppConfig,
       optIndividualDetails match {
         case Some(IndividualDetails(firstName, lastName, dateOfBirth, optNino, None)) =>
           Json.obj(
-            "callingService" -> callingService,
+            "callingService" -> JsString(callingService),
             "firstName" -> firstName,
             "lastName" -> lastName,
             "dateOfBirth" -> dateOfBirth,

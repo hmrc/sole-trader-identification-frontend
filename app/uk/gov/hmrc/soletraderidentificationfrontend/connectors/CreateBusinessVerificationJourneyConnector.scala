@@ -37,7 +37,12 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                         journeyConfig: JourneyConfig
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
-    val pageTitle: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+    val pageTitle: String = journeyConfig.pageConfig.labels
+      .flatMap(_.optEnglishServiceName)
+      .getOrElse(journeyConfig.pageConfig.optServiceName
+        .getOrElse(appConfig.defaultServiceName)
+      )
+
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
