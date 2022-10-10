@@ -16,16 +16,47 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
-case class JourneyLabels(welsh: TranslationLabels)
+case class JourneyLabels(optWelshServiceName: Option[String],
+                         optEnglishServiceName: Option[String],
+                         optWelshFullNamePageLabel: Option[String],
+                         optEnglishFullNamePageLabel: Option[String]
+                         ) {
+
+  def nonEmpty: Boolean =
+    this.optWelshServiceName.exists(_.nonEmpty) || this.optEnglishServiceName.exists(_.nonEmpty) ||
+      this.optWelshFullNamePageLabel.exists(_.nonEmpty) || this.optEnglishFullNamePageLabel.exists(_.nonEmpty)
+}
 
 object JourneyLabels {
 
-  private val welshLabelsKey: String = "cy"
+  val welshLabelsKey: String = "cy"
+  val englishLabelsKey: String = "en"
+  val optServiceNameLabelKey: String = "optServiceName"
+  val optFullNameLabelKey: String = "optFullNamePageLabel"
 
-  implicit val reads: Reads[JourneyLabels] = (JsPath \ welshLabelsKey).read[TranslationLabels].map(JourneyLabels.apply)
-  implicit val writes: OWrites[JourneyLabels] = (JsPath \ welshLabelsKey).write[TranslationLabels].contramap(_.welsh)
+
+  implicit val reads: Reads[JourneyLabels] = (
+    (JsPath \ welshLabelsKey \ optServiceNameLabelKey).readNullable[String] and
+      (JsPath \ englishLabelsKey \ optServiceNameLabelKey).readNullable[String] and
+      (JsPath \ welshLabelsKey \ optFullNameLabelKey).readNullable[String] and
+      (JsPath \ englishLabelsKey \ optFullNameLabelKey).readNullable[String]
+    ) (JourneyLabels.apply _)
+
+  implicit val writes: OWrites[JourneyLabels] = (
+    (JsPath \ welshLabelsKey \ optServiceNameLabelKey).writeNullable[String] and
+      (JsPath \ englishLabelsKey \ optServiceNameLabelKey).writeNullable[String] and
+      (JsPath \ welshLabelsKey \ optFullNameLabelKey).writeNullable[String] and
+      (JsPath \ englishLabelsKey \ optFullNameLabelKey).writeNullable[String]
+    ) (unlift(JourneyLabels.unapply))
 
   val format: OFormat[JourneyLabels] = OFormat(reads, writes)
+
+  def toMap(optServiceName: Option[String], optFullNameLabel: Option[String]): Map[String, String] =
+    Map(optServiceNameLabelKey -> optServiceName, optFullNameLabelKey -> optFullNameLabel)
+      .collect {
+        case (key, Some(value)) => key -> value
+      }
 }

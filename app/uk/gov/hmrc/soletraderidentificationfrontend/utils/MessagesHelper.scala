@@ -18,11 +18,38 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 
 import play.api.http.HttpConfiguration
 import play.api.i18n.{DefaultMessagesApi, DefaultMessagesApiProvider, Langs}
-import play.api.libs.json.Json
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, TranslationLabels}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels}
 
 import javax.inject.{Inject, Singleton}
+
+object MessagesHelper {
+
+
+  def amendMessagesWithLabelsFromJourneyConfig(initialMessages: Map[String, Map[String, String]],
+                                               journeyConfig: JourneyConfig): Map[String, Map[String, String]] = {
+
+    val extraEnglishTranslations: Map[String, String] = journeyConfig.pageConfig.labels match {
+      case Some(JourneyLabels(_, optEnglishServiceName, _, optEnglishFullName)) =>
+        JourneyLabels.toMap(optEnglishServiceName, optEnglishFullName)
+      case Some(JourneyLabels(_, None, _, None)) | None =>
+        JourneyLabels.toMap(journeyConfig.pageConfig.optServiceName, journeyConfig.pageConfig.optFullNamePageLabel)
+      case _ => Map.empty
+    }
+
+    val extraWelshTranslations: Map[String, String] = journeyConfig.pageConfig.labels match {
+      case Some(JourneyLabels(optWelshServiceName, _, optWelshFullName, _)) =>
+        JourneyLabels.toMap(optWelshServiceName, optWelshFullName)
+      case _ => Map.empty
+    }
+
+    initialMessages.map {
+      case (lang@"en", oldMessages) => lang -> (oldMessages ++ extraEnglishTranslations)
+      case (lang@"cy", oldMessages) => lang -> (oldMessages ++ extraWelshTranslations)
+      case (lang, oldMessages) => lang -> oldMessages
+    }
+  }
+}
 
 @Singleton
 class MessagesHelper @Inject()(environment: Environment,
@@ -33,27 +60,14 @@ class MessagesHelper @Inject()(environment: Environment,
 
   lazy val defaultMessages: Map[String, Map[String, String]] = loadAllMessages
 
-  def getRemoteMessagesApi(journeyConfig: JourneyConfig): DefaultMessagesApi = {
-    val englishLabels = TranslationLabels(journeyConfig.pageConfig.optFullNamePageLabel, journeyConfig.pageConfig.optServiceName)
-    val english: Map[String, String] = Json.toJsObject(englishLabels).asOpt[Map[String, String]].getOrElse(Map())
-
-    val welshLabels = journeyConfig.pageConfig.labels.map(ls => Json.toJsObject(ls)).orElse(Some(Json.obj()))
-    val welsh = welshLabels.flatMap(js => (js \ "cy").asOpt[Map[String, String]]).getOrElse(Map())
-
-    val allMessages = defaultMessages.map {
-      case (s, m) if s == "en" => s -> (m ++ english)
-      case (s, m) if s == "cy" => s -> (m ++ welsh)
-      case (s, m) => s -> m
-    }
-
+  def getRemoteMessagesApi(journeyConfig: JourneyConfig): DefaultMessagesApi =
     new DefaultMessagesApi(
-      allMessages,
+      MessagesHelper.amendMessagesWithLabelsFromJourneyConfig(defaultMessages, journeyConfig),
       langs,
       langCookieName = langCookieName,
       langCookieSecure = langCookieSecure,
       langCookieHttpOnly = langCookieHttpOnly,
       httpConfiguration = httpConfiguration
     )
-  }
 
 }
