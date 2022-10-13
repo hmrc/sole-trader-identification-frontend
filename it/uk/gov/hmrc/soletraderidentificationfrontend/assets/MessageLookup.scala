@@ -110,6 +110,7 @@ object MessageLookup {
     val line_4 = "Address line 4 (optional)"
     val line_5 = "Address line 5 (optional)"
     val postcode = "Postcode"
+    val postcode_hint = "You only need to enter a postcode if the address is in the United Kingdom"
     val country = "Country"
 
     object Error {

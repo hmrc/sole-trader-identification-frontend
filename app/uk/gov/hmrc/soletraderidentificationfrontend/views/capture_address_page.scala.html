@@ -87,15 +87,6 @@
             hasFieldTitle = true,
             classes = "govuk-input--width-20"
         )
-        @inputText(
-            form = form,
-            id = "postcode",
-            name = "postcode",
-            label = messages("enter-address.postcode"),
-            isPageHeading = false,
-            hasFieldTitle = true,
-            classes = "govuk-input--width-10"
-        )
 
         @select(components.Select(
             id = "country",
@@ -113,7 +104,7 @@
             formGroupClasses = "form-field-group"
             ))
 
-        <script src="@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")" ></script>
+        <script src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>
         <script>
             accessibleAutocomplete.enhanceSelectElement({
                 selectElement: document.getElementById("country"),
@@ -129,6 +120,17 @@
                 }
             })
         </script>
+
+        @inputText(
+            form = form,
+            id = "postcode",
+            name = "postcode",
+            label = messages("enter-address.postcode"),
+            isPageHeading = false,
+            hasFieldTitle = true,
+            hint = Some(Html(messages("enter-address.hint"))),
+            classes = "govuk-input--width-10"
+        )
 
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
