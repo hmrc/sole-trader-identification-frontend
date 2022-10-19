@@ -48,4 +48,7 @@ GET         /:journeyId/details-did-not-match            uk.gov.hmrc.soletraderi
 
 GET         /:journeyId/business-verification-result     uk.gov.hmrc.soletraderidentificationfrontend.controllers.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId)
 
+GET         /:journeyId/identity-verification-result     uk.gov.hmrc.soletraderidentificationfrontend.controllers.NinoIVController.retrieveNinoIVResult(journeyId)
+
+
 ->          /hmrc-frontend                               hmrcfrontend.Routes
