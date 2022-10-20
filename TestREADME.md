@@ -211,8 +211,10 @@ Example response body for the Sole Trader Journey:
 
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "sautr": "1234567890",
@@ -230,8 +232,10 @@ Example response body for the Sole Trader Journey:
 Example response body for the Sole Trader Flow where the Registration failed:
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "sautr": "1234567890",
@@ -254,8 +258,10 @@ Example response body for the Sole Trader Flow where the Registration failed:
 Example response body for the Individual Flow:
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "identifiersMatch": true

@@ -43,11 +43,11 @@ All URLs provided must be relative, apart from locally, where localhost is allow
 {
     "continueUrl" : "/test",
     "businessVerificationCheck" : true ,
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
-    "optFullNamePageLabel" : "What is the name of the nominated partner?",
+    "optFullNamePageLabel" : "What is the name of the nominated partner?", // deprecated, use labels.en.optFullNamePageLabel 
     "regime" : "VATC",
     "labels" : {
       "cy" : {
@@ -84,11 +84,11 @@ All URLs provided must be relative, apart from locally, where localhost is allow
 ```
 {
     "continueUrl" : "/test",
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
     "accessibilityUrl" : "/accessibility-statement/my-service",
-    "optFullNamePageLabel" : "What is the name of the nominated partner?",
+    "optFullNamePageLabel" : "What is the name of the nominated partner?", // deprecated, use labels.en.optFullNamePageLabel 
     "regime" : "VATC",
     "labels" : {
       "cy" : {
@@ -135,8 +135,10 @@ Example response body for the Sole Trader Flow:
 
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "sautr": "1234567890",
@@ -155,8 +157,10 @@ Example response body for the Sole Trader Flow where the Registration failed:
 
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "sautr": "1234567890",
@@ -180,8 +184,10 @@ Example response body for the Individual Flow:
 
 ```
 {
-    "firstName": "John",
-    "lastName": "Smith",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Smith"
+    },
     "dateOfBirth": 1978-01-05,
     "nino": "AA111111A",
     "identifiersMatch": true
@@ -219,11 +225,11 @@ All URLs provided must be relative, apart from locally, where localhost is allow
 {
     "continueUrl" : "/test",
     "businessVerificationCheck" : true ,
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
     "enableSautrCheck" : "true",
-    "optFullNamePageLabel" : "What is the name of the nominated partner?"
+    "optFullNamePageLabel" : "What is the name of the nominated partner?" // deprecated, use labels.en.optFullNamePageLabel
     "regime" : "VATC",
     "labels" : {
       "cy" : {
