@@ -22,5 +22,10 @@ POST       /authenticator/match                                                 
 GET        /business-verification/journey/:journeyId/status                                 uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.retrieveVerificationResult(journeyId)
 + nocsrf
 POST       /business-verification/journey                                                   uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.createBusinessVerificationJourney
+
++ nocsrf
+POST       /nino-identity-verification/journey                                              uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers.NinoIVStubController.createNinoIVJourney
+GET        /nino-identity-verification/journey/:journeyId/status                            uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers.NinoIVStubController.retrieveVerificationResult(journeyId)
+
 + nocsrf
 POST       /enrolment-store/enrolments                                                      uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers.KnownFactsStubController.stubKnownFacts
