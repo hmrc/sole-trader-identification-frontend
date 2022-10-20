@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches = Seq(AuthenticatorStub, BusinessVerificationStub, EnableNoNinoJourney, KnownFactsStub, EnableNinoIVJourney, StubNinoIvJourney)
+  val switches = Seq(AuthenticatorStub, BusinessVerificationStub, EnableNoNinoJourney, KnownFactsStub, EnableNinoIVJourney, NinoIVJourneyStub)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -59,7 +59,7 @@ case object EnableNinoIVJourney extends FeatureSwitch {
   override val displayName: String = "Enable Nino IV journey"
 }
 
-case object StubNinoIvJourney extends FeatureSwitch {
+case object NinoIVJourneyStub extends FeatureSwitch {
   override val configName: String = "feature-switch.stub-nino-iv-journey"
   override val displayName: String = "Stub Nino IV journey"
 }

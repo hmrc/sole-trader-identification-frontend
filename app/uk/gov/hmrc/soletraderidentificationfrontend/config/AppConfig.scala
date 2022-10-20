@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{AuthenticatorStub, BusinessVerificationStub, FeatureSwitching, KnownFactsStub}
+import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config._
 import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
 
 import java.io.IOException
@@ -68,6 +68,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   private lazy val businessVerificationUrl = servicesConfig.getString("microservice.services.business-verification.url")
 
+  private lazy val ninoIVUrl = servicesConfig.getString("microservice.services.nino-identity-verification.url")
+
   def createBusinessVerificationJourneyUrl: String = {
     if (isEnabled(BusinessVerificationStub))
       s"$selfBaseUrl/identify-your-sole-trader-business/test-only/business-verification/journey"
@@ -80,6 +82,20 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
       s"$selfBaseUrl/identify-your-sole-trader-business/test-only/business-verification/journey/$journeyId/status"
     else
       s"$businessVerificationUrl/journey/$journeyId/status"
+  }
+
+  def createNinoIVJourneyUrl: String = {
+    if (isEnabled(NinoIVJourneyStub))
+      s"$selfBaseUrl/identify-your-sole-trader-business/test-only/nino-identity-verification/journey"
+    else
+      s"$ninoIVUrl/journey"
+  }
+
+  def getNinoIVResultUrl(journeyId: String): String = {
+    if (isEnabled(NinoIVJourneyStub))
+      s"$selfBaseUrl/identify-your-sole-trader-business/test-only/nino-identity-verification/journey/$journeyId/status"
+    else
+      s"$ninoIVUrl/journey/$journeyId/status"
   }
 
   def registerUrl: String = s"$backendUrl/sole-trader-identification/register"

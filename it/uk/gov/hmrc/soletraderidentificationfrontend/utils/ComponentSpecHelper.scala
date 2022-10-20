@@ -67,7 +67,8 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
     "microservice.services.authenticator.port" -> mockPort,
     "microservice.services.business-verification.url" -> s"$mockUrl/business-verification",
     "microservice.services.enrolment-store-proxy.host" -> mockHost,
-    "microservice.services.enrolment-store-proxy.port" -> mockPort
+    "microservice.services.enrolment-store-proxy.port" -> mockPort,
+    "microservice.services.nino-identity-verification.url" -> s"$mockUrl/nino-identity-verification"
   )
 
   val baseUrl: String = "/identify-your-sole-trader-business"
