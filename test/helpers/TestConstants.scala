@@ -24,7 +24,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
 import java.util.UUID
-import scala.collection.immutable
 import scala.util.Random
 
 
