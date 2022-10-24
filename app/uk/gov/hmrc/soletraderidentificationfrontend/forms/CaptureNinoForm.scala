@@ -17,7 +17,6 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms._
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil._
