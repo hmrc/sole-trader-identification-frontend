@@ -95,7 +95,7 @@ class CaptureNinoController @Inject()(mcc: MessagesControllerComponents,
             ,
             nino =>
               for {
-                _ <- soleTraderIdentificationService.storeNino(journeyId, nino)
+                _ <- soleTraderIdentificationService.storeNino(journeyId, nino.replaceAll("\\s","").toUpperCase)
                 _ <- soleTraderIdentificationService.removeAddress(journeyId)
                 _ <- soleTraderIdentificationService.removeOverseasTaxIdentifier(journeyId)
                 _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)

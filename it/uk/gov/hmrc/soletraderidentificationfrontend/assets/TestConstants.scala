@@ -34,6 +34,8 @@ object TestConstants {
   val testFullName: FullName = FullName(testFirstName, testLastName)
   val testFullNameLowerCase: FullName = FullName("john", "smith")
   val testNino: String = "AA111111A"
+  val testValidNinoSeq: Seq[String] = Seq("AA111111A", "AA 11 11 11 A", "aa111111a", "aA 11 11 11A", " AA 11 11 11 A", "AA1111 11 A ")
+  val testInvalidNinoSeq: Seq[String] = Seq("AAAAAAAAA", "AA-11-11-11-A", "QA 11 11 11 A", "aO111111a", "kn 11 11 11A", " AA 11 11 11 f", "GB1111 11 A ")
   val testNinoRecordedByKnownFacts: String = "BB111111B"
   val testSautr: String = "1234567890"
   val testContinueUrl = "/test-continue-url"

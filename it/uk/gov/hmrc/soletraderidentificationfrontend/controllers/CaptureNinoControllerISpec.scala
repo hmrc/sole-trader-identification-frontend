@@ -106,7 +106,9 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
   }
 
   "POST /national-insurance-number" when {
-    "the nino is correctly formatted" should {
+
+    for(testNino <- testValidNinoSeq)
+    s"the nino is correctly formatted: $testNino" should {
       "redirect to check your answers page" in {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -114,7 +116,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        stubStoreNino(testJourneyId, testNino)(status = OK)
+        stubStoreNino(testJourneyId, testNino.toUpperCase.trim.replaceAll("\\s", ""))(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
@@ -128,6 +130,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
         )
       }
+
       "redirect to the capture sautr page" in {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -135,7 +138,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testSoleTraderJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        stubStoreNino(testJourneyId, testNino)(status = OK)
+        stubStoreNino(testJourneyId, testNino.toUpperCase.trim.replaceAll("\\s", ""))(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
@@ -171,7 +174,8 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
       testCaptureNinoErrorNoNino(result)
     }
 
-    "an invalid nino is submitted" should {
+    for(nino <- testInvalidNinoSeq)
+    s"an invalid nino is submitted: $nino" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -181,7 +185,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AAAAAAAAAA")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> nino)
       }
 
       "return a bad request" in {

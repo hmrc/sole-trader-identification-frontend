@@ -20,12 +20,13 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
+import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil._
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
 
 import scala.util.matching.Regex
 
 object CaptureNinoForm {
-  val ninoRegex: Regex = "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}[A-D]$".r
+  val ninoRegex: Regex = "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y]) ?\\d{2} ?\\d{2} ?\\d{2} ?[A-D]{1}$".r
 
   val ninoNotEntered: Constraint[String] = Constraint("nino.not-entered")(
     nino => validate(
@@ -43,6 +44,6 @@ object CaptureNinoForm {
 
   val form: Form[String] =
     Form(
-      "nino" -> text.verifying(ninoNotEntered andThen ninoIncorrectFormat)
+      "nino" -> optText.toTrimmedText.verifying(ninoNotEntered andThen ninoIncorrectFormat)
     )
 }
