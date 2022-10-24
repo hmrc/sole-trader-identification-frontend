@@ -17,13 +17,12 @@
 package forms
 
 import helpers.TestConstants._
-import org.scalatest.OptionValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.Form
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureNinoForm.{form => captureNinoForm}
 
-class CaptureNinoFormSpec extends AnyWordSpec with Matchers with OptionValues {
+class CaptureNinoFormSpec extends AnyWordSpec with Matchers {
 
   val ninoForm: Form[_] = captureNinoForm
 
