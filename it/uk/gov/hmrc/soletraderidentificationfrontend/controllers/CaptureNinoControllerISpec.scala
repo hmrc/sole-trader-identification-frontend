@@ -128,7 +128,6 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
         )
       }
-
       "redirect to the capture sautr page" in {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -136,7 +135,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testSoleTraderJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        stubStoreNino(testJourneyId, testNino.toUpperCase.trim.replaceAll("\\s", ""))(status = OK)
+        stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
@@ -172,7 +171,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
       testCaptureNinoErrorNoNino(result)
     }
 
-    s"an invalid nino is submitted" should {
+    "an invalid nino is submitted" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -182,7 +181,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AAAAAAAAA")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AAAAAAAAAA")
       }
 
       "return a bad request" in {
