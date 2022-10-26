@@ -24,6 +24,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
 import java.time.LocalDate
 import java.util.UUID
+import scala.util.Random
 
 
 object TestConstants {
@@ -54,6 +55,34 @@ object TestConstants {
   val testOverseasIdentifierCountry: String = "AL"
   val testDefaultServiceName: String = "Entity Validation Service"
   val testServiceName: String = "Test Service"
+
+  val invalidNinoFirstLetterSeq: Seq[String] = Seq("D", "F", "I", "Q", "U", "V")
+  val invalidNinoSecondLetterSeq: Seq[String] = invalidNinoFirstLetterSeq :+ "O"
+  val invalidNinoLastLetterSeq: Seq[String] = ('E' to 'Z').map(_.toString)
+  val validNinoLastLetterSeq: Seq[String] = ('A' to 'D').map(_.toString)
+  val invalidNinoAdditionalPrefixesSeq: Seq[String] = Seq("BG", "GB", "KN", "NK", "NT", "TN", "ZZ")
+  val invalidNinoPrefixesSeq: Seq[String] = (for {
+    firstLetter <- invalidNinoFirstLetterSeq
+    secondLetter <- invalidNinoSecondLetterSeq
+  } yield firstLetter + secondLetter) ++ invalidNinoAdditionalPrefixesSeq
+  val ninoWithInvalidPrefixSeq: Seq[String] = invalidNinoPrefixesSeq.map(prefix =>
+    prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
+  val ninoWithInvalidSuffixSeq: Seq[String] = invalidNinoLastLetterSeq.map(suffix =>
+    "AA123456" + suffix)
+
+  val validNinoFirstLetterSeq: Seq[String] = ('A' to 'Z').map(_.toString).diff(invalidNinoFirstLetterSeq)
+  val validNinoSecondLetterSeq: Seq[String] = ('A' to 'Z').map(_.toString).diff(invalidNinoSecondLetterSeq)
+  val validNinoPrefixesSeq: Seq[String] = (for {
+    firstLetter <- validNinoFirstLetterSeq
+    secondLetter <- validNinoSecondLetterSeq
+  } yield firstLetter + secondLetter).diff(invalidNinoAdditionalPrefixesSeq)
+
+  val ninoWithValidPrefixSeq: Seq[String] = validNinoPrefixesSeq.map(prefix =>
+    prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
+
+  val testValidNinoAdditionalSeq: Seq[String] = Seq("aa111111a", "aA 11 11 11A", " AA 11 11 11 A", "AA1111 11 A ")
+  val testInvalidNinoAdditionalSeq: Seq[String] =
+    Seq("AAAAAAAAA", "AA-11-11-11-A", "QA 11 11 11 A", "aO111111a", "kn 11 11 11A", " AA 11 11 11 f", "GB1111 11 A ")
 
   val testIrSAEnrolment: Enrolment = Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", testSautr)), "Activated", None)
   val testEnrolments: Enrolments = Enrolments(Set(testIrSAEnrolment))
