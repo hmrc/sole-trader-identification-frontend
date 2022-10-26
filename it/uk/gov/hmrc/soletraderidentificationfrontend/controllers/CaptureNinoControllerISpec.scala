@@ -17,11 +17,11 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.EnableNoNinoJourney
+import uk.gov.hmrc.soletraderidentificationfrontend.models.FullName
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureNinoViewTests
@@ -106,9 +106,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
   }
 
   "POST /national-insurance-number" when {
-
-    for(testNino <- testValidNinoSeq)
-    s"the nino is correctly formatted: $testNino" should {
+    "the nino is correctly formatted" should {
       "redirect to check your answers page" in {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -116,7 +114,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
           journeyConfig = testIndividualJourneyConfig
         ))
         stubAuth(OK, successfulAuthResponse())
-        stubStoreNino(testJourneyId, testNino.toUpperCase.trim.replaceAll("\\s", ""))(status = OK)
+        stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
@@ -174,8 +172,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
       testCaptureNinoErrorNoNino(result)
     }
 
-    for(nino <- testInvalidNinoSeq)
-    s"an invalid nino is submitted: $nino" should {
+    s"an invalid nino is submitted" should {
       lazy val result = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
@@ -185,7 +182,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> nino)
+        post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "AAAAAAAAA")
       }
 
       "return a bad request" in {

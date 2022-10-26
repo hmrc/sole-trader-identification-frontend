@@ -27,14 +27,14 @@ class CaptureNinoFormSpec extends AnyWordSpec with Matchers {
   val ninoForm: Form[_] = captureNinoForm
 
   "CaptureNinoForm.value" should {
-    for(nino <- ninoWithInvalidPrefixSeq ++ ninoWithInvalidSuffixSeq)
+    for(nino <- ninoWithInvalidPrefixSeq ++ ninoWithInvalidSuffixSeq ++ testInvalidNinoAdditionalSeq)
     s"return None for an invalid nino: $nino" in {
       ninoForm.bind(Map("nino" -> nino)).value mustBe None
     }
 
-    for(nino <- ninoWithValidPrefixSeq)
+    for(nino <- ninoWithValidPrefixSeq ++ testValidNinoAdditionalSeq)
     s"return Some($nino) for a valid nino" in {
-      ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino)
+      ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino.trim)
     }
 
     for (nino <- ninoWithInvalidPrefixSeq.map(_.grouped(2).mkString(" ")) ++ ninoWithInvalidSuffixSeq.map(_.grouped(2).mkString(" ")))

@@ -80,6 +80,10 @@ object TestConstants {
   val ninoWithValidPrefixSeq: Seq[String] = validNinoPrefixesSeq.map(prefix =>
     prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
 
+  val testValidNinoAdditionalSeq: Seq[String] = Seq("aa111111a", "aA 11 11 11A", " AA 11 11 11 A", "AA1111 11 A ")
+  val testInvalidNinoAdditionalSeq: Seq[String] =
+    Seq("AAAAAAAAA", "AA-11-11-11-A", "QA 11 11 11 A", "aO111111a", "kn 11 11 11A", " AA 11 11 11 f", "GB1111 11 A ")
+
   val testIrSAEnrolment: Enrolment = Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", testSautr)), "Activated", None)
   val testEnrolments: Enrolments = Enrolments(Set(testIrSAEnrolment))
 
