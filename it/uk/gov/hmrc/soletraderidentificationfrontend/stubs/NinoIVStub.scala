@@ -18,7 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testDefaultServiceName
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testDefaultServiceName, testDefaultWelshServiceName}
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
@@ -45,11 +45,11 @@ trait NinoIVStub extends WireMockMethods {
         body = body
       )
 
-  def stubCreateNinoIdentityVerificationJourneyFromStub(nino: String,
-                                                        journeyId: String,
-                                                        journeyConfig: JourneyConfig
-                                                       )(status: Int,
-                                                         body: JsObject = Json.obj()): StubMapping =
+  def stubCreateNinoIVJourneyFromStub(nino: String,
+                                      journeyId: String,
+                                      journeyConfig: JourneyConfig
+                                     )(status: Int,
+                                       body: JsObject = Json.obj()): StubMapping =
     internalStubCreateNinoIvJourney(
       nino = nino,
       journeyId = journeyId,
@@ -72,7 +72,13 @@ trait NinoIVStub extends WireMockMethods {
                                              )(status: Int,
                                                body: JsObject): StubMapping = {
 
-    val pageTitle: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
+    val pageTitle: String = journeyConfig.pageConfig.labels
+      .flatMap(_.optEnglishServiceName)
+      .getOrElse(journeyConfig.pageConfig.optServiceName
+        .getOrElse(testDefaultServiceName)
+      )
+
+    val welshPageTitle: String = journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName).getOrElse(testDefaultWelshServiceName)
 
     val postBody = Json.obj(
       "origin" -> journeyConfig.regime.toLowerCase,
@@ -83,8 +89,15 @@ trait NinoIVStub extends WireMockMethods {
       ),
       "continueUrl" -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
       "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-      "pageTitle" -> pageTitle,
-      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
+      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
+      "labels" -> Json.obj(
+        "en" -> Json.obj(
+          "pageTitle" -> pageTitle
+        ),
+        "cy" -> Json.obj(
+          "pageTitle" -> welshPageTitle
+        )
+      )
     )
     when(method = POST, uri = uriToPostTo, postBody)
       .thenReturn(
@@ -95,4 +108,3 @@ trait NinoIVStub extends WireMockMethods {
 
 
 }
-

@@ -94,6 +94,7 @@ object TestConstants {
   val testAccessibilityUrl: String = "/accessibility"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
   val testDefaultServiceName: String = "Entity Validation Service"
+  val testDefaultWelshServiceName: String = "Gwasanaeth Dilysu Endid"
   val testServiceName: String = "Test Service"
   val testFullNamePageLabel: String = "What is the name of the nominated partner?"
   val welshFullNamePageLabel: String = "Welsh " + testFullNamePageLabel
