@@ -66,6 +66,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   lazy val defaultServiceName: String = servicesConfig.getString("defaultServiceName")
 
+  lazy val defaultWelshServiceName: String = servicesConfig.getString("defaultWelshServiceName")
+
   private lazy val businessVerificationUrl = servicesConfig.getString("microservice.services.business-verification.url")
 
   private lazy val ninoIVUrl = servicesConfig.getString("microservice.services.nino-identity-verification.url")

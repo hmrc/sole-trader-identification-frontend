@@ -17,6 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.FORBIDDEN
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.Json
 import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,12 +33,16 @@ class CreateNinoIVJourneyConnectorISpec extends ComponentSpecHelper with NinoIVS
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
+  val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+
+  implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en"), Lang("cy")))
+
   "createNinoIVJourneyConnector" when {
     s"the $NinoIVJourneyStub feature switch is enabled" should {
       "return the redirectUri" when {
         "the journey creation has been successful" in {
           enable(NinoIVJourneyStub)
-          stubCreateNinoIdentityVerificationJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateNinoIVJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
           val result = await(createNinoIVJourneyConnector.createNinoIdentityVerificationJourney(testJourneyId, testNino, testSoleTraderJourneyConfig))
 
@@ -48,7 +53,7 @@ class CreateNinoIVJourneyConnectorISpec extends ComponentSpecHelper with NinoIVS
       "return no redirect URL and an appropriate IV status" when {
         "the journey creation has been unsuccessful because IV cannot find the record" in {
           enable(NinoIVJourneyStub)
-          stubCreateNinoIdentityVerificationJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
+          stubCreateNinoIVJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
 
           val result = await(createNinoIVJourneyConnector.createNinoIdentityVerificationJourney(testJourneyId, testNino, testSoleTraderJourneyConfig))
 
@@ -56,7 +61,7 @@ class CreateNinoIVJourneyConnectorISpec extends ComponentSpecHelper with NinoIVS
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           enable(NinoIVJourneyStub)
-          stubCreateNinoIdentityVerificationJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
+          stubCreateNinoIVJourneyFromStub(testNino, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
 
           val result = await(createNinoIVJourneyConnector.createNinoIdentityVerificationJourney(testJourneyId, testNino, testSoleTraderJourneyConfig))
 

@@ -25,7 +25,7 @@ import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{EnableNoNinoJourney, KnownFactsStub}
+import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{EnableNinoIVJourney, EnableNoNinoJourney, KnownFactsStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching._
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs._
@@ -43,7 +43,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
   with CreateTrnStub
   with KnownFactsStub
   with RegisterStub
-  with NinoInsightsStub {
+  with NinoInsightsStub
+  with NinoIVStub {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig)
@@ -57,6 +58,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
   override def beforeEach(): Unit = {
     await(journeyConfigRepository.drop)
+    disable(EnableNinoIVJourney)
     WireMock.resetAllScenarios()
     super.beforeEach()
   }
@@ -307,35 +309,72 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
     "the sautr check is enabled" should {
       "redirect to business verification url" when {
         "the provided details match what is held in the database" when {
-          "the user has a sautr and a nino with no IR-SA enrolment" in {
-            await(journeyConfigRepository.insertJourneyConfig(
-              journeyId = testJourneyId,
-              authInternalId = testInternalId,
-              journeyConfig = testSoleTraderJourneyConfig
-            ))
-            stubAuth(OK, successfulAuthResponse())
-            stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
-            stubNinoInsights(testNino)(OK, testInsightsReturnBody)
-            stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
-            stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
-            stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
-            stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
-            stubRetrieveNino(testJourneyId)(OK, testNino)
-            stubRetrieveAddress(testJourneyId)(NOT_FOUND)
-            stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
-            stubAudit()
+          "the user has a sautr and a nino with no IR-SA enrolment" when {
+            "the EnableNinoIVJourney is disabled" in {
+              await(journeyConfigRepository.insertJourneyConfig(
+                journeyId = testJourneyId,
+                authInternalId = testInternalId,
+                journeyConfig = testSoleTraderJourneyConfig
+              ))
+              stubAuth(OK, successfulAuthResponse())
+              stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+              stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+              stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
+              stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+              stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+              stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+              stubRetrieveNino(testJourneyId)(OK, testNino)
+              stubRetrieveAddress(testJourneyId)(NOT_FOUND)
+              stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+              stubAudit()
 
-            val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+              val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
 
-            result must have {
-              httpStatus(SEE_OTHER)
-              redirectUri(testBusinessVerificationRedirectUrl)
+              result must have {
+                httpStatus(SEE_OTHER)
+                redirectUri(testBusinessVerificationRedirectUrl)
+              }
+
+              verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
+              verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+              verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
+              verifyAudit()
             }
+            "the EnableNinoIVJourney is enabled" when {
+              "Nino IV journey creation fails but BV journey creation is successful" in {
+                enable(EnableNinoIVJourney)
+                await(journeyConfigRepository.insertJourneyConfig(
+                  journeyId = testJourneyId,
+                  authInternalId = testInternalId,
+                  journeyConfig = testSoleTraderJourneyConfig
+                ))
+                stubAuth(OK, successfulAuthResponse())
+                stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+                stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+                stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
+                stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+                stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+                stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+                stubRetrieveNino(testJourneyId)(OK, testNino)
+                stubRetrieveAddress(testJourneyId)(NOT_FOUND)
+                stubCreateNinoIdentityVerificationJourney(testNino, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND)
+                stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToChallenge)(OK)
+                stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+                stubAudit()
 
-            verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
-            verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
-            verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
-            verifyAudit()
+                val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+                result must have {
+                  httpStatus(SEE_OTHER)
+                  redirectUri(testBusinessVerificationRedirectUrl)
+                }
+
+                verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
+                verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+                verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
+                verifyAudit()
+              }
+            }
           }
           "the user does not have a nino or IR-SA enrolment" in {
             enable(EnableNoNinoJourney)
@@ -403,6 +442,39 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           }
         }
       }
+      "redirect to Nino IV url" when {
+        "the EnableNinoIVJourney is enabled" in {
+          enable(EnableNinoIVJourney)
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          ))
+          stubAuth(OK, successfulAuthResponse())
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson)
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
+          stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+          stubRetrieveNino(testJourneyId)(OK, testNino)
+          stubRetrieveAddress(testJourneyId)(NOT_FOUND)
+          stubCreateNinoIdentityVerificationJourney(testNino, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+          stubAudit()
+
+          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri(testBusinessVerificationRedirectUrl)
+          }
+
+          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
+          verifyAudit()
+        }
+      }
 
       "redirect to continue url" when {
         "the user has been locked out of business verification" in {
@@ -420,6 +492,46 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
           stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
           stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
+          stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)(OK)
+          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+          stubAudit()
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson ++ Json.obj("identifiersMatch" -> SuccessfulMatchKey)).setRequiredScenarioState("auditing")
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatch)
+          stubRetrieveAuthenticatorDetails(testJourneyId)(OK, Json.toJson(testIndividualDetails))
+          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationFailJson)
+          stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
+          stubRetrieveES20Result(testJourneyId)(NOT_FOUND)
+
+          val result = post(s"/identify-your-sole-trader-business/$testJourneyId/check-your-answers-business")()
+
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri(testContinueUrl)
+          }
+
+          verifyStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)
+          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)
+          verifyStoreIdentifiersMatch(testJourneyId, JsString(SuccessfulMatchKey))
+          verifyStoreNinoInsights(testJourneyId, testInsightsReturnBody)
+          verifyAuditTypeFor(auditTypeToBeFound = "SoleTraderRegistration")
+        }
+        "the user has been locked out of Nino IV" in {
+          enable(EnableNinoIVJourney)
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          ))
+          stubAuth(OK, successfulAuthResponse())
+
+          stubRetrieveIndividualDetails(testJourneyId)(OK, testIndividualDetailsJson).setNewScenarioState("auditing")
+          stubNinoInsights(testNino)(OK, testInsightsReturnBody)
+          stubStoreNinoInsights(testJourneyId, testInsightsReturnBody)(OK)
+          stubMatch(testIndividualDetails)(OK, successfulMatchJson(testIndividualDetails))
+          stubStoreAuthenticatorDetails(testJourneyId, testIndividualDetails)(OK)
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatch)(OK)
+          stubCreateNinoIdentityVerificationJourney(testNino, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
           stubStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationFail)(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
           stubAudit()

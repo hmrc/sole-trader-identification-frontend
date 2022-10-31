@@ -43,6 +43,8 @@ class CreateNinoIVJourneyConnector @Inject()(http: HttpClient,
         .getOrElse(appConfig.defaultServiceName)
       )
 
+    val welshPageTitle: String = journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName).getOrElse(appConfig.defaultWelshServiceName)
+
     val jsonBody: JsObject =
       Json.obj(
         "origin" -> journeyConfig.regime.toLowerCase,
@@ -52,8 +54,15 @@ class CreateNinoIVJourneyConnector @Inject()(http: HttpClient,
           )),
         "continueUrl" -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
         "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-        "pageTitle" -> pageTitle,
-        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
+        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
+        "labels" -> Json.obj(
+          "en" -> Json.obj(
+            "pageTitle" -> pageTitle
+          ),
+          "cy" -> Json.obj(
+            "pageTitle" -> welshPageTitle
+          )
+        )
       )
 
     http.POST[JsObject, NinoIVJourneyCreationResponse](appConfig.createNinoIVJourneyUrl, jsonBody)(

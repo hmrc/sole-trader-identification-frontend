@@ -22,38 +22,38 @@ import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.BusinessVerificationJourneyCreationResponse
+import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateNinoIVJourneyConnector.NinoIVJourneyCreationResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.services.BusinessVerificationService
+import uk.gov.hmrc.soletraderidentificationfrontend.services.NinoIVService
 
 import scala.concurrent.Future
 
-trait MockBusinessVerificationService extends MockitoSugar with BeforeAndAfterEach {
+trait MockNinoIVService extends MockitoSugar with BeforeAndAfterEach {
   self: Suite =>
 
-  val mockBusinessVerificationService: BusinessVerificationService = mock[BusinessVerificationService]
+  val mockNinoIVService: NinoIVService = mock[NinoIVService]
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockBusinessVerificationService)
+    reset(mockNinoIVService)
   }
 
-  def mockCreateBusinessVerificationJourney(journeyId: String,
-                                            sautr: String,
-                                            journeyConfig: JourneyConfig
-                                           )(response: Future[BusinessVerificationJourneyCreationResponse]): OngoingStubbing[_] =
-    when(mockBusinessVerificationService.createBusinessVerificationJourney(
+  def mockCreateNinoIVJourney(journeyId: String,
+                              nino: String,
+                              journeyConfig: JourneyConfig
+                             )(response: Future[NinoIVJourneyCreationResponse]): OngoingStubbing[_] =
+    when(mockNinoIVService.createNinoIVJourney(
       ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(sautr),
+      ArgumentMatchers.eq(nino),
       ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyCreateBusinessVerificationJourney(journeyId: String,
-                                              sautr: String,
-                                              journeyConfig: JourneyConfig): Unit =
-    verify(mockBusinessVerificationService).createBusinessVerificationJourney(ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(sautr),
+  def verifyCreateNinoIVJourney(journeyId: String,
+                                nino: String,
+                                journeyConfig: JourneyConfig): Unit =
+    verify(mockNinoIVService).createNinoIVJourney(ArgumentMatchers.eq(journeyId),
+      ArgumentMatchers.eq(nino),
       ArgumentMatchers.eq(journeyConfig))(ArgumentMatchers.any[HeaderCarrier])
 
 }
