@@ -27,6 +27,8 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
+  val noOfISO3166CountryCodes: Int = 249
+
   "AppConfig" should {
 
     "provide the name of a country identified by a given country code" when {
@@ -42,6 +44,22 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
         appConfig.getCountryName("GB", "cy") mustBe "Y Deyrnas Unedig"
 
       }
+    }
+
+    "provide 249 ISO-3166 Country codes" when {
+
+      "the preferred language is english" in {
+
+        appConfig.getCountryListByLanguage("en").size mustBe noOfISO3166CountryCodes
+
+      }
+
+      "the preferred language is welsh" in {
+
+        appConfig.getCountryListByLanguage("cy").size mustBe noOfISO3166CountryCodes
+
+      }
+
     }
 
     "raise an exception" when {
