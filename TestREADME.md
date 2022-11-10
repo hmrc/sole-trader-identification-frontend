@@ -8,11 +8,14 @@
 2. [Setting up an Individual Journey](TestREADME.md#get-test-onlycreate-individual-journey)
 3. [Retrieving Journey Data](TestREADME.md#get-test-onlyretrieve-journeyjourneyid-or-test-onlyretrieve-journey)
 4. Business Verification Stub
-   - [Create Journey](TestREADME.md#post-test-onlyverification-questionjourney)
-   - [Retrieve Result](TestREADME.md#get--test-onlyverification-questionjourneyjourneyidstatus)
-5. Authenticator stub
+   - [Create Journey](TestREADME.md#post-test-onlybusiness-verificationjourney)
+   - [Retrieve Result](TestREADME.md#get--test-onlybusiness-verificationjourneyjourneyidstatus)
+5. Nino Identity Verification Stub
+   - [Create Journey](TestREADME.md#post-test-onlynino-identity-verificationjourney)
+   - [Retrieve Result](TestREADME.md#get--test-onlynino-identity-verificationjourneyjourneyidstatus)
+6. Authenticator stub
    - [Test Data](TestREADME.md#using-the-authenticator-stub)
-6. Known Facts stub
+7. Known Facts stub
    - [Test Data](TestREADME.md#using-the-known-facts-stub)
    
 
@@ -268,7 +271,7 @@ Example response body for the Individual Flow:
 }
 ```
 
-### POST test-only/verification-question/journey
+### POST test-only/business-verification/journey
 
 ---
 Stubs creating a Business Verification journey. The Business Verification Stub Feature Switch will need to be enabled.
@@ -285,7 +288,7 @@ Example Response body:
 {“redirectUri” : "/testUrl?journeyId=<businessVerificationJourneyId>"}
 ```
 
-### GET  test-only/verification-question/journey/:journeyId/status
+### GET  test-only/business-verification/journey/:journeyId/status
 
 ---
 Stubs retrieving the result from the Business Verification Service. The Business Verification Stub feature switch will need to be enabled.
@@ -303,6 +306,45 @@ Example Response body:
   "origin": vat,
   "identifier": {
     "saUtr" -> "1234567890"
+  },
+  "verificationStatus" -> "PASS"
+}
+```
+
+### POST test-only/nino-identity-verification/journey
+
+---
+Stubs creating a Nino Identity Verification journey. The Stub Nino IV journey feature switch will need to be enabled.
+
+#### Request:
+No body is required for this request
+
+#### Response:
+Status: **Created(201)**
+
+Example Response body:
+
+```
+{“redirectUri” : "/testUrl?journeyId=<NinoVerificationJourneyId>"}
+```
+
+### GET  test-only/nino-identity-verification/journey/:journeyId/status
+
+---
+Stubs retrieving the result from the Nino Identity Verification Service. The Stub Nino IV journey feature switch will need to be enabled.
+
+#### Request:
+A valid Nino Verification journeyId must be sent in the URI
+
+#### Response:
+Status: **OK(200)**
+
+Example Response body:
+```
+{
+  "origin": vat,
+  "identifier": {
+    "nino" -> "AA111111A"
   },
   "verificationStatus" -> "PASS"
 }
