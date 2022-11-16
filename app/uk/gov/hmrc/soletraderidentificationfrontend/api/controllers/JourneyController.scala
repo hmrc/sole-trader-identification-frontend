@@ -26,6 +26,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyContr
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig, SoleTraderDetails}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlNotAllowed, JourneyConfigUrlInvalid}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.UrlHelper
 
@@ -122,10 +123,11 @@ object JourneyController {
   private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = (JsPath \ jsPathKeyToBeRead).read[String]
     .flatMap { someIncomingUrlToBeValidated =>
       (_: JsValue) =>
-        if (urlHelper.isAValidUrl(urlToBeValidated = someIncomingUrlToBeValidated))
-          JsSuccess(someIncomingUrlToBeValidated)
-        else
-          JsError(s"$someIncomingUrlToBeValidated value for $jsPathKeyToBeRead json key is not relative or accepted urls")
+        urlHelper.isAValidUrl(urlToBeValidated = someIncomingUrlToBeValidated) match {
+            case JourneyConfigUrlAllowed => JsSuccess(someIncomingUrlToBeValidated)
+            case JourneyConfigUrlNotAllowed => JsError(s"$someIncomingUrlToBeValidated value for $jsPathKeyToBeRead json key is not relative or accepted urls")
+            case JourneyConfigUrlInvalid => JsError(s"An unexpected error occurred validating $someIncomingUrlToBeValidated for $jsPathKeyToBeRead json key")
+        }
     }
 
   private def enableSautrCheck(sautrCheckPolicy: SautrCheckPolicy, sautrCheckFromIncomingJson: Option[Boolean]): Boolean = sautrCheckPolicy match {

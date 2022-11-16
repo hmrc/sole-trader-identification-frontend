@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations
+package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-import scala.language.implicitConversions
+sealed trait JourneyConfigUrlStatus
 
-object YesNo extends Enumeration {
+case object JourneyConfigUrlAllowed extends JourneyConfigUrlStatus
 
-  type YesNo = Value
+case object JourneyConfigUrlNotAllowed extends JourneyConfigUrlStatus
 
-  val Yes: Value = Value("Yes")
-  val No: Value = Value("No")
-
-  implicit def toString(choice: YesNo.Value): String = choice.toString
-}
+case object JourneyConfigUrlInvalid extends JourneyConfigUrlStatus

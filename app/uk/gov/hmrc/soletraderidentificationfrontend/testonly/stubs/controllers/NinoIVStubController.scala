@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers
 
-import jdk.nashorn.api.scripting.JSObject
-import play.api.libs.json.{JsArray, JsObject, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsObject, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, InjectedController}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.TranslationLabels
 
 import java.util.UUID
 import javax.inject.Singleton
