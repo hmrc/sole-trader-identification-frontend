@@ -19,6 +19,8 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfigUrlStatus
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlNotAllowed, JourneyConfigUrlInvalid}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
@@ -26,14 +28,14 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class UrlHelper @Inject()(appConfig: AppConfig) {
 
-  def isAValidUrl(urlToBeValidated: String): Boolean =
+  def isAValidUrl(urlToBeValidated: String): JourneyConfigUrlStatus =
     Try(RedirectUrl(urlToBeValidated)) match {
-      case Failure(_: IllegalArgumentException) =>
-        false
+      case Failure(_: IllegalArgumentException) => JourneyConfigUrlNotAllowed
+      case Failure(_: Throwable) => JourneyConfigUrlInvalid
       case Success(maybeAValidUrl) =>
         maybeAValidUrl.getEither(OnlyRelative | AbsoluteWithHostnameFromAllowlist(appConfig.allowedHosts)) match {
-          case Right(_) => true
-          case Left(_) => false
+          case Right(_) => JourneyConfigUrlAllowed
+          case Left(_) => JourneyConfigUrlNotAllowed
         }
     }
 

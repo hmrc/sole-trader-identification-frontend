@@ -28,7 +28,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentific
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificationConnector) {

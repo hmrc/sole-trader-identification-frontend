@@ -152,7 +152,7 @@ class CheckYourAnswersRowBuilder @Inject()() {
 
 
   private def createOverseasTaxIdProvidedRow(journeyId: String, overseasTaxIdentifier: String)
-                                            (implicit messages: Messages, appConfig: AppConfig): Aliases.SummaryListRow =
+                                            (implicit messages: Messages): Aliases.SummaryListRow =
     buildSummaryRow(
       key = messages("check-your-answers.tax_identifier"),
       value = messages("check-your-answers.tax_identifier_yes", overseasTaxIdentifier),
