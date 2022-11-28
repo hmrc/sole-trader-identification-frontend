@@ -44,7 +44,6 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     val createJourneyApiUrlSuffixScenarios: TableFor1[String] =
       Tables.Table(
         "createJourneyApiUrlSuffix",
-        "journey",
         "sole-trader-journey",
         "individual-journey"
       )
@@ -113,175 +112,179 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     }
   }
 
-  "POST /api/journey" should {
-    val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
-      "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
-      "businessVerificationCheck" -> testSoleTraderJourneyConfig.businessVerificationCheck,
-      "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
-      "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-      "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
-      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
-      "regime" -> testSoleTraderJourneyConfig.regime
-    )
+  "POST /api/sole-trader-journey" when {
+    "Business verification is true" should {
+      val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
+        "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+        "businessVerificationCheck" -> testSoleTraderJourneyConfig.businessVerificationCheck,
+        "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+        "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+        "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
+        "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+        "regime" -> testSoleTraderJourneyConfig.regime
+      )
 
-    "returns json containing the url to Capture Full Name Controller" when {
+      "returns json containing the url to Capture Full Name Controller" when {
 
-      "an optFullNamePageLabel field is not provided" in {
-        stubAuth(OK, successfulAuthResponse())
-        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        "an optFullNamePageLabel field is not provided" in {
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-        lazy val result = post("/sole-trader-identification/api/journey", testSoleTraderJourneyConfigJson)
+          lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
 
-        (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
+          (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig)
-      }
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig)
+        }
 
-      "an optFullNamePageLabel field is provided" in {
-        stubAuth(OK, successfulAuthResponse())
-        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        "an optFullNamePageLabel field is provided" in {
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-        post(
-          uri = "/sole-trader-identification/api/journey",
-          json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
-        )
-
-        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
-          .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
-
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
-      }
-
-      "optional Welsh language labels are provided" in {
-
-        stubAuth(OK, successfulAuthResponse())
-        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-
-        post(
-          uri = "/sole-trader-identification/api/journey",
-          json = testSoleTraderJourneyConfigJson +
-            ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel, "optServiceName" -> welshTestServiceName)))
-        )
-
-        val pageConfig = testSoleTraderPageConfig.copy(
-          labels = Some(JourneyLabels(Some(welshTestServiceName),None,Some(welshFullNamePageLabel),None)))
-
-        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
-          pageConfig = pageConfig
-        )
-
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
-      }
-
-    }
-
-    "redirect to Sign In page" when {
-      "the user is UNAUTHORISED" in {
-        stubAuthFailure()
-
-        lazy val result = post("/sole-trader-identification/api/journey", testSoleTraderJourneyConfigJson)
-
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            "?continue_url=%2Fsole-trader-identification%2Fapi%2Fjourney" +
-            "&origin=sole-trader-identification-frontend"
+          post(
+            uri = "/sole-trader-identification/api/sole-trader-journey",
+            json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
           )
-        )
+
+          val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
+            .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
+
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        }
+
+        "optional Welsh language labels are provided" in {
+
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+          post(
+            uri = "/sole-trader-identification/api/sole-trader-journey",
+            json = testSoleTraderJourneyConfigJson +
+              ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel, "optServiceName" -> welshTestServiceName)))
+          )
+
+          val pageConfig = testSoleTraderPageConfig.copy(
+            labels = Some(JourneyLabels(Some(welshTestServiceName), None, Some(welshFullNamePageLabel), None)))
+
+          val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
+            pageConfig = pageConfig
+          )
+
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        }
+
+      }
+
+      "redirect to Sign In page" when {
+        "the user is UNAUTHORISED" in {
+          stubAuthFailure()
+
+          lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
+
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectUri("/bas-gateway/sign-in" +
+              "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
+              "&origin=sole-trader-identification-frontend"
+            )
+          )
+        }
       }
     }
   }
 
-  "POST /api/sole-trader-journey" should {
-    val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
-      "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
-      "businessVerificationCheck" -> false,
-      "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
-      "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
-      "regime" -> testSoleTraderJourneyConfig.regime
-    )
+  "POST /api/sole-trader-journey" when {
+    "Business verification is false" should {
+      val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
+        "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+        "businessVerificationCheck" -> false,
+        "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+        "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+        "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+        "regime" -> testSoleTraderJourneyConfig.regime
+      )
 
-    "returns json containing the url to Capture Full Name Controller" when {
+      "returns json containing the url to Capture Full Name Controller" when {
 
-      "an optFullNamePageLabel field is not provided" in {
+        "an optFullNamePageLabel field is not provided" in {
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+          lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
+
+          (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
+
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+        }
+
+        "an optFullNamePageLabel field is provided" in {
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+          post(
+            uri = "/sole-trader-identification/api/sole-trader-journey",
+            json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
+          )
+
+          val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
+            .copy(businessVerificationCheck = false)
+            .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
+
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        }
+
+        "an optional Welsh full name page label is provided" in {
+
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+          post(
+            uri = "/sole-trader-identification/api/sole-trader-journey",
+            json = testSoleTraderJourneyConfigJson +
+              ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel)))
+          )
+
+          val pageConfig = testSoleTraderPageConfig.copy(
+            labels = Some(JourneyLabels(None, None, Some(welshFullNamePageLabel), None)))
+
+          val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
+            .copy(businessVerificationCheck = false)
+            .copy(pageConfig = pageConfig)
+
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
+        }
+
+      }
+
+      "ignore an incoming enableSautrCheck json field set to false" in {
+
         stubAuth(OK, successfulAuthResponse())
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-        lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
+        val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj("enableSautrCheck" -> false)
+
+        lazy val result = post("/sole-trader-identification/api/sole-trader-journey", incomingJson)
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
         await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+
       }
 
-      "an optFullNamePageLabel field is provided" in {
-        stubAuth(OK, successfulAuthResponse())
-        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      "redirect to Sign In page" when {
+        "the user is UNAUTHORISED" in {
+          stubAuthFailure()
 
-        post(
-          uri = "/sole-trader-identification/api/sole-trader-journey",
-          json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
-        )
+          lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
 
-        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
-          .copy(businessVerificationCheck = false)
-          .copy(pageConfig = testSoleTraderPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
-
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
-      }
-
-      "an optional Welsh full name page label is provided" in {
-
-        stubAuth(OK, successfulAuthResponse())
-        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-
-        post(
-          uri = "/sole-trader-identification/api/sole-trader-journey",
-          json = testSoleTraderJourneyConfigJson +
-            ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel)))
-        )
-
-        val pageConfig = testSoleTraderPageConfig.copy(
-          labels = Some(JourneyLabels(None, None, Some(welshFullNamePageLabel), None)))
-
-        val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
-          .copy(businessVerificationCheck = false)
-          .copy(pageConfig = pageConfig)
-
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedSoleTraderJourneyConfig)
-      }
-
-    }
-
-    "ignore an incoming enableSautrCheck json field set to false" in {
-
-      stubAuth(OK, successfulAuthResponse())
-      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-
-      val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj("enableSautrCheck" -> false)
-
-      lazy val result = post("/sole-trader-identification/api/sole-trader-journey", incomingJson)
-
-      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
-
-      await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
-
-    }
-
-    "redirect to Sign In page" when {
-      "the user is UNAUTHORISED" in {
-        stubAuthFailure()
-
-        lazy val result = post("/sole-trader-identification/api/sole-trader-journey", testSoleTraderJourneyConfigJson)
-
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
-            "&origin=sole-trader-identification-frontend"
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectUri("/bas-gateway/sign-in" +
+              "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
+              "&origin=sole-trader-identification-frontend"
+            )
           )
-        )
+        }
       }
     }
   }

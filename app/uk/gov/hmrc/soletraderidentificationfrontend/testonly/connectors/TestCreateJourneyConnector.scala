@@ -35,9 +35,6 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
                                            appConfig: AppConfig
                                           )(implicit ec: ExecutionContext) {
 
-  def createJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] =
-    postTo(destination = apiRoutes.JourneyController.createJourney(), journeyConfig = journeyConfig)
-
   def createSoleTraderJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] =
     postTo(destination = apiRoutes.JourneyController.createSoleTraderJourney(), journeyConfig = journeyConfig)
 
