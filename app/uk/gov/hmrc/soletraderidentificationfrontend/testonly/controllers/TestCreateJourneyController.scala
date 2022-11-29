@@ -58,7 +58,7 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateJourneyController.submit))
             ),
           journeyConfig =>
-            testCreateJourneyConnector.createJourney(journeyConfig).map {
+            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map {
               journeyUrl => SeeOther(journeyUrl)
             }
         )

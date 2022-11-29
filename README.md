@@ -194,9 +194,7 @@ Example response body for the Individual Flow:
 }
 ```
 
-### POST /sole-trader-identification/api/journey
-
-### Deprecated - use POST /sole-trader-identification/api/sole-trader-journey instead
+### POST /sole-trader-identification/api/journey is deprecated use POST /sole-trader-identification/api/sole-trader-journey instead
 
 ---
 Creates a new journey for a Sole Trader, storing the journeyConfig against the journeyId.
