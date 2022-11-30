@@ -28,9 +28,9 @@ Shows all feature switches:
     - Use stub for Authenticator API
     - Use stub for Business Verification flow
     - Use stub for Known Facts API
-    - Enable no nino journey
+    - Enable no nino journey (this is set to true in production)
    
-2. Sole Trader Identification
+2. Sole Trader Identification (see Sole Trader Identification TestREADME for more info)
    
    - Use stub for get SA Reference
    - Use stub for submissions to DES
@@ -293,6 +293,8 @@ Example Response body:
 ---
 Stubs retrieving the result from the Business Verification Service. The Business Verification Stub feature switch will need to be enabled.
 
+The stub bypasses the whole Business Verification flow. Always returns BusinessVerification Status as PASS.
+
 #### Request:
 A valid Business Verification journeyId must be sent in the URI
 
@@ -320,7 +322,13 @@ Stubs creating a Nino Identity Verification journey. The Stub Nino IV journey fe
 No body is required for this request
 
 #### Response:
-Status: **Created(201)**
+Status:
+
+| Expected Response    | Reason                            | Example                    |
+|----------------------|-----------------------------------|----------------------------|
+| ```CREATED(201)```   | ```Journey Created```             | ```Any other valid Nino``` |
+| ```NOT_FOUND(404)``` | ```Data for Nino doesn't exist``` | ```"BB222222B"```          |
+
 
 Example Response body:
 
@@ -332,6 +340,8 @@ Example Response body:
 
 ---
 Stubs retrieving the result from the Nino Identity Verification Service. The Stub Nino IV journey feature switch will need to be enabled.
+
+The stub bypasses the whole Nino Verification flow.
 
 #### Request:
 A valid Nino Verification journeyId must be sent in the URI
@@ -352,6 +362,8 @@ Example Response body:
 
 ### Using the Authenticator stub
 
+This stubs the call we make to /authenticator/match which attempts to match the data provided against a HOD record.
+
 This stub returns different responses based on the entered last name.
 
 `fail` & `deceased` will return a data mismatch which upon submitting CYA will redirect the user to an error page.
@@ -369,6 +381,8 @@ Any other last name will return the data user has entered along with `1234567890
 
 
 ### Using the Known Facts stub
+
+This stubs the call to enrolment-store-proxy (ES20) that we make.
 
 This stub returns different response bodies based on the sautr entered.
 
