@@ -197,7 +197,6 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.notRealDate
     }
     "assign error class to date input components" in {
-      println(doc.body())
       doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
       doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
       doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
