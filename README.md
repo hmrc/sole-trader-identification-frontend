@@ -32,6 +32,8 @@ above behaviour will apply also if the property is present, but one or both of t
 not defined. optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting
 journey page.
 
+The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
+
 All other fields must be provided.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
@@ -76,6 +78,8 @@ optServiceName" is not defined the service name in english will be the service d
 above behaviour will apply also if the property is present, but one or both of the nested properties "en" and "cy" are
 not defined. optFullNamePageLabel if present will allow the calling service to customise title and H1 of the starting
 journey page.
+
+The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
 All other fields must be provided.
 
@@ -211,6 +215,8 @@ journey page.
 
 The enableSautrCheck field allows the calling service to decide whether to ask the user to provide an SAUTR that will be
 verified. By default "enableSautrCheck" will be false.
+
+The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
 All other fields must be provided.
 

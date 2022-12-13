@@ -51,7 +51,7 @@ This is a test entry point which simulates a service by triggering the initial P
 
 3. DeskPro Service ID (Required)
 
-   - Used for the `Get help with this page` link
+   - Used for the Beta feedback link
    - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
@@ -104,7 +104,7 @@ This is a test entry point which simulates a service by triggering the initial P
 
 3. DeskPro Service ID (Required)
 
-   - Used for the `Get help with this page` link
+   - Used for the Beta feedback link
    - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
@@ -154,7 +154,7 @@ This is a test entry point which simulates a service by triggering the initial P
 
 3. DeskPro Service ID (Required)
 
-   - Used for the `Get help with this page` link
+   - Used for the Beta feedback link
    - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
