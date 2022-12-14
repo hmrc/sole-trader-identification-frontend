@@ -46,8 +46,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
   private lazy val backendUrl: String = servicesConfig.baseUrl("sole-trader-identification")
 
   val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
-  val analyticsToken: String = servicesConfig.getString(s"google-analytics.token")
-  val analyticsHost: String = servicesConfig.getString(s"google-analytics.host")
+  val analyticsToken: String = servicesConfig.getString("google-analytics.token")
+  val analyticsHost: String = servicesConfig.getString("google-analytics.host")
 
   def soleTraderIdentificationUrl(journeyId: String): String = s"$backendUrl/sole-trader-identification/journey/$journeyId"
 
@@ -63,6 +63,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
   lazy val vatRegFeedbackUrl = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin"
 
   def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
+
+  lazy val deskProServiceId: String = "grs"
 
   lazy val defaultServiceName: String = servicesConfig.getString("defaultServiceName")
 
@@ -155,4 +157,3 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
   lazy val insightsUrl: String = s"$backendUrl/sole-trader-identification/nino-insights"
 
 }
-
