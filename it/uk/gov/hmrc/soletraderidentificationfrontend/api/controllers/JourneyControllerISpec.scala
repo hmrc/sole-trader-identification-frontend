@@ -32,13 +32,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
   "POST /sole-trader-identification/api/<typeOfJourney> for all journey types" should {
 
     val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
-      "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+      "continueUrl"               -> testSoleTraderJourneyConfig.continueUrl,
       "businessVerificationCheck" -> testSoleTraderJourneyConfig.businessVerificationCheck,
-      "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
-      "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-      "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
-      "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
-      "regime" -> testSoleTraderJourneyConfig.regime
+      "deskProServiceId"          -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+      "signOutUrl"                -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+      "enableSautrCheck"          -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
+      "accessibilityUrl"          -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+      "regime"                    -> testSoleTraderJourneyConfig.regime
     )
 
     val createJourneyApiUrlSuffixScenarios: TableFor1[String] =
@@ -59,28 +59,30 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     "respond with Bad Request" when {
       "incoming json contains a non relative url" in {
 
-        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) => {
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
+          {
 
-          forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) => {
-            stubAuth(OK, successfulAuthResponse())
+            forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) =>
+              {
+                stubAuth(OK, successfulAuthResponse())
 
-            stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+                stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-            val journeyUrl = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix
+                val journeyUrl = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix
 
-            post(
-              uri = journeyUrl,
-              json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://www.google.com/")
-            ).status must be(BAD_REQUEST)
+                post(
+                  uri  = journeyUrl,
+                  json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://www.google.com/")
+                ).status must be(BAD_REQUEST)
 
-            post(
-              uri = journeyUrl,
-              json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "/")
-            ).status must be(BAD_REQUEST)
+                post(
+                  uri  = journeyUrl,
+                  json = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "/")
+                ).status must be(BAD_REQUEST)
 
+              }
+            }
           }
-          }
-        }
         }
       }
     }
@@ -88,25 +90,27 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     "respond with Created " when {
       "incoming json contains a localhost url" in {
 
-        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) => {
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
+          {
 
-          forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) => {
+            forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) =>
+              {
 
-            stubAuth(OK, successfulAuthResponse())
+                stubAuth(OK, successfulAuthResponse())
 
-            stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+                stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-            val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://localhost:9000/some/url")
+                val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://localhost:9000/some/url")
 
-            lazy val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
+                lazy val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
 
-            result.status must be(CREATED)
+                result.status must be(CREATED)
 
-            journeyConfigRepository.drop
+                journeyConfigRepository.drop
 
+              }
+            }
           }
-          }
-        }
         }
       }
     }
@@ -115,13 +119,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
   "POST /api/sole-trader-journey" when {
     "Business verification is true" should {
       val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
-        "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+        "continueUrl"               -> testSoleTraderJourneyConfig.continueUrl,
         "businessVerificationCheck" -> testSoleTraderJourneyConfig.businessVerificationCheck,
-        "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
-        "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-        "enableSautrCheck" -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
-        "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
-        "regime" -> testSoleTraderJourneyConfig.regime
+        "deskProServiceId"          -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+        "signOutUrl"                -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+        "enableSautrCheck"          -> testSoleTraderJourneyConfig.pageConfig.enableSautrCheck,
+        "accessibilityUrl"          -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+        "regime"                    -> testSoleTraderJourneyConfig.regime
       )
 
       "returns json containing the url to Capture Full Name Controller" when {
@@ -142,7 +146,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
           post(
-            uri = "/sole-trader-identification/api/sole-trader-journey",
+            uri  = "/sole-trader-identification/api/sole-trader-journey",
             json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
           )
 
@@ -163,8 +167,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
               ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel, "optServiceName" -> welshTestServiceName)))
           )
 
-          val pageConfig = testSoleTraderPageConfig.copy(
-            labels = Some(JourneyLabels(Some(welshTestServiceName), None, Some(welshFullNamePageLabel), None)))
+          val pageConfig =
+            testSoleTraderPageConfig.copy(labels = Some(JourneyLabels(Some(welshTestServiceName), None, Some(welshFullNamePageLabel), None)))
 
           val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig.copy(
             pageConfig = pageConfig
@@ -183,9 +187,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
           result must have(
             httpStatus(SEE_OTHER),
-            redirectUri("/bas-gateway/sign-in" +
-              "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
-              "&origin=sole-trader-identification-frontend"
+            redirectUri(
+              "/bas-gateway/sign-in" +
+                "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
+                "&origin=sole-trader-identification-frontend"
             )
           )
         }
@@ -196,12 +201,12 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
   "POST /api/sole-trader-journey" when {
     "Business verification is false" should {
       val testSoleTraderJourneyConfigJson: JsObject = Json.obj(
-        "continueUrl" -> testSoleTraderJourneyConfig.continueUrl,
+        "continueUrl"               -> testSoleTraderJourneyConfig.continueUrl,
         "businessVerificationCheck" -> false,
-        "deskProServiceId" -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
-        "signOutUrl" -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
-        "accessibilityUrl" -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
-        "regime" -> testSoleTraderJourneyConfig.regime
+        "deskProServiceId"          -> testSoleTraderJourneyConfig.pageConfig.deskProServiceId,
+        "signOutUrl"                -> testSoleTraderJourneyConfig.pageConfig.signOutUrl,
+        "accessibilityUrl"          -> testSoleTraderJourneyConfig.pageConfig.accessibilityUrl,
+        "regime"                    -> testSoleTraderJourneyConfig.regime
       )
 
       "returns json containing the url to Capture Full Name Controller" when {
@@ -214,7 +219,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
           (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(
+            testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
+          )
         }
 
         "an optFullNamePageLabel field is provided" in {
@@ -222,7 +229,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
           post(
-            uri = "/sole-trader-identification/api/sole-trader-journey",
+            uri  = "/sole-trader-identification/api/sole-trader-journey",
             json = testSoleTraderJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
           )
 
@@ -244,8 +251,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
               ("labels" -> Json.obj("cy" -> Json.obj("optFullNamePageLabel" -> welshFullNamePageLabel)))
           )
 
-          val pageConfig = testSoleTraderPageConfig.copy(
-            labels = Some(JourneyLabels(None, None, Some(welshFullNamePageLabel), None)))
+          val pageConfig = testSoleTraderPageConfig.copy(labels = Some(JourneyLabels(None, None, Some(welshFullNamePageLabel), None)))
 
           val expectedSoleTraderJourneyConfig = testSoleTraderJourneyConfig
             .copy(businessVerificationCheck = false)
@@ -267,7 +273,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureFullNameController.show(testJourneyId).url)
 
-        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testSoleTraderJourneyConfig.copy(businessVerificationCheck = false))
+        await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId)) mustBe Some(
+          testSoleTraderJourneyConfig.copy(businessVerificationCheck = false)
+        )
 
       }
 
@@ -279,9 +287,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
           result must have(
             httpStatus(SEE_OTHER),
-            redirectUri("/bas-gateway/sign-in" +
-              "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
-              "&origin=sole-trader-identification-frontend"
+            redirectUri(
+              "/bas-gateway/sign-in" +
+                "?continue_url=%2Fsole-trader-identification%2Fapi%2Fsole-trader-journey" +
+                "&origin=sole-trader-identification-frontend"
             )
           )
         }
@@ -291,12 +300,12 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
   "POST /api/individual-journey" should {
     val testJourneyConfigJson: JsObject = Json.obj(
-      "continueUrl" -> testIndividualJourneyConfig.continueUrl,
+      "continueUrl"               -> testIndividualJourneyConfig.continueUrl,
       "businessVerificationCheck" -> false,
-      "deskProServiceId" -> testIndividualJourneyConfig.pageConfig.deskProServiceId,
-      "signOutUrl" -> testIndividualJourneyConfig.pageConfig.signOutUrl,
-      "accessibilityUrl" -> testIndividualJourneyConfig.pageConfig.accessibilityUrl,
-      "regime" -> testSoleTraderJourneyConfig.regime
+      "deskProServiceId"          -> testIndividualJourneyConfig.pageConfig.deskProServiceId,
+      "signOutUrl"                -> testIndividualJourneyConfig.pageConfig.signOutUrl,
+      "accessibilityUrl"          -> testIndividualJourneyConfig.pageConfig.accessibilityUrl,
+      "regime"                    -> testSoleTraderJourneyConfig.regime
     )
 
     "returns json containing the url to Capture Full Name Controller" when {
@@ -317,7 +326,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
         post(
-          uri = "/sole-trader-identification/api/individual-journey",
+          uri  = "/sole-trader-identification/api/individual-journey",
           json = testJourneyConfigJson + ("optFullNamePageLabel" -> JsString(testFullNamePageLabel))
         )
 
@@ -338,8 +347,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
             ("labels" -> Json.obj("cy" -> Json.obj("optServiceName" -> welshTestServiceName)))
         )
 
-        val pageConfig = testIndividualPageConfig.copy(
-          labels = Some(JourneyLabels(optWelshServiceName = Some(welshTestServiceName), None, None, None)))
+        val pageConfig =
+          testIndividualPageConfig.copy(labels = Some(JourneyLabels(optWelshServiceName = Some(welshTestServiceName), None, None, None)))
 
         val expectedIndividualJourneyConfig = testIndividualJourneyConfig
           .copy(businessVerificationCheck = false)
@@ -372,9 +381,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            "?continue_url=%2Fsole-trader-identification%2Fapi%2Findividual-journey" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              "?continue_url=%2Fsole-trader-identification%2Fapi%2Findividual-journey" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -385,19 +395,20 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     "return captured data" when {
       "the journeyId exists and the identifiers match" in {
         val testEndDetailsJson: JsObject = {
-          Json.obj("fullName" -> Json.obj(
-            "firstName" -> testFirstName,
-            "lastName" -> testLastName
-          ),
-            "dateOfBirth" -> testDateOfBirth,
-            "nino" -> testNino,
-            "saPostcode" -> testSaPostcode,
-            "sautr" -> testSautr,
-            "identifiersMatch" -> true,
+          Json.obj(
+            "fullName" -> Json.obj(
+              "firstName" -> testFirstName,
+              "lastName"  -> testLastName
+            ),
+            "dateOfBirth"          -> testDateOfBirth,
+            "nino"                 -> testNino,
+            "saPostcode"           -> testSaPostcode,
+            "sautr"                -> testSautr,
+            "identifiersMatch"     -> true,
             "businessVerification" -> testBusinessVerificationPassJson,
-            "registration" -> testSuccessfulRegistrationJson,
+            "registration"         -> testSuccessfulRegistrationJson,
             "reputation" -> Json.obj(
-              "code" -> 0,
+              "code"   -> 0,
               "reason" -> "0 code"
             )
           )
@@ -406,7 +417,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = Json.toJson(testSoleTraderDetails)
+          body   = Json.toJson(testSoleTraderDetails)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -420,7 +431,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationNotEnoughInfoToCallJson)
+            body   = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationNotEnoughInfoToCallJson)
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -436,7 +447,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationNotEnoughInfoToChallengeJson)
+            body   = testSoleTraderDetailsJsonMisMatch(testBusinessVerificationNotEnoughInfoToChallengeJson)
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -453,29 +464,30 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         "return identifiers match 'false' if the user opts to continue their journey" in {
 
           val expectedJourneyDataJson: JsObject = {
-            Json.obj("fullName" -> Json.obj(
-              "firstName" -> testFirstName,
-              "lastName" -> testLastName
-            ),
+            Json.obj(
+              "fullName" -> Json.obj(
+                "firstName" -> testFirstName,
+                "lastName"  -> testLastName
+              ),
               "dateOfBirth" -> testDateOfBirth,
-              "address" -> testAddress,
-              "sautr" -> testSautr,
-              "saPostcode" -> testSaPostcode,
+              "address"     -> testAddress,
+              "sautr"       -> testSautr,
+              "saPostcode"  -> testSaPostcode,
               "overseas" -> Json.obj(
                 "taxIdentifier" -> testOverseasTaxIdentifier,
-                "country" -> testOverseasTaxIdentifierCountry
+                "country"       -> testOverseasTaxIdentifierCountry
               ),
-              "identifiersMatch" -> false,
+              "identifiersMatch"     -> false,
               "businessVerification" -> testBusinessVerificationUnchallengedJson,
-              "registration" -> testRegistrationNotCalledJson,
-              "trn" -> testTrn
+              "registration"         -> testRegistrationNotCalledJson,
+              "trn"                  -> testTrn
             )
           }
 
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveSoleTraderDetails(testJourneyId)(
             status = OK,
-            body = testSoleTraderDetailsJsonNoNinoKnownFactsNoContent(testBusinessVerificationNotEnoughInfoToCallJson)
+            body   = testSoleTraderDetailsJsonNoNinoKnownFactsNoContent(testBusinessVerificationNotEnoughInfoToCallJson)
           )
 
           lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -490,13 +502,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         val testExpectedRetrievedJourneyDataJson: JsObject = {
           Json.obj("fullName" -> Json.obj(
-            "firstName" -> testFirstName,
-            "lastName" -> testLastName
-          ),
-            "dateOfBirth" -> testDateOfBirth,
-            "nino" -> testNino,
-            "identifiersMatch" -> true
-          )
+                     "firstName" -> testFirstName,
+                     "lastName"  -> testLastName
+                   ),
+                   "dateOfBirth"      -> testDateOfBirth,
+                   "nino"             -> testNino,
+                   "identifiersMatch" -> true
+                  )
         }
 
         "the Nino is uppercase" in {
@@ -535,7 +547,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = Json.toJsObject(testSoleTraderDetailsIndividualJourneyNoNino)
+          body   = Json.toJsObject(testSoleTraderDetailsIndividualJourneyNoNino)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -549,19 +561,19 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
           Json.obj(
             "fullName" -> Json.obj(
               "firstName" -> testFirstName,
-              "lastName" -> testLastName
+              "lastName"  -> testLastName
             ),
-            "dateOfBirth" -> testDateOfBirth,
-            "nino" -> testNino,
-            "saPostcode" -> testSaPostcode,
-            "sautr" -> testSautr,
+            "dateOfBirth"      -> testDateOfBirth,
+            "nino"             -> testNino,
+            "saPostcode"       -> testSaPostcode,
+            "sautr"            -> testSautr,
             "identifiersMatch" -> true,
             "registration" -> Json.obj(
-              "registrationStatus" -> "REGISTERED",
+              "registrationStatus"          -> "REGISTERED",
               "registeredBusinessPartnerId" -> testSafeId
             ),
             "reputation" -> Json.obj(
-              "code" -> 0,
+              "code"   -> 0,
               "reason" -> "0 code"
             )
           )
@@ -570,7 +582,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveSoleTraderDetails(testJourneyId)(
           status = OK,
-          body = Json.toJsObject(testSoleTraderDetailsNoBV)
+          body   = Json.toJsObject(testSoleTraderDetailsNoBV)
         )
 
         lazy val result = get(s"/sole-trader-identification/api/journey/$testJourneyId")
@@ -599,9 +611,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fsole-trader-identification%2Fapi%2Fjourney%2F$testJourneyId" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fsole-trader-identification%2Fapi%2Fjourney%2F$testJourneyId" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -614,6 +627,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     )
   )
 
-  private def extractBusinessVerificationJsonBranch(fullJson: JsValue): JsObject = fullJson.transform((JsPath \ "businessVerification").json.pickBranch).get
+  private def extractBusinessVerificationJsonBranch(fullJson: JsValue): JsObject =
+    fullJson.transform((JsPath \ "businessVerification").json.pickBranch).get
 
 }

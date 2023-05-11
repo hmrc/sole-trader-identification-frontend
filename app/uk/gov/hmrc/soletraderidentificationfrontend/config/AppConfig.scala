@@ -28,7 +28,7 @@ import javax.inject.{Inject, Singleton}
 import scala.jdk.CollectionConverters._
 
 @Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
 
   val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 
@@ -106,7 +106,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   def registerWithTrnUrl: String = s"$backendUrl/sole-trader-identification/register-trn"
 
-  def ninoTeamUrl: String = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/national-insurance-enquiries-for-employees-and-individuals"
+  def ninoTeamUrl: String =
+    "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/national-insurance-enquiries-for-employees-and-individuals"
 
   def createTrnUrl: String = s"$backendUrl/sole-trader-identification/get-trn"
 
@@ -127,7 +128,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig,
 
   private lazy val orderedCountryListInWelsh: Seq[Country] = countriesListInWelsh.values.toSeq.sortBy(_.name)
 
-  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if (code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
+  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] =
+    if (code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
 
   def getCountryName(countryCode: String, langCode: String = "en"): String = getCountryListByLanguage(langCode).get(countryCode) match {
     case Some(Country(_, name)) =>

@@ -22,8 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.soletraderidentificationfrontend.services.EnrolmentService
 
-class EnrolmentServiceSpec extends AnyWordSpec
-  with Matchers {
+class EnrolmentServiceSpec extends AnyWordSpec with Matchers {
 
   object TestService extends EnrolmentService
 

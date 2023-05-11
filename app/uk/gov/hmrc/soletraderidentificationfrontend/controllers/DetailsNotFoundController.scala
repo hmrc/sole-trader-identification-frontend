@@ -31,30 +31,31 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class DetailsNotFoundController @Inject()(mcc: MessagesControllerComponents,
-                                          view: details_not_found_page,
-                                          val authConnector: AuthConnector,
-                                          journeyService: JourneyService,
-                                          messagesHelper: MessagesHelper
-                                         )(implicit val config: AppConfig,
-                                           executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class DetailsNotFoundController @Inject() (mcc: MessagesControllerComponents,
+                                           view: details_not_found_page,
+                                           val authConnector: AuthConnector,
+                                           journeyService: JourneyService,
+                                           messagesHelper: MessagesHelper
+                                          )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(
-                pageConfig = journeyConfig.pageConfig,
-                redirectLocation = routes.RetryJourneyController.tryAgain(journeyId),
-                journeyId = journeyId
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              pageConfig       = journeyConfig.pageConfig,
+              redirectLocation = routes.RetryJourneyController.tryAgain(journeyId),
+              journeyId        = journeyId
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 }

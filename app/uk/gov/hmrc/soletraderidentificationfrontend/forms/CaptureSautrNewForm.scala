@@ -42,14 +42,14 @@ object CaptureSautrNewForm {
             case _ => Left(Seq(FormError(sautrValueKey, sautrError)))
           }
         case Some(`option_no`) => Right(None)
-        case _ => Left(Seq(FormError(key, radioError)))
+        case _                 => Left(Seq(FormError(key, radioError)))
       }
     }
 
     override def unbind(key: String, value: Option[String]): Map[String, String] = {
       val stringValue = value match {
         case Some(_) => option_yes
-        case None => option_no
+        case None    => option_no
       }
 
       Map(key -> stringValue)

@@ -27,25 +27,25 @@ class CaptureNinoFormSpec extends AnyWordSpec with Matchers {
   val ninoForm: Form[_] = captureNinoForm
 
   "CaptureNinoForm.value" should {
-    for(nino <- ninoWithInvalidPrefixSeq ++ ninoWithInvalidSuffixSeq ++ testInvalidNinoAdditionalSeq)
-    s"return None for an invalid nino: $nino" in {
-      ninoForm.bind(Map("nino" -> nino)).value mustBe None
-    }
+    for (nino <- ninoWithInvalidPrefixSeq ++ ninoWithInvalidSuffixSeq ++ testInvalidNinoAdditionalSeq)
+      s"return None for an invalid nino: $nino" in {
+        ninoForm.bind(Map("nino" -> nino)).value mustBe None
+      }
 
-    for(nino <- ninoWithValidPrefixSeq ++ testValidNinoAdditionalSeq)
-    s"return Some($nino) for a valid nino" in {
-      ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino.trim)
-    }
+    for (nino <- ninoWithValidPrefixSeq ++ testValidNinoAdditionalSeq)
+      s"return Some($nino) for a valid nino" in {
+        ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino.trim)
+      }
 
     for (nino <- ninoWithInvalidPrefixSeq.map(_.grouped(2).mkString(" ")) ++ ninoWithInvalidSuffixSeq.map(_.grouped(2).mkString(" ")))
-    s"return None for an invalid (spaced) nino: $nino" in {
-      ninoForm.bind(Map("nino" -> nino)).value mustBe None
-    }
+      s"return None for an invalid (spaced) nino: $nino" in {
+        ninoForm.bind(Map("nino" -> nino)).value mustBe None
+      }
 
     for (nino <- ninoWithValidPrefixSeq.map(_.grouped(2).mkString(" "))) {
-    s"return Some($nino) for a valid (spaced) nino" in {
-      ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino)
-    }
+      s"return Some($nino) for a valid (spaced) nino" in {
+        ninoForm.bind(Map("nino" -> nino)).value mustBe Some(nino)
+      }
     }
 
     "trim the whitespaces from nino and return Some(nino)" in {

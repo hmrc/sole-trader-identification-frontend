@@ -32,70 +32,73 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
-                                             view: capture_date_of_birth_page,
-                                             soleTraderIdentificationService: SoleTraderIdentificationService,
-                                             val authConnector: AuthConnector,
-                                             journeyService: JourneyService,
-                                             messagesHelper: MessagesHelper
-                                            )(implicit val config: AppConfig,
-                                              ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureDateOfBirthController @Inject() (mcc: MessagesControllerComponents,
+                                              view: capture_date_of_birth_page,
+                                              soleTraderIdentificationService: SoleTraderIdentificationService,
+                                              val authConnector: AuthConnector,
+                                              journeyService: JourneyService,
+                                              messagesHelper: MessagesHelper
+                                             )(implicit val config: AppConfig, ec: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
-            firstName <- soleTraderIdentificationService
-              .retrieveFullName(journeyId)
-              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-          } yield {
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          firstName <- soleTraderIdentificationService
+                         .retrieveFullName(journeyId)
+                         .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
               firstName,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-              form = captureDateOfBirthForm()
-            ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+              form       = captureDateOfBirthForm()
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          captureDateOfBirthForm().bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        captureDateOfBirthForm()
+          .bindFromRequest()
+          .fold(
             formWithErrors => {
               for {
-                journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
+                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
                 firstName <- soleTraderIdentificationService
-                  .retrieveFullName(journeyId)
-                  .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+                               .retrieveFullName(journeyId)
+                               .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
               } yield {
                 val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
                 implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  firstName,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-                  form = formWithErrors))
+                BadRequest(
+                  view(firstName,
+                       pageConfig = journeyConfig.pageConfig,
+                       formAction = routes.CaptureDateOfBirthController.submit(journeyId),
+                       form       = formWithErrors
+                      )
+                )
               }
-            }
-            ,
+            },
             dateOfBirth =>
-              soleTraderIdentificationService.storeDateOfBirth(journeyId, dateOfBirth).map {
-                _ => Redirect(routes.CaptureNinoController.show(journeyId))
+              soleTraderIdentificationService.storeDateOfBirth(journeyId, dateOfBirth).map { _ =>
+                Redirect(routes.CaptureNinoController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }
-

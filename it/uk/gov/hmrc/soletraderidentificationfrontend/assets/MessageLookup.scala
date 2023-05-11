@@ -117,7 +117,8 @@ object MessageLookup {
       val no_entry_address1 = "Enter the first line of the address"
       val no_entry_address2 = "Enter the second line of the address"
       val too_many_characters_address = "The address must be 35 characters or fewer"
-      val invalid_characters_address = "The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops"
+      val invalid_characters_address =
+        "The address must only include letters a to z, numbers and special characters such as hyphens, speech marks and full stops"
       val invalid_characters_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
       val non_uk_postcode = "Enter a postcode, like AA1 1AA"
       val no_entry_country = "Enter a country"
@@ -129,7 +130,8 @@ object MessageLookup {
   object CaptureSautr {
     val title = "What is applicant’s Unique Taxpayer Reference? - Entity Validation Service - GOV.UK"
     val heading = s"What is $testFirstName’s Unique Taxpayer Reference?"
-    val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
+    val line_1 =
+      "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
     val line_2 = "I do not have a Unique Taxpayer Reference"
     val details_line_1 = "Your UTR helps us identify your business"
     val details_line_2 = "I cannot find the UTR"
@@ -137,7 +139,8 @@ object MessageLookup {
 
     val new_title = "Does the applicant have a Unique Taxpayer Reference? - Entity Validation Service - GOV.UK"
     val new_heading = s"Does $testFirstName have a Unique Taxpayer Reference?"
-    val new_line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. Your UTR helps us identify your business."
+    val new_line_1 =
+      "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. Your UTR helps us identify your business."
     val new_label = "Unique Taxpayer Reference"
 
     object Error {
@@ -167,7 +170,8 @@ object MessageLookup {
 
     val title = "What is the business’s overseas tax identifier? - Entity Validation Service - GOV.UK"
     val heading = "What is the business’s overseas tax identifier?"
-    val hint = "We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+    val hint =
+      "We may use this number to help us identify your business. The tax identifier could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
     val form_field_1 = "Enter a tax identifier"
     val form_field_2 = "Enter the name of the country that issued the tax identifier"
     val no_identifierLink = "I do not want to provide an identifier"
@@ -184,7 +188,8 @@ object MessageLookup {
   object CaptureOverseasTaxIdentifier {
 
     val title = "Does the business have an overseas tax identifier?"
-    val hint = "This may help us identify the business. It could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify the business details."
+    val hint =
+      "This may help us identify the business. It could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify the business details."
 
     object Error {
       val no_tax_identifier_selection = "Select yes if the business has an overseas tax identifier"
@@ -217,7 +222,8 @@ object MessageLookup {
     val line_2 = "If you used the wrong details, you can try again using different details."
     val link_2 = "try again using different details."
     val line_3 = "If you used the correct details, you cannot continue to register using this online service."
-    val line_4 = "You need to contact the National Insurance team (opens in a new tab) and tell them there is an issue with your National Insurance number, no matter what tax regime you’re using."
+    val line_4 =
+      "You need to contact the National Insurance team (opens in a new tab) and tell them there is an issue with your National Insurance number, no matter what tax regime you’re using."
     val link_4 = "contact the National Insurance team (opens in a new tab)"
   }
 

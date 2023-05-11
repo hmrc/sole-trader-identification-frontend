@@ -23,18 +23,18 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.AuthStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CouldNotConfirmBusinessErrorViewTests
 
-class CouldNotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
-  with CouldNotConfirmBusinessErrorViewTests
-  with AuthStub {
+class CouldNotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper with CouldNotConfirmBusinessErrorViewTests with AuthStub {
 
   "GET /could-not-confirm-business" should {
 
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testSoleTraderJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testSoleTraderJourneyConfig
+        )
+      )
 
       stubAuth(OK, successfulAuthResponse())
 

@@ -22,9 +22,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 
-class RetryJourneyControllerISpec extends ComponentSpecHelper
-  with AuthStub
-  with SoleTraderIdentificationStub {
+class RetryJourneyControllerISpec extends ComponentSpecHelper with AuthStub with SoleTraderIdentificationStub {
 
   "GET /try-again" should {
 
@@ -32,11 +30,13 @@ class RetryJourneyControllerISpec extends ComponentSpecHelper
 
       "a user elects to restart the sole trader journey" in {
 
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
 
         stubAuth(OK, successfulAuthResponse())
         stubRemoveAllData(testJourneyId)(NO_CONTENT)

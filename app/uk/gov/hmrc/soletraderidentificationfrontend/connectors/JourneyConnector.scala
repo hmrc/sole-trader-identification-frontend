@@ -25,9 +25,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateJourneyConnector @Inject()(httpClient: HttpClient,
-                                       appConfig: AppConfig
-                                      )(implicit ec: ExecutionContext) {
+class CreateJourneyConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createJourney()(implicit hc: HeaderCarrier): Future[String] =
     httpClient.POSTEmpty[String](appConfig.createJourneyUrl)(CreateJourneyHttpReads, hc, ec)

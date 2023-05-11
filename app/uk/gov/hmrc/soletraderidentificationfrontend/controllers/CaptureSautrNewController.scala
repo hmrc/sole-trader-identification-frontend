@@ -32,68 +32,72 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureSautrNewController @Inject()(mcc: MessagesControllerComponents,
-                                          view: capture_sautr_new_page,
-                                          soleTraderIdentificationService: SoleTraderIdentificationService,
-                                          val authConnector: AuthConnector,
-                                          journeyService: JourneyService,
-                                          messagesHelper: MessagesHelper
-                                         )(implicit val config: AppConfig,
-                                           executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureSautrNewController @Inject() (mcc: MessagesControllerComponents,
+                                           view: capture_sautr_new_page,
+                                           soleTraderIdentificationService: SoleTraderIdentificationService,
+                                           val authConnector: AuthConnector,
+                                           journeyService: JourneyService,
+                                           messagesHelper: MessagesHelper
+                                          )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            firstName <- soleTraderIdentificationService
-              .retrieveFullName(journeyId)
-              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-          } yield {
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          firstName <- soleTraderIdentificationService
+                         .retrieveFullName(journeyId)
+                         .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
               firstName,
-              journeyId = journeyId,
+              journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureSautrNewController.submit(journeyId),
-              form = CaptureSautrNewForm.form
-            ))
-          }
-        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+              form       = CaptureSautrNewForm.form
+            )
+          )
+        }
+      case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          CaptureSautrNewForm.form.bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        CaptureSautrNewForm.form
+          .bindFromRequest()
+          .fold(
             formWithErrors => {
               for {
                 journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
                 firstName <- soleTraderIdentificationService
-                  .retrieveFullName(journeyId)
-                  .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+                               .retrieveFullName(journeyId)
+                               .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
               } yield {
                 val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
                 implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  firstName,
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureSautrNewController.submit(journeyId),
-                  form = formWithErrors
-                ))
+                BadRequest(
+                  view(
+                    firstName,
+                    journeyId  = journeyId,
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureSautrNewController.submit(journeyId),
+                    form       = formWithErrors
+                  )
+                )
               }
             },
             {
               case Some(sautr) =>
                 for {
-                  _ <- soleTraderIdentificationService.storeSautr(journeyId, sautr)
-                  _ <- soleTraderIdentificationService.removeSaPostcode(journeyId)
+                  _       <- soleTraderIdentificationService.storeSautr(journeyId, sautr)
+                  _       <- soleTraderIdentificationService.removeSaPostcode(journeyId)
                   optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
                 } yield optNino match {
                   case Some(_) =>
@@ -103,8 +107,8 @@ class CaptureSautrNewController @Inject()(mcc: MessagesControllerComponents,
                 }
               case _ =>
                 for {
-                  _ <- soleTraderIdentificationService.removeSautr(journeyId)
-                  _ <- soleTraderIdentificationService.removeSaPostcode(journeyId)
+                  _       <- soleTraderIdentificationService.removeSautr(journeyId)
+                  _       <- soleTraderIdentificationService.removeSaPostcode(journeyId)
                   optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
                 } yield optNino match {
                   case Some(_) =>
@@ -114,8 +118,8 @@ class CaptureSautrNewController @Inject()(mcc: MessagesControllerComponents,
                 }
             }
           )
-        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

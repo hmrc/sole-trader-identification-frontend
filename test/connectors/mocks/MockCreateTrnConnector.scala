@@ -39,11 +39,13 @@ trait MockCreateTrnConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockCreateTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address)(response: Future[String]): OngoingStubbing[_] = {
-    when(mockCreateTrnConnector.createTrn(
-      ArgumentMatchers.eq(dateOfBirth),
-      ArgumentMatchers.eq(fullName),
-      ArgumentMatchers.eq(address)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+    when(
+      mockCreateTrnConnector.createTrn(
+        ArgumentMatchers.eq(dateOfBirth),
+        ArgumentMatchers.eq(fullName),
+        ArgumentMatchers.eq(address)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
   }
 
   def verifyCreateTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address): Unit = {
@@ -55,4 +57,3 @@ trait MockCreateTrnConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
 }
-

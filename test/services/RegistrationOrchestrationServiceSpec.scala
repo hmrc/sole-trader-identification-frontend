@@ -31,19 +31,21 @@ import uk.gov.hmrc.soletraderidentificationfrontend.services.RegistrationOrchest
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RegistrationOrchestrationServiceSpec extends AnyWordSpec
-  with Matchers
-  with MockSoleTraderIdentificationService
-  with MockRegistrationConnector
-  with MockCreateTrnService
-  with MockAuditService {
+class RegistrationOrchestrationServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with MockSoleTraderIdentificationService
+    with MockRegistrationConnector
+    with MockCreateTrnService
+    with MockAuditService {
 
-  object TestService extends RegistrationOrchestrationService(
-    mockSoleTraderIdentificationService,
-    mockRegistrationConnector,
-    mockCreateTrnService,
-    mockAuditService
-  )
+  object TestService
+      extends RegistrationOrchestrationService(
+        mockSoleTraderIdentificationService,
+        mockRegistrationConnector,
+        mockCreateTrnService,
+        mockAuditService
+      )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -71,7 +73,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, Some(testSautr), testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
+          val actualRegistrationStatus: RegistrationStatus =
+            await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
           actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
           verifyRegistration(testNino, Some(testSautr), testRegime)
@@ -163,7 +166,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
+          val actualRegistrationStatus: RegistrationStatus =
+            await(TestService.registerAfterBusinessVerification(testJourneyId, testSoleTraderJourneyConfig))
           actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
           verifyRegistrationWithTrn(testTrn, testSautr, testRegime)
@@ -244,7 +248,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
           mockRegister(testNino, None, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
           mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-          val actualRegistrationStatus: RegistrationStatus = await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig))
+          val actualRegistrationStatus: RegistrationStatus =
+            await(TestService.registerWithoutBusinessVerification(testJourneyId, Some(testNino), None, testSoleTraderJourneyConfig))
           actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
           verifyRegistration(testNino, None, testRegime)
@@ -260,7 +265,9 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(Registered(testSafeId)))
         mockStoreRegistrationResponse(testJourneyId, Registered(testSafeId))(Future.successful(SuccessfullyStored))
 
-        await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)) mustBe {
+        await(
+          TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig)
+        ) mustBe {
           Registered(testSafeId)
         }
 
@@ -274,7 +281,8 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec
         mockRegisterWithTrn(testTrn, testSautr, testRegime)(Future.successful(RegistrationFailed(testRegistrationFailure)))
         mockStoreRegistrationResponse(testJourneyId, RegistrationFailed(testRegistrationFailure))(Future.successful(SuccessfullyStored))
 
-        val actualRegistrationStatus: RegistrationStatus = await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig))
+        val actualRegistrationStatus: RegistrationStatus =
+          await(TestService.registerWithoutBusinessVerification(testJourneyId, optNino = None, saUtr = Some(testSautr), testSoleTraderJourneyConfig))
         actualRegistrationStatus mustBe RegistrationFailed(testRegistrationFailure)
 
         verifyRegistrationWithTrn(testTrn, testSautr, testRegime)

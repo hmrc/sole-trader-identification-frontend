@@ -18,10 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class JourneyConfig(continueUrl: String,
-                         businessVerificationCheck: Boolean,
-                         pageConfig: PageConfig,
-                         regime: String)
+case class JourneyConfig(continueUrl: String, businessVerificationCheck: Boolean, pageConfig: PageConfig, regime: String)
 
 object JourneyConfig {
   implicit val format: OFormat[JourneyConfig] = Json.format[JourneyConfig]

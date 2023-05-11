@@ -98,11 +98,12 @@ object ViewSpecHelper {
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =
-    (element: Elements) => HavePropertyMatchResult(
-      element.text() == text,
-      "text",
-      text,
-      element.text()
-    )
+    (element: Elements) =>
+      HavePropertyMatchResult(
+        element.text() == text,
+        "text",
+        text,
+        element.text()
+      )
 
 }

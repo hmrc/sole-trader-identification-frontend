@@ -38,22 +38,20 @@ trait MockNinoIVService extends MockitoSugar with BeforeAndAfterEach {
     reset(mockNinoIVService)
   }
 
-  def mockCreateNinoIVJourney(journeyId: String,
-                              nino: String,
-                              journeyConfig: JourneyConfig
-                             )(response: Future[NinoIVJourneyCreationResponse]): OngoingStubbing[_] =
-    when(mockNinoIVService.createNinoIVJourney(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig)(
+    response: Future[NinoIVJourneyCreationResponse]
+  ): OngoingStubbing[_] =
+    when(
+      mockNinoIVService.createNinoIVJourney(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(nino),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyCreateNinoIVJourney(journeyId: String,
-                                nino: String,
-                                journeyConfig: JourneyConfig): Unit =
-    verify(mockNinoIVService).createNinoIVJourney(ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(journeyConfig))(ArgumentMatchers.any[HeaderCarrier])
+  def verifyCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig): Unit =
+    verify(mockNinoIVService).createNinoIVJourney(ArgumentMatchers.eq(journeyId), ArgumentMatchers.eq(nino), ArgumentMatchers.eq(journeyConfig))(
+      ArgumentMatchers.any[HeaderCarrier]
+    )
 
 }

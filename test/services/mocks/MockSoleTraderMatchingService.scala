@@ -38,37 +38,32 @@ trait MockSoleTraderMatchingService extends MockitoSugar with BeforeAndAfterEach
     reset(mockSoleTraderMatchingService)
   }
 
-  def mockMatchSoleTraderDetails(journeyId: String,
-                                 individualDetails: IndividualDetails,
-                                 journeyConfig: JourneyConfig
-                                )(response: Future[SoleTraderDetailsMatchResult]): OngoingStubbing[_] =
-    when(mockSoleTraderMatchingService.matchSoleTraderDetails(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(individualDetails),
-      ArgumentMatchers.eq(journeyConfig),
-    )(ArgumentMatchers.any[HeaderCarrier],
-      ArgumentMatchers.any[ExecutionContext])
+  def mockMatchSoleTraderDetails(journeyId: String, individualDetails: IndividualDetails, journeyConfig: JourneyConfig)(
+    response: Future[SoleTraderDetailsMatchResult]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderMatchingService.matchSoleTraderDetails(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(individualDetails),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier], ArgumentMatchers.any[ExecutionContext])
     ).thenReturn(response)
 
-  def verifyMatchSoleTraderDetails(journeyId: String,
-                                   individualDetails: IndividualDetails,
-                                   journeyConfig: JourneyConfig
-                                  ): Unit =
+  def verifyMatchSoleTraderDetails(journeyId: String, individualDetails: IndividualDetails, journeyConfig: JourneyConfig): Unit =
     verify(mockSoleTraderMatchingService).matchSoleTraderDetails(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(individualDetails),
       ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier],
-      ArgumentMatchers.any[ExecutionContext])
+    )(ArgumentMatchers.any[HeaderCarrier], ArgumentMatchers.any[ExecutionContext])
 
-  def mockMatchSoleTraderDetailsNoNino(journeyId: String,
-                                       individualDetails: IndividualDetails
-                                      )(response: Future[SoleTraderDetailsMatchResult]): OngoingStubbing[_] =
-    when(mockSoleTraderMatchingService.matchSoleTraderDetailsNoNino(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(individualDetails)
-    )(ArgumentMatchers.any[HeaderCarrier],
-      ArgumentMatchers.any[ExecutionContext])
+  def mockMatchSoleTraderDetailsNoNino(journeyId: String, individualDetails: IndividualDetails)(
+    response: Future[SoleTraderDetailsMatchResult]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderMatchingService.matchSoleTraderDetailsNoNino(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(individualDetails)
+      )(ArgumentMatchers.any[HeaderCarrier], ArgumentMatchers.any[ExecutionContext])
     ).thenReturn(response)
 
 }

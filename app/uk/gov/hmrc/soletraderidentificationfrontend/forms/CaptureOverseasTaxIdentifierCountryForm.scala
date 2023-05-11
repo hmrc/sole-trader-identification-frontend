@@ -22,10 +22,10 @@ import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.MappingUtil.{OTe
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.utils.ValidationHelper.validate
 
 object CaptureOverseasTaxIdentifierCountryForm {
-  private val countryNotEntered: Constraint[String] = Constraint("country.not-entered")(
-    country => validate(
+  private val countryNotEntered: Constraint[String] = Constraint("country.not-entered")(country =>
+    validate(
       constraint = country.isEmpty,
-      errMsg = "error.tax_identifier_country"
+      errMsg     = "error.tax_identifier_country"
     )
   )
 

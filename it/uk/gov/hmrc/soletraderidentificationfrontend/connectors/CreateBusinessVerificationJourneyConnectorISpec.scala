@@ -37,9 +37,13 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           enable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(
+            CREATED,
+            Json.obj("redirectUri" -> testContinueUrl)
+          )
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -50,7 +54,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           enable(BusinessVerificationStub)
           stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(NotEnoughEvidence)
         }
@@ -58,7 +63,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           enable(BusinessVerificationStub)
           stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(UserLockedOut)
         }
@@ -68,9 +74,12 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           disable(BusinessVerificationStub)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(CREATED,
+                                                                                                       Json.obj("redirectUri" -> testContinueUrl)
+                                                                                                      )
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -81,7 +90,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           disable(BusinessVerificationStub)
           stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(NotEnoughEvidence)
         }
@@ -89,7 +99,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           disable(BusinessVerificationStub)
           stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
+          val result =
+            await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(UserLockedOut)
         }

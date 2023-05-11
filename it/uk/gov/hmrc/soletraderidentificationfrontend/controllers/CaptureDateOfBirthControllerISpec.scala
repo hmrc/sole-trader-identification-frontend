@@ -27,18 +27,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureDateOfBirthView
 
 import java.time.LocalDate
 
-class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
-  with CaptureDateOfBirthViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper with CaptureDateOfBirthViewTests with SoleTraderIdentificationStub with AuthStub {
 
   "GET /date-of-birth" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
       get(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")
@@ -54,19 +53,22 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "redirect to sign in page" when {
       "the user is UNAUTHORISED" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuthFailure()
         lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fdate-of-birth" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fdate-of-birth" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -76,18 +78,20 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
   "POST /date-of-birth" when {
     "the whole form is correctly formatted" should {
       "redirect to the Capture Nino page and store the data in the backend" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreDob(testJourneyId, testDateOfBirth)(status = OK)
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> testDateOfBirth.getYear.toString
+          "date-of-birth-year"  -> testDateOfBirth.getYear.toString
         )
 
         result must have(
@@ -99,11 +103,13 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the whole form is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -117,17 +123,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the date of birth is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "",
+          "date-of-birth-day"   -> "",
           "date-of-birth-month" -> "",
-          "date-of-birth-year" -> ""
+          "date-of-birth-year"  -> ""
         )
       }
       "return a bad request" in {
@@ -138,17 +146,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "a future year is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> "2050"
+          "date-of-birth-year"  -> "2050"
         )
       }
       "return a bad request" in {
@@ -159,17 +169,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "not real date is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "31",
+          "date-of-birth-day"   -> "31",
           "date-of-birth-month" -> "02",
-          "date-of-birth-year" -> "2020"
+          "date-of-birth-year"  -> "2020"
         )
       }
       "return a bad request" in {
@@ -180,17 +192,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "an invalid date is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "31",
-          "date-of-birth-month" -> "O2", //0 => O
-          "date-of-birth-year" -> "2020"
+          "date-of-birth-day"   -> "31",
+          "date-of-birth-month" -> "O2", // 0 => O
+          "date-of-birth-year"  -> "2020"
         )
       }
       "return a bad request" in {
@@ -201,17 +215,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the dob submitted is less than 16 years ago" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> LocalDate.now.minusYears(10).getYear.toString
+          "date-of-birth-year"  -> LocalDate.now.minusYears(10).getYear.toString
         )
       }
       "return a bad request" in {
@@ -222,17 +238,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the year in the date of birth is before 1900" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> "1899"
+          "date-of-birth-year"  -> "1899"
         )
       }
       "return a bad request" in {
@@ -244,17 +262,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the day component of the date of birth submitted is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "",
+          "date-of-birth-day"   -> "",
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> testDateOfBirth.getYear.toString
+          "date-of-birth-year"  -> testDateOfBirth.getYear.toString
         )
       }
       "return a bad request" in {
@@ -265,17 +285,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the month component of the date of birth submitted is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> "",
-          "date-of-birth-year" -> testDateOfBirth.getYear.toString
+          "date-of-birth-year"  -> testDateOfBirth.getYear.toString
         )
       }
       "return a bad request" in {
@@ -287,17 +309,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the year component of the date of birth submitted is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
           "date-of-birth-month" -> testDateOfBirth.getMonthValue.toString,
-          "date-of-birth-year" -> ""
+          "date-of-birth-year"  -> ""
         )
       }
       "return a bad request" in {
@@ -310,17 +334,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
     "the day and month components of the date of birth submitted are missing" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "",
-          "date-of-birth-month" ->  "",
-          "date-of-birth-year" ->  testDateOfBirth.getYear.toString
+          "date-of-birth-day"   -> "",
+          "date-of-birth-month" -> "",
+          "date-of-birth-year"  -> testDateOfBirth.getYear.toString
         )
       }
 
@@ -334,17 +360,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
     "the day and year components of the date of birth submitted are missing" should {
 
       lazy val result: WSResponse = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "",
-          "date-of-birth-month" ->  testDateOfBirth.getDayOfMonth.toString,
-          "date-of-birth-year" ->  ""
+          "date-of-birth-day"   -> "",
+          "date-of-birth-month" -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-year"  -> ""
         )
       }
 
@@ -357,17 +385,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "the month and year components of the date of birth submitted are missing" should {
       lazy val result: WSResponse = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> testDateOfBirth.getDayOfMonth.toString,
-          "date-of-birth-month" ->  "",
-          "date-of-birth-year" ->  ""
+          "date-of-birth-day"   -> testDateOfBirth.getDayOfMonth.toString,
+          "date-of-birth-month" -> "",
+          "date-of-birth-year"  -> ""
         )
       }
 
@@ -380,18 +410,20 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "there is a form error and customer full name exists" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "31",
+          "date-of-birth-day"   -> "31",
           "date-of-birth-month" -> "02",
-          "date-of-birth-year" -> "to simulate an error"
+          "date-of-birth-year"  -> "to simulate an error"
         )
       }
       testTitleAndHeadingInTheErrorView(result)
@@ -399,17 +431,19 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
 
     "there is a form error and customer full name does NOT exist" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")(
-          "date-of-birth-day" -> "31",
+          "date-of-birth-day"   -> "31",
           "date-of-birth-month" -> "02",
-          "date-of-birth-year" -> "to simulate an error"
+          "date-of-birth-year"  -> "to simulate an error"
         )
       }
 
@@ -421,6 +455,3 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper
     }
   }
 }
-
-
-

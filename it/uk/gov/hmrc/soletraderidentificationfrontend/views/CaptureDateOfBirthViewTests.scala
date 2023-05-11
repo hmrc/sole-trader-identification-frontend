@@ -19,12 +19,11 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureDateOfBirth => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureDateOfBirth => messages, Header}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-
 
 trait CaptureDateOfBirthViewTests {
   this: ComponentSpecHelper =>
@@ -112,16 +111,16 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "correctly define link to erroneous input" in {
-        doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
+      doc.getErrorSummaryLink.attr("href") mustBe "#date-of-birth-day"
     }
 
     "correctly display the field errors" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.noDobEntered
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -145,9 +144,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.noDobEntered
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -171,9 +170,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.futureDate
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -197,9 +196,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.notRealDate
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -223,9 +222,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidDate
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
       doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
   def testCaptureDateOfBirthErrorMessageInvalidAge(result: => WSResponse): Unit = {
@@ -248,9 +247,9 @@ trait CaptureDateOfBirthViewTests {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalidAge
     }
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -275,9 +274,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to date input components" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
 
   }
@@ -304,9 +303,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to day input input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
       doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must not include "govuk-input--error"
     }
   }
 
@@ -332,9 +331,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to month input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must not include "govuk-input--error"
     }
   }
 
@@ -360,9 +359,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to year input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must not include "govuk-input--error"
       doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -388,9 +387,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to year input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must not include "govuk-input--error"
     }
 
   }
@@ -417,9 +416,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to year input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must include("govuk-input--error")
       doc.getTextFieldInput("date-of-birth-month").first().attr("class") must not include "govuk-input--error"
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 
@@ -445,9 +444,9 @@ trait CaptureDateOfBirthViewTests {
     }
 
     "assign error class to year input component" in {
-      doc.getTextFieldInput("date-of-birth-day").first().attr("class") must not include "govuk-input--error"
-      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include ("govuk-input--error")
-      doc.getTextFieldInput("date-of-birth-year").first().attr("class") must include ("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-day").first().attr("class")   must not include "govuk-input--error"
+      doc.getTextFieldInput("date-of-birth-month").first().attr("class") must include("govuk-input--error")
+      doc.getTextFieldInput("date-of-birth-year").first().attr("class")  must include("govuk-input--error")
     }
   }
 

@@ -25,9 +25,9 @@ import javax.inject.{Inject, Singleton}
 
 object MessagesHelper {
 
-
   def amendMessagesWithLabelsFromJourneyConfig(initialMessages: Map[String, Map[String, String]],
-                                               journeyConfig: JourneyConfig): Map[String, Map[String, String]] = {
+                                               journeyConfig: JourneyConfig
+                                              ): Map[String, Map[String, String]] = {
 
     val extraEnglishTranslations: Map[String, String] = journeyConfig.pageConfig.labels match {
       case Some(JourneyLabels(_, optEnglishServiceName, _, optEnglishFullName)) =>
@@ -44,19 +44,16 @@ object MessagesHelper {
     }
 
     initialMessages.map {
-      case (lang@"en", oldMessages) => lang -> (oldMessages ++ extraEnglishTranslations)
-      case (lang@"cy", oldMessages) => lang -> (oldMessages ++ extraWelshTranslations)
-      case (lang, oldMessages) => lang -> oldMessages
+      case (lang @ "en", oldMessages) => lang -> (oldMessages ++ extraEnglishTranslations)
+      case (lang @ "cy", oldMessages) => lang -> (oldMessages ++ extraWelshTranslations)
+      case (lang, oldMessages)        => lang -> oldMessages
     }
   }
 }
 
 @Singleton
-class MessagesHelper @Inject()(environment: Environment,
-                               config: Configuration,
-                               langs: Langs,
-                               httpConfiguration: HttpConfiguration
-                              ) extends DefaultMessagesApiProvider(environment, config, langs, httpConfiguration) {
+class MessagesHelper @Inject() (environment: Environment, config: Configuration, langs: Langs, httpConfiguration: HttpConfiguration)
+    extends DefaultMessagesApiProvider(environment, config, langs, httpConfiguration) {
 
   lazy val defaultMessages: Map[String, Map[String, String]] = loadAllMessages
 
@@ -64,10 +61,10 @@ class MessagesHelper @Inject()(environment: Environment,
     new DefaultMessagesApi(
       MessagesHelper.amendMessagesWithLabelsFromJourneyConfig(defaultMessages, journeyConfig),
       langs,
-      langCookieName = langCookieName,
-      langCookieSecure = langCookieSecure,
+      langCookieName     = langCookieName,
+      langCookieSecure   = langCookieSecure,
       langCookieHttpOnly = langCookieHttpOnly,
-      httpConfiguration = httpConfiguration
+      httpConfiguration  = httpConfiguration
     )
 
 }

@@ -21,13 +21,13 @@ import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.KnownFactsHttpParser.KnownFactsHttpReads
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsResponse, KnownFactsResponseError, KnownFactsNoContentError}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsNoContentError, KnownFactsResponse, KnownFactsResponseError}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class RetrieveKnownFactsConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Either[KnownFactsResponseError, KnownFactsResponse]] = {
 
@@ -35,16 +35,13 @@ class RetrieveKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: A
       "service" -> "IR-SA",
       "knownFacts" -> Json.arr(
         Json.obj(
-          "key" -> "UTR",
+          "key"   -> "UTR",
           "value" -> sautr
         )
       )
     )
 
-    httpClient.POST(appConfig.knownFactsUrl, jsonBody)(implicitly[Writes[JsObject]],
-      KnownFactsHttpReads,
-      hc,
-      ec)
+    httpClient.POST(appConfig.knownFactsUrl, jsonBody)(implicitly[Writes[JsObject]], KnownFactsHttpReads, hc, ec)
 
   }
 }
@@ -65,7 +62,8 @@ object KnownFactsHttpParser {
           knownFacts match {
             case JsSuccess(verifiersList, _) =>
               val optPostcode: Option[String] = verifiersList.find(verifier => verifier.key == "Postcode").map(verifier => verifier.value)
-              val optIsAbroadFlag: Option[Boolean] = verifiersList.find(verifier => verifier.key == "IsAbroad").map(verifier => if (verifier.value == "Y") true else false)
+              val optIsAbroadFlag: Option[Boolean] =
+                verifiersList.find(verifier => verifier.key == "IsAbroad").map(verifier => if (verifier.value == "Y") true else false)
               val optNino: Option[String] = verifiersList.find(verifier => verifier.key == "NINO").map(verifier => verifier.value)
               Right(KnownFactsResponse(optPostcode, optIsAbroadFlag, optNino))
             case JsError(errors) => throw new InternalServerException(s"`Failed to read Known Facts API response with the following error/s: $errors")
@@ -76,6 +74,5 @@ object KnownFactsHttpParser {
       }
     }
   }
-
 
 }

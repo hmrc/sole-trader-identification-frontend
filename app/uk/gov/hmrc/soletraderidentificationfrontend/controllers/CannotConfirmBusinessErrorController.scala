@@ -32,69 +32,71 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CannotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComponents,
-                                                     view: cannot_confirm_business_error_page,
-                                                     val authConnector: AuthConnector,
-                                                     soleTraderIdentificationService: SoleTraderIdentificationService,
-                                                     journeyService: JourneyService,
-                                                     trnService: CreateTrnService,
-                                                     messagesHelper: MessagesHelper
-                                                    )(implicit val config: AppConfig,
-                                                      executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CannotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerComponents,
+                                                      view: cannot_confirm_business_error_page,
+                                                      val authConnector: AuthConnector,
+                                                      soleTraderIdentificationService: SoleTraderIdentificationService,
+                                                      journeyService: JourneyService,
+                                                      trnService: CreateTrnService,
+                                                      messagesHelper: MessagesHelper
+                                                     )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
-                form = cannotConfirmBusinessForm
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
+              form       = cannotConfirmBusinessForm
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          cannotConfirmBusinessForm.bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        cannotConfirmBusinessForm
+          .bindFromRequest()
+          .fold(
             formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig =>
-                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                  BadRequest(view(
+              journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(
+                  view(
                     pageConfig = journeyConfig.pageConfig,
                     formAction = routes.CannotConfirmBusinessErrorController.submit(journeyId),
-                    form = formWithErrors
-                  ))
+                    form       = formWithErrors
+                  )
+                )
               },
             continue =>
               if (continue) {
                 for {
                   optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
-                  _ <- if (optNino.isEmpty) trnService.createTrn(journeyId) //Create TRN at end of journey to avoid duplication
-                  else Future.unit
-                  journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
+                  _ <- if (optNino.isEmpty) trnService.createTrn(journeyId) // Create TRN at end of journey to avoid duplication
+                       else Future.unit
+                  journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
                 } yield Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
               } else {
-                soleTraderIdentificationService.removeAllData(journeyId).map {
-                  _ => Redirect(routes.CaptureFullNameController.show(journeyId))
+                soleTraderIdentificationService.removeAllData(journeyId).map { _ =>
+                  Redirect(routes.CaptureFullNameController.show(journeyId))
                 }
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

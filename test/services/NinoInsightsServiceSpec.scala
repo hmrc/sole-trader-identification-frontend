@@ -29,15 +29,13 @@ import uk.gov.hmrc.soletraderidentificationfrontend.services.NinoInsightsService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NinoInsightsServiceSpec extends AnyWordSpec
-  with Matchers
-  with MockSoleTraderIdentificationService
-  with MockInsightsConnector {
+class NinoInsightsServiceSpec extends AnyWordSpec with Matchers with MockSoleTraderIdentificationService with MockInsightsConnector {
 
-  object TestService extends NinoInsightsService(
-    mockNinoInsightsConnector,
-    mockSoleTraderIdentificationService
-  )
+  object TestService
+      extends NinoInsightsService(
+        mockNinoInsightsConnector,
+        mockSoleTraderIdentificationService
+      )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 

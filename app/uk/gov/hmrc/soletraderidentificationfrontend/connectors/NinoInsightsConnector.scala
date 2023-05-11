@@ -26,9 +26,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NinoInsightsConnector @Inject()(http: HttpClient,
-                                      appConfig: AppConfig
-                                     )(implicit ec: ExecutionContext) {
+class NinoInsightsConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveNinoInsights(nino: String)(implicit hc: HeaderCarrier): Future[JsObject] = {
     val jsonBody = Json.obj(

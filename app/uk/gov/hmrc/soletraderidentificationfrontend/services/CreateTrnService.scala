@@ -23,23 +23,23 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateTrnService @Inject()(soleTraderIdentificationService: SoleTraderIdentificationService,
-                                 createTrnConnector: CreateTrnConnector
-                                )(implicit ec: ExecutionContext) {
-
+class CreateTrnService @Inject() (soleTraderIdentificationService: SoleTraderIdentificationService, createTrnConnector: CreateTrnConnector)(implicit
+  ec: ExecutionContext
+) {
 
   def createTrn(journeyId: String)(implicit headerCarrier: HeaderCarrier): Future[String] = {
     for {
       optDateOfBirth <- soleTraderIdentificationService.retrieveDateOfBirth(journeyId)
-      optName <- soleTraderIdentificationService.retrieveFullName(journeyId)
-      optAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
+      optName        <- soleTraderIdentificationService.retrieveFullName(journeyId)
+      optAddress     <- soleTraderIdentificationService.retrieveAddress(journeyId)
       trn <- (optDateOfBirth, optName, optAddress) match {
-        case (Some(dateOfBirth), Some(name), Some(address)) =>
-          createTrnConnector.createTrn(dateOfBirth,
-            name.copy(firstName = name.firstName.capitalize, lastName = name.lastName.capitalize),
-            address.withSanitisedPostcode)
-        case _ => throw new InternalServerException(s"Missing required data to create TRN for journeyId: $journeyId")
-      }
+               case (Some(dateOfBirth), Some(name), Some(address)) =>
+                 createTrnConnector.createTrn(dateOfBirth,
+                                              name.copy(firstName = name.firstName.capitalize, lastName = name.lastName.capitalize),
+                                              address.withSanitisedPostcode
+                                             )
+               case _ => throw new InternalServerException(s"Missing required data to create TRN for journeyId: $journeyId")
+             }
       _ <- soleTraderIdentificationService.storeTrn(journeyId, trn)
     } yield {
       trn

@@ -24,14 +24,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NinoInsightsService @Inject()(ninoInsightsConnector: NinoInsightsConnector,
-                                    soleTraderIdentificationService: SoleTraderIdentificationService
-                                   )(implicit ec: ExecutionContext) {
+class NinoInsightsService @Inject() (ninoInsightsConnector: NinoInsightsConnector, soleTraderIdentificationService: SoleTraderIdentificationService)(
+  implicit ec: ExecutionContext
+) {
 
   def ninoInsights(journeyId: String, nino: String)(implicit hc: HeaderCarrier): Future[JsObject] = {
     for {
       insights <- ninoInsightsConnector.retrieveNinoInsights(nino)
-      _ <- soleTraderIdentificationService.storeInsights(journeyId, insights)
+      _        <- soleTraderIdentificationService.storeInsights(journeyId, insights)
     } yield insights
   }
 

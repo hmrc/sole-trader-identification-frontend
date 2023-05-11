@@ -27,34 +27,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class NinoIVController @Inject()(mcc: MessagesControllerComponents,
-                                 val authConnector: AuthConnector,
-                                 ninoIVService: NinoIVService,
-                                 journeyService: JourneyService,
-                                 registrationOrchestrationService: RegistrationOrchestrationService,
-                                 soleTraderIdentificationService: SoleTraderIdentificationService
-                                )(implicit val executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class NinoIVController @Inject() (mcc: MessagesControllerComponents,
+                                  val authConnector: AuthConnector,
+                                  ninoIVService: NinoIVService,
+                                  journeyService: JourneyService,
+                                  registrationOrchestrationService: RegistrationOrchestrationService,
+                                  soleTraderIdentificationService: SoleTraderIdentificationService
+                                 )(implicit val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def retrieveNinoIVResult(journeyId: String): Action[AnyContent] = Action.async {
-    implicit req =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          req.getQueryString("journeyId") match {
-            case Some(verificationJourneyId) =>
-              for {
-                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-                verificationStatus <- ninoIVService.retrieveNinoIVStatus(verificationJourneyId)
-                _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
-                _ <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
-              } yield {
-                SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-              }
-            case None =>
-              throw new InternalServerException("Missing JourneyID from Nino Identity Verification callback")
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def retrieveNinoIVResult(journeyId: String): Action[AnyContent] = Action.async { implicit req =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        req.getQueryString("journeyId") match {
+          case Some(verificationJourneyId) =>
+            for {
+              journeyConfig      <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              verificationStatus <- ninoIVService.retrieveNinoIVStatus(verificationJourneyId)
+              _                  <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
+              _                  <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
+            } yield {
+              SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+            }
+          case None =>
+            throw new InternalServerException("Missing JourneyID from Nino Identity Verification callback")
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

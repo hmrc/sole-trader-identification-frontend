@@ -33,8 +33,7 @@ trait MockCreateTrnService extends MockitoSugar with BeforeAndAfterEach {
 
   def mockCreateTrn(journeyId: String)(response: Future[String]): OngoingStubbing[_] =
     when(
-      mockCreateTrnService.createTrn(ArgumentMatchers.eq(journeyId)
-      )(ArgumentMatchers.any[HeaderCarrier])
+      mockCreateTrnService.createTrn(ArgumentMatchers.eq(journeyId))(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def verifyCreateTrn(journeyId: String): Unit =

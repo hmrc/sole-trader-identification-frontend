@@ -24,55 +24,52 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RegistrationOrchestrationService @Inject()(soleTraderIdentificationService: SoleTraderIdentificationService,
-                                                 registrationConnector: RegistrationConnector,
-                                                 trnService: CreateTrnService,
-                                                 auditService: AuditService
-                                                )(implicit ec: ExecutionContext) {
+class RegistrationOrchestrationService @Inject() (soleTraderIdentificationService: SoleTraderIdentificationService,
+                                                  registrationConnector: RegistrationConnector,
+                                                  trnService: CreateTrnService,
+                                                  auditService: AuditService
+                                                 )(implicit ec: ExecutionContext) {
 
-  def registerAfterBusinessVerification(journeyId: String, journeyConfig: JourneyConfig)
-                                       (implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
-    registrationStatus <- soleTraderIdentificationService.retrieveBusinessVerificationStatus(journeyId).flatMap {
-      case Some(BusinessVerificationPass) | Some(SaEnrolled) => for {
-        optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
-        optSautr <- soleTraderIdentificationService.retrieveSautr(journeyId)
-        registrationStatus <- register(journeyId, optNino, optSautr, journeyConfig.regime)
-      } yield registrationStatus
-      case Some(_) =>
-        Future.successful(RegistrationNotCalled)
-      case None =>
-        throw new InternalServerException(s"Missing business verification state in database for $journeyId")
+  def registerAfterBusinessVerification(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+    for {
+      registrationStatus <- soleTraderIdentificationService.retrieveBusinessVerificationStatus(journeyId).flatMap {
+                              case Some(BusinessVerificationPass) | Some(SaEnrolled) =>
+                                for {
+                                  optNino            <- soleTraderIdentificationService.retrieveNino(journeyId)
+                                  optSautr           <- soleTraderIdentificationService.retrieveSautr(journeyId)
+                                  registrationStatus <- register(journeyId, optNino, optSautr, journeyConfig.regime)
+                                } yield registrationStatus
+                              case Some(_) =>
+                                Future.successful(RegistrationNotCalled)
+                              case None =>
+                                throw new InternalServerException(s"Missing business verification state in database for $journeyId")
+                            }
+      _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
+    } yield {
+      auditService.auditJourney(journeyId, journeyConfig)
+      registrationStatus
     }
-    _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
-  } yield {
-    auditService.auditJourney(journeyId, journeyConfig)
-    registrationStatus
-  }
 
-  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: Option[String], journeyConfig: JourneyConfig)
-                                         (implicit hc: HeaderCarrier): Future[RegistrationStatus] = for {
+  def registerWithoutBusinessVerification(journeyId: String, optNino: Option[String], saUtr: Option[String], journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier
+  ): Future[RegistrationStatus] = for {
     registrationStatus <- register(journeyId, optNino, saUtr, journeyConfig.regime)
-    _ <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
-  } yield
-    registrationStatus
+    _                  <- soleTraderIdentificationService.storeRegistrationStatus(journeyId, registrationStatus)
+  } yield registrationStatus
 
-
-  private def register(journeyId: String,
-                       optNino: Option[String],
-                       optSautr: Option[String],
-                       regime: String
-                      )(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+  private def register(journeyId: String, optNino: Option[String], optSautr: Option[String], regime: String)(implicit
+    hc: HeaderCarrier
+  ): Future[RegistrationStatus] =
     (optNino, optSautr, regime) match {
       case (Some(nino), optSautr, regime) =>
         registrationConnector.registerWithNino(nino, optSautr, regime)
       case (None, optSautr, regime) =>
-        trnService.createTrn(journeyId) flatMap {
-          trn =>
-            registrationConnector.registerWithTrn(
-              trn,
-              optSautr.getOrElse(throw new InternalServerException(s"Missing sautr required for Register call with TRN for $journeyId")),
-              regime
-            )
+        trnService.createTrn(journeyId) flatMap { trn =>
+          registrationConnector.registerWithTrn(
+            trn,
+            optSautr.getOrElse(throw new InternalServerException(s"Missing sautr required for Register call with TRN for $journeyId")),
+            regime
+          )
         }
     }
 }

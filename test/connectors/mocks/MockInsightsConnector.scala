@@ -38,9 +38,11 @@ trait MockInsightsConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockRetrieveNinoInsights(nino: String)(response: Future[JsObject]): OngoingStubbing[_] = {
-    when(mockNinoInsightsConnector.retrieveNinoInsights(
-      ArgumentMatchers.eq(nino)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+    when(
+      mockNinoInsightsConnector.retrieveNinoInsights(
+        ArgumentMatchers.eq(nino)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
   }
 
 }

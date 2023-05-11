@@ -24,21 +24,20 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureFullNameViewTests
 
-class CaptureFullNameControllerISpec extends ComponentSpecHelper
-  with CaptureFullNameViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureFullNameControllerISpec extends ComponentSpecHelper with CaptureFullNameViewTests with SoleTraderIdentificationStub with AuthStub {
 
   val testFirstName = "John"
   val testLastName = "Smith"
 
   "GET /full-name" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
     }
@@ -52,17 +51,20 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
     }
 
     "return, given a persisted pageConfig with a custom full name page label, a view which" should {
-        lazy val viewWithCustomFullNamePageLabel: WSResponse = {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
+      lazy val viewWithCustomFullNamePageLabel: WSResponse = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
             authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
-          ))
-          stubAuth(OK, successfulAuthResponse())
-          get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
-        }
+            journeyConfig =
+              testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
+          )
+        )
+        stubAuth(OK, successfulAuthResponse())
+        get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
+      }
 
-        testCaptureFullNameViewWithCustomFullNameLabel(result = viewWithCustomFullNamePageLabel)
+      testCaptureFullNameViewWithCustomFullNameLabel(result = viewWithCustomFullNamePageLabel)
     }
 
     "redirect to sign in page" when {
@@ -72,9 +74,10 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Ffull-name" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Ffull-name" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -84,17 +87,19 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
   "POST /full-name" when {
     "the whole form is correctly formatted" should {
       "redirect to the Capture Date of Birth page and store the data in the backend" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreFullName(testJourneyId, FullName(testFirstName, testLastName))(status = OK)
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> testFirstName,
-          "last-name" -> testLastName
+          "last-name"  -> testLastName
         )
 
         result must have(
@@ -106,17 +111,19 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "first name and/or last name contain leading/trailing whitespaces" should {
       "remove whitespaces, redirect to the Capture Date of Birth page and store trimmed values in the backend" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreFullName(testJourneyId, FullName(testFirstName, testLastName))(status = OK)
 
         lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> s"   $testFirstName   ",
-          "last-name" -> s"   $testLastName   "
+          "last-name"  -> s"   $testLastName   "
         )
 
         result must have(
@@ -130,15 +137,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the whole form is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> "",
-          "last-name" -> ""
+          "last-name"  -> ""
         )
       }
       "return a bad request" in {
@@ -149,15 +158,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the first name is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> "",
-          "last-name" -> testLastName
+          "last-name"  -> testLastName
         )
       }
       "return a bad request" in {
@@ -168,15 +179,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the last name is missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> testFirstName,
-          "last-name" -> ""
+          "last-name"  -> ""
         )
       }
       "return a bad request" in {
@@ -187,15 +200,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the first name and last name are missing" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> "",
-          "last-name" -> ""
+          "last-name"  -> ""
         )
       }
       "return a bad request" in {
@@ -206,15 +221,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the first name is invalid" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> "00000",
-          "last-name" -> testLastName
+          "last-name"  -> testLastName
         )
       }
       "return a bad request" in {
@@ -225,15 +242,17 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "the last name is invalid" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> testFirstName,
-          "last-name" -> "00000"
+          "last-name"  -> "00000"
         )
       }
       "return a bad request" in {
@@ -244,15 +263,18 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper
 
     "there is a form error and the given persisted pageConfig has a custom full name page label" should {
       lazy val viewWithCustomFullNamePageLabel = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig =
+              testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(optFullNamePageLabel = Some(testFullNamePageLabel)))
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         post(uri = s"/identify-your-sole-trader-business/$testJourneyId/full-name")(
           "first-name" -> testFirstName,
-          "last-name" -> ""
+          "last-name"  -> ""
         )
       }
       testCaptureFullNameErrorViewWithCustomFullNameLabel(result = viewWithCustomFullNamePageLabel)

@@ -28,33 +28,32 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
-                                                           appConfig: AppConfig
-                                                          )(implicit ec: ExecutionContext) {
+class CreateBusinessVerificationJourneyConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
-  def createBusinessVerificationJourney(journeyId: String,
-                                        sautr: String,
-                                        journeyConfig: JourneyConfig
-                                       )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
+  def createBusinessVerificationJourney(journeyId: String, sautr: String, journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier
+  ): Future[BusinessVerificationJourneyCreationResponse] = {
 
     val pageTitle: String = journeyConfig.pageConfig.labels
       .flatMap(_.optEnglishServiceName)
-      .getOrElse(journeyConfig.pageConfig.optServiceName
-        .getOrElse(appConfig.defaultServiceName)
+      .getOrElse(
+        journeyConfig.pageConfig.optServiceName
+          .getOrElse(appConfig.defaultServiceName)
       )
 
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
-        "origin" -> journeyConfig.regime.toLowerCase,
+        "origin"      -> journeyConfig.regime.toLowerCase,
         "identifiers" -> Json.arr(
           Json.obj(
             "saUtr" -> sautr
-          )),
-        "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+          )
+        ),
+        "continueUrl"               -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
         "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-        "pageTitle" -> pageTitle,
-        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
+        "pageTitle"                 -> pageTitle,
+        "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId
       )
 
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(

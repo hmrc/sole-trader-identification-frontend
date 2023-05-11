@@ -24,12 +24,12 @@ trait RegisterStub extends WireMockMethods {
 
   def stubRegister(nino: String, optSautr: Option[String], regime: String)(status: Int, body: JsObject): StubMapping = {
     val detailsJson = Json.obj(
-      "nino" -> nino.toUpperCase,
+      "nino"   -> nino.toUpperCase,
       "regime" -> regime
     ) ++ {
       optSautr match {
         case Some(sautr) => Json.obj("sautr" -> sautr)
-        case _ => Json.obj()
+        case _           => Json.obj()
       }
     }
 
@@ -40,32 +40,32 @@ trait RegisterStub extends WireMockMethods {
     when(method = POST, uri = "/sole-trader-identification/register", jsonBody)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 
   def stubRegisterWithTrn(trn: String, sautr: String, regime: String)(status: Int, body: JsObject): StubMapping = {
     val jsonBody = Json.obj(
-      "trn" -> trn,
-      "sautr" -> sautr,
+      "trn"    -> trn,
+      "sautr"  -> sautr,
       "regime" -> regime
     )
 
     when(method = POST, uri = "/sole-trader-identification/register-trn", jsonBody)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 
   def verifyRegister(nino: String, optSautr: Option[String], regime: String): Unit = {
     val detailsJson = Json.obj(
-      "nino" -> nino.toUpperCase,
+      "nino"   -> nino.toUpperCase,
       "regime" -> regime
     ) ++ {
       optSautr match {
         case Some(sautr) => Json.obj("sautr" -> sautr)
-        case _ => Json.obj()
+        case _           => Json.obj()
       }
     }
 
@@ -78,8 +78,8 @@ trait RegisterStub extends WireMockMethods {
 
   def verifyRegisterWithTrn(trn: String, sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(
-      "trn" -> trn,
-      "sautr" -> sautr,
+      "trn"    -> trn,
+      "sautr"  -> sautr,
       "regime" -> regime
     )
 

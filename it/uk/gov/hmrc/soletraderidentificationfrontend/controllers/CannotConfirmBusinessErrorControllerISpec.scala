@@ -24,22 +24,25 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, CreateTrnSt
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CannotConfirmBusinessErrorViewTests
 
-class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
-  with CannotConfirmBusinessErrorViewTests
-  with SoleTraderIdentificationStub
-  with CreateTrnStub
-  with AuthStub {
+class CannotConfirmBusinessErrorControllerISpec
+    extends ComponentSpecHelper
+    with CannotConfirmBusinessErrorViewTests
+    with SoleTraderIdentificationStub
+    with CreateTrnStub
+    with AuthStub {
 
   val testFirstName = "John"
   val testLastName = "Smith"
 
   "GET /cannot-confirm-business" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfigWithCallingService
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfigWithCallingService
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/cannot-confirm-business")
     }
@@ -58,9 +61,10 @@ class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
         lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/cannot-confirm-business")
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fcannot-confirm-business" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fcannot-confirm-business" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -71,11 +75,13 @@ class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
     "the user selects yes" when {
       "the user has previously provided a nino" should {
         "redirect to the contineurl" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testIndividualJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveNino(testJourneyId)(OK, testNino)
 
@@ -90,11 +96,13 @@ class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
       }
       "the user has not provided a nino" should {
         "create a trn redirect to the contineurl" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testIndividualJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testIndividualJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveNino(testJourneyId)(NOT_FOUND)
           stubRetrieveFullName(testJourneyId)(OK, Json.toJson(testFullName))
@@ -116,11 +124,13 @@ class CannotConfirmBusinessErrorControllerISpec extends ComponentSpecHelper
 
     "the user selects no" should {
       "redirect to the capture fullname page" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveAllData(testJourneyId)(NO_CONTENT)
 

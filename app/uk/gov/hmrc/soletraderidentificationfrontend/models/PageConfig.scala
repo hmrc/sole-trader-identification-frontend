@@ -24,29 +24,18 @@ case class PageConfig(optServiceName: Option[String],
                       enableSautrCheck: Boolean,
                       accessibilityUrl: String,
                       optFullNamePageLabel: Option[String],
-                      labels: Option[JourneyLabels] = None)
+                      labels: Option[JourneyLabels] = None
+                     )
 
 object PageConfig {
 
-  def apply(deskProServiceId: String,
-            signOutUrl: String,
-            enableSautrCheck: Boolean,
-            accessibilityUrl: String,
-            labels: JourneyLabels
-           ): PageConfig = {
+  def apply(deskProServiceId: String, signOutUrl: String, enableSautrCheck: Boolean, accessibilityUrl: String, labels: JourneyLabels): PageConfig = {
 
     val optLabels = if (labels.nonEmpty) Some(labels) else None
 
-    new PageConfig(None,
-      deskProServiceId,
-      signOutUrl,
-      enableSautrCheck,
-      accessibilityUrl,
-      None,
-      optLabels)
+    new PageConfig(None, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, None, optLabels)
   }
 
   implicit val format: OFormat[PageConfig] = Json.format[PageConfig]
-
 
 }

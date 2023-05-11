@@ -20,7 +20,7 @@ import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NO_CONTENT, OK, await, defa
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.KnownFactsStub
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsResponse, KnownFactsNoContentError}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{KnownFactsNoContentError, KnownFactsResponse}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.KnownFactsStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 

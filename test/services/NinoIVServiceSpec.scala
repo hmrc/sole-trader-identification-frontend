@@ -31,12 +31,12 @@ import uk.gov.hmrc.soletraderidentificationfrontend.services.NinoIVService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-class NinoIVServiceSpec extends AnyWordSpec
-  with Matchers
-  with MockSoleTraderIdentificationService
-  with MockCreateNinoIVJourneyConnector
-  with MockRetrieveNinoIVStatusConnector {
+class NinoIVServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with MockSoleTraderIdentificationService
+    with MockCreateNinoIVJourneyConnector
+    with MockRetrieveNinoIVStatusConnector {
 
   object TestService extends NinoIVService(mockCreateNinoIVJourneyConnector, mockRetrieveNinoIVStatusConnector, mockSoleTraderIdentificationService)
 

@@ -38,9 +38,10 @@ trait MockRetrieveKnownFactsConnector extends MockitoSugar with BeforeAndAfterEa
   }
 
   def mockRetrieveKnownFacts(sautr: String)(response: Future[Either[KnownFactsResponseError, KnownFactsResponse]]): OngoingStubbing[_] = {
-    when(mockRetrieveKnownFactsConnector.retrieveKnownFacts(
-      ArgumentMatchers.eq(sautr)
-    )(ArgumentMatchers.any[HeaderCarrier])
+    when(
+      mockRetrieveKnownFactsConnector.retrieveKnownFacts(
+        ArgumentMatchers.eq(sautr)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
   }
 

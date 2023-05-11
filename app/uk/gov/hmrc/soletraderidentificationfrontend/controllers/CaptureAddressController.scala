@@ -32,73 +32,79 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureAddressController @Inject()(mcc: MessagesControllerComponents,
-                                         view: capture_address_page,
-                                         soleTraderIdentificationService: SoleTraderIdentificationService,
-                                         val authConnector: AuthConnector,
-                                         journeyService: JourneyService,
-                                         messagesHelper: MessagesHelper
-                                        )(implicit val config: AppConfig,
-                                          ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureAddressController @Inject() (mcc: MessagesControllerComponents,
+                                          view: capture_address_page,
+                                          soleTraderIdentificationService: SoleTraderIdentificationService,
+                                          val authConnector: AuthConnector,
+                                          journeyService: JourneyService,
+                                          messagesHelper: MessagesHelper
+                                         )(implicit val config: AppConfig, ec: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            firstName <- soleTraderIdentificationService
-              .retrieveFullName(journeyId)
-              .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
-          } yield {
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          firstName <- soleTraderIdentificationService
+                         .retrieveFullName(journeyId)
+                         .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+        } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
               firstName,
-              journeyId = journeyId,
+              journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureAddressController.submit(journeyId),
-              form = CaptureAddressForm.apply(),
-              countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
-            ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+              form       = CaptureAddressForm.apply(),
+              countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          CaptureAddressForm.apply().bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        CaptureAddressForm
+          .apply()
+          .bindFromRequest()
+          .fold(
             formWithErrors => {
               for {
                 journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
                 firstName <- soleTraderIdentificationService
-                  .retrieveFullName(journeyId)
-                  .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+                               .retrieveFullName(journeyId)
+                               .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
               } yield {
                 val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
                 implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                BadRequest(view(
-                  firstName,
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureAddressController.submit(journeyId),
-                  form = formWithErrors,
-                  countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
-                ))
+                BadRequest(
+                  view(
+                    firstName,
+                    journeyId  = journeyId,
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureAddressController.submit(journeyId),
+                    form       = formWithErrors,
+                    countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
+                  )
+                )
               }
             },
             address =>
-              soleTraderIdentificationService.storeAddress(journeyId, address).map {
-                _ => Redirect(routes.CaptureSautrController.show(journeyId))
+              soleTraderIdentificationService.storeAddress(journeyId, address).map { _ =>
+                Redirect(routes.CaptureSautrController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

@@ -32,17 +32,23 @@ trait MockRegistrationOrchestrationService extends MockitoSugar with BeforeAndAf
 
   val mockRegistrationOrchestrationService: RegistrationOrchestrationService = mock[RegistrationOrchestrationService]
 
-  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], journeyConfig: JourneyConfig)
-                                             (response: Future[RegistrationStatus]): OngoingStubbing[_] =
-    when(mockRegistrationOrchestrationService.registerWithoutBusinessVerification(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(optNino),
-      ArgumentMatchers.eq(optSautr),
-      ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], journeyConfig: JourneyConfig)(
+    response: Future[RegistrationStatus]
+  ): OngoingStubbing[_] =
+    when(
+      mockRegistrationOrchestrationService.registerWithoutBusinessVerification(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(optNino),
+        ArgumentMatchers.eq(optSautr),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyRegisterWithoutBusinessVerification(journeyId: String, optNino: Option[String], optSautr: Option[String], journeyConfig: JourneyConfig): Unit =
+  def verifyRegisterWithoutBusinessVerification(journeyId: String,
+                                                optNino: Option[String],
+                                                optSautr: Option[String],
+                                                journeyConfig: JourneyConfig
+                                               ): Unit =
     verify(mockRegistrationOrchestrationService).registerWithoutBusinessVerification(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(optNino),

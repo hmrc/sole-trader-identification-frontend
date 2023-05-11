@@ -30,7 +30,7 @@ trait NinoInsightsStub extends WireMockMethods {
     when(method = POST, uri = "/sole-trader-identification/nino-insights", jsonBody)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 

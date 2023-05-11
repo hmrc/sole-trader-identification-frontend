@@ -56,6 +56,6 @@ object RetrieveIndividualDetailsHttpParser {
       (JsPath \ DateOfBirthKey).read[LocalDate] and
       (JsPath \ NinoKey).readNullable[String] and
       (JsPath \ SautrKey).readNullable[String]
-    ) (IndividualDetails.apply _)
+  )(IndividualDetails.apply _)
 
 }

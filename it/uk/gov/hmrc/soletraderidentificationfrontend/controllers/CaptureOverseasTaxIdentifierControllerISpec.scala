@@ -23,22 +23,24 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureOverseasTaxIdentifierViewTests
 
-
-class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
-  with AuthStub
-  with SoleTraderIdentificationStub
-  with CaptureOverseasTaxIdentifierViewTests {
+class CaptureOverseasTaxIdentifierControllerISpec
+    extends ComponentSpecHelper
+    with AuthStub
+    with SoleTraderIdentificationStub
+    with CaptureOverseasTaxIdentifierViewTests {
 
   "GET /overseas-identifier" when {
 
     "displayed" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
       }
@@ -62,9 +64,10 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -77,23 +80,26 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
     "the user selects 'Yes' and the tax identifier is correctly formatted" should {
 
       "redirect to Country selection page" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)(OK)
 
-        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "Yes",
-          "tax-identifier" -> testOverseasTaxIdentifier)
+        lazy val result =
+          post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "Yes",
+                                                                                          "tax-identifier"       -> testOverseasTaxIdentifier
+                                                                                         )
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri(routes.CaptureOverseasTaxIdentifierCountryController.show(testJourneyId).url)
         )
-         verifyStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)
+        verifyStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)
       }
 
     }
@@ -102,18 +108,19 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
       "redirect to Check Your Answers" in {
 
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
         stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
 
-        lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "No",
-          "tax-identifier" -> "")
+        lazy val result =
+          post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "No", "tax-identifier" -> "")
 
         result must have(
           httpStatus(SEE_OTHER),
@@ -128,11 +135,13 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
     "the user submits the form without making a selection" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
 
         stubAuth(OK, successfulAuthResponse())
 
@@ -149,16 +158,16 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
     "the user selects 'Yes' but does not define the tax identifier" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "Yes",
-          "tax-identifier" -> "")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "Yes", "tax-identifier" -> "")
       }
 
       "return a bad request" in {
@@ -171,16 +180,18 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
     "the user selects 'Yes' but enters an invalid tax identifier" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "Yes",
-          "tax-identifier" -> "1234$5566434")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "Yes",
+                                                                                        "tax-identifier"       -> "1234$5566434"
+                                                                                       )
       }
 
       "return a bad request" in {
@@ -193,16 +204,19 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
     "the user selects 'Yes' but enters a tax identifier that is too long" should {
 
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
 
         stubAuth(OK, successfulAuthResponse())
-        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "Yes",
-          "tax-identifier" -> "1234567890123456789012345678901234567890123456789012345678901")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")(
+          "tax-identifier-radio" -> "Yes",
+          "tax-identifier"       -> "1234567890123456789012345678901234567890123456789012345678901"
+        )
       }
 
       "return a bad request" in {
@@ -218,15 +232,17 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier"
-        )("tax-identifier-radio" -> "Yes",
-          "tax-identifier" -> testOverseasTaxIdentifier)
+        lazy val result: WSResponse =
+          post(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "Yes",
+                                                                                          "tax-identifier"       -> testOverseasTaxIdentifier
+                                                                                         )
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Foverseas-identifier" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }

@@ -37,28 +37,27 @@ trait MockJourneyConfigRepository extends MockitoSugar with BeforeAndAfterEach {
     reset(mockJourneyConfigRepository)
   }
 
-  def mockInsertJourneyConfig(journeyId: String,
-                              internalId: String,
-                              journeyConfig: JourneyConfig
-                             )(response: Future[InsertOneResult]): OngoingStubbing[_] = {
-    when(mockJourneyConfigRepository.insertJourneyConfig(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(internalId),
-      ArgumentMatchers.eq(journeyConfig)
-    )).thenReturn(response)
+  def mockInsertJourneyConfig(journeyId: String, internalId: String, journeyConfig: JourneyConfig)(
+    response: Future[InsertOneResult]
+  ): OngoingStubbing[_] = {
+    when(
+      mockJourneyConfigRepository.insertJourneyConfig(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(internalId),
+        ArgumentMatchers.eq(journeyConfig)
+      )
+    ).thenReturn(response)
   }
 
-  def mockFindJourneyConfig(journeyId: String,
-                            authInternalId: String
-                           )(response: Future[Option[JourneyConfig]]): OngoingStubbing[_] = {
-    when(mockJourneyConfigRepository.findJourneyConfig(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(authInternalId)
-    )).thenReturn(response)
+  def mockFindJourneyConfig(journeyId: String, authInternalId: String)(response: Future[Option[JourneyConfig]]): OngoingStubbing[_] = {
+    when(
+      mockJourneyConfigRepository.findJourneyConfig(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(authInternalId)
+      )
+    ).thenReturn(response)
   }
-  def verifyInsertJourneyConfig(journeyId: String,
-                                internalId: String,
-                                journeyConfig: JourneyConfig): Unit =
+  def verifyInsertJourneyConfig(journeyId: String, internalId: String, journeyConfig: JourneyConfig): Unit =
     verify(mockJourneyConfigRepository).insertJourneyConfig(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(internalId),

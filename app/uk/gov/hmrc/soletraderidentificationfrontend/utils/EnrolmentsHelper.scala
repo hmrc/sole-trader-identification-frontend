@@ -21,11 +21,10 @@ import uk.gov.hmrc.auth.core.Enrolments
 object EnrolmentsHelper {
 
   def getSaEnrolment(enrolments: Enrolments): Option[String] =
-    enrolments.getEnrolment("IR-SA").flatMap {
-      IRSAEnrolments =>
-        IRSAEnrolments.getIdentifier("UTR").map {
-          _.value
-        }
+    enrolments.getEnrolment("IR-SA").flatMap { IRSAEnrolments =>
+      IRSAEnrolments.getIdentifier("UTR").map {
+        _.value
+      }
 
     }
 }

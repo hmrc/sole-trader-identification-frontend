@@ -39,7 +39,7 @@ object SoleTraderVerificationResultHttpParser {
       (JsPath \ DateOfBirthKey).read[LocalDate] and
       (JsPath \ NinoKey).readNullable[String] and
       (JsPath \ SautrKey).readNullable[String]
-    ) (IndividualDetails.apply _)
+  )(IndividualDetails.apply _)
 
   implicit object SoleTraderVerificationResultReads extends HttpReads[AuthenticatorResponse] {
     override def read(method: String, url: String, response: HttpResponse): AuthenticatorResponse =

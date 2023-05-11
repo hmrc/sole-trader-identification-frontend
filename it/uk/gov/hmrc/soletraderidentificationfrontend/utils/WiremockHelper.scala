@@ -39,7 +39,7 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     val uriMapping = postRequestedFor(urlEqualTo(uri))
     val postRequest = optBody match {
       case Some(body) => uriMapping.withRequestBody(equalTo(body))
-      case None => uriMapping
+      case None       => uriMapping
     }
     verify(postRequest)
   }
@@ -51,48 +51,43 @@ object WiremockHelper extends Eventually with IntegrationPatience {
   def verifyDelete(uri: String): Unit = verify(deleteRequestedFor(urlEqualTo(uri)))
 
   def stubGet(url: String, status: Integer, body: String): StubMapping =
-    stubFor(get(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(body)
-      )
+    stubFor(
+      get(urlMatching(url))
+        .willReturn(
+          aResponse().withStatus(status).withBody(body)
+        )
     )
 
   def stubPost(url: String, status: Integer, responseBody: String): StubMapping =
-    stubFor(post(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(responseBody)
-      )
+    stubFor(
+      post(urlMatching(url))
+        .willReturn(
+          aResponse().withStatus(status).withBody(responseBody)
+        )
     )
 
   def stubPut(url: String, status: Integer, responseBody: String): StubMapping =
-    stubFor(put(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(responseBody)
-      )
+    stubFor(
+      put(urlMatching(url))
+        .willReturn(
+          aResponse().withStatus(status).withBody(responseBody)
+        )
     )
 
   def stubPatch(url: String, status: Integer, responseBody: String): StubMapping =
-    stubFor(patch(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(responseBody)
-      )
+    stubFor(
+      patch(urlMatching(url))
+        .willReturn(
+          aResponse().withStatus(status).withBody(responseBody)
+        )
     )
 
   def stubDelete(url: String, status: Integer, responseBody: String): StubMapping =
-    stubFor(delete(urlMatching(url))
-      .willReturn(
-        aResponse().
-          withStatus(status).
-          withBody(responseBody)
-      )
+    stubFor(
+      delete(urlMatching(url))
+        .willReturn(
+          aResponse().withStatus(status).withBody(responseBody)
+        )
     )
 
   def stubAudit(): StubMapping = {
@@ -104,7 +99,7 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     val uriMapping = putRequestedFor(urlEqualTo(uri))
     val putRequest = optBody match {
       case Some(body) => uriMapping.withRequestBody(equalTo(body))
-      case None => uriMapping
+      case None       => uriMapping
     }
     verify(putRequest)
   }
@@ -116,7 +111,7 @@ object WiremockHelper extends Eventually with IntegrationPatience {
 
   def verifyAuditTypeFor(auditTypeToBeFound: String): Unit = {
     def extractRequestBody(request: LoggedRequest): JsValue = Try(Json.parse(request.getBodyAsString)) match {
-      case Failure(_) => throw new IllegalStateException(s"Audit should receive json request but it did not. Request details:\n$request")
+      case Failure(_)     => throw new IllegalStateException(s"Audit should receive json request but it did not. Request details:\n$request")
       case Success(value) => value
     }
 
@@ -125,20 +120,19 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     def filterAuditTypeRequests(allAuditMessages: Seq[LoggedRequest], auditType: String) = allAuditMessages.filter(loggedRequest =>
       (extractRequestBody(loggedRequest) \ "auditType").validate[String] match {
         case JsSuccess(value, _) => value.equals(auditType)
-        case JsError(_) => false
-      })
+        case JsError(_)          => false
+      }
+    )
 
     eventually {
       import scala.jdk.CollectionConverters._
-      val allAuditRequests = WireMock.findAll(auditRequest)
-        .listIterator
-        .asScala
-        .toList
+      val allAuditRequests = WireMock.findAll(auditRequest).listIterator.asScala.toList
 
       val allAuditTypeRequestsFound: Seq[LoggedRequest] = filterAuditTypeRequests(allAuditRequests, auditTypeToBeFound)
 
       if (allAuditTypeRequestsFound.size == 1) ()
-      else throw new AssertionError(s"Expecting exactly 1 json with auditType equals to $auditTypeToBeFound but got ${allAuditTypeRequestsFound.size}")
+      else
+        throw new AssertionError(s"Expecting exactly 1 json with auditType equals to $auditTypeToBeFound but got ${allAuditTypeRequestsFound.size}")
     }
   }
 

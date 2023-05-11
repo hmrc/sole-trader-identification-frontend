@@ -19,7 +19,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 import play.api.libs.json.Json
 
 case class Country(country: String, name: String)
-  object Country {
-    implicit val CountryFormat = Json.format[Country]
-  }
-
+object Country {
+  implicit val CountryFormat = Json.format[Country]
+}

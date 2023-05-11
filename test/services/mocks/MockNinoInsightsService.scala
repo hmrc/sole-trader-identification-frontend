@@ -33,7 +33,10 @@ trait MockNinoInsightsService extends MockitoSugar with BeforeAndAfterEach {
   val mockNinoInsightsService: NinoInsightsService = mock[NinoInsightsService]
 
   def mockNinoInsights(journeyId: String, nino: String)(response: Future[JsObject]): OngoingStubbing[_] =
-    when(mockNinoInsightsService.ninoInsights(
-      ArgumentMatchers.eq(journeyId), ArgumentMatchers.eq(nino)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+    when(
+      mockNinoInsightsService.ninoInsights(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(nino)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
 }

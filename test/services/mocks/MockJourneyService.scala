@@ -36,12 +36,12 @@ trait MockJourneyService extends MockitoSugar with BeforeAndAfterEach {
     reset(mockJourneyService)
   }
 
-  def mockGetJourneyConfig(journeyId: String,
-                           authInternalId: String)
-                          (response: Future[JourneyConfig]): OngoingStubbing[_] =
-    when(mockJourneyService.getJourneyConfig(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(authInternalId)
-    )).thenReturn(response)
+  def mockGetJourneyConfig(journeyId: String, authInternalId: String)(response: Future[JourneyConfig]): OngoingStubbing[_] =
+    when(
+      mockJourneyService.getJourneyConfig(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(authInternalId)
+      )
+    ).thenReturn(response)
 
 }

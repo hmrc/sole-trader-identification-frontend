@@ -27,19 +27,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RegistrationConnector @Inject()(httpClient: HttpClient,
-                                      appConfig: AppConfig
-                                     )(implicit ec: ExecutionContext) {
+class RegistrationConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def registerWithNino(nino: String, optSautr: Option[String], regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
 
     val detailsJson = Json.obj(
-      "nino" -> nino.toUpperCase,
+      "nino"   -> nino.toUpperCase,
       "regime" -> regime
     ) ++ {
       optSautr match {
         case Some(sautr) => Json.obj("sautr" -> sautr)
-        case _ => Json.obj()
+        case _           => Json.obj()
       }
     }
 
@@ -58,8 +56,8 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
   def registerWithTrn(temporaryReferenceNumber: String, sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
 
     val jsonBody = Json.obj(
-      "trn" -> temporaryReferenceNumber,
-      "sautr" -> sautr,
+      "trn"    -> temporaryReferenceNumber,
+      "sautr"  -> sautr,
       "regime" -> regime
     )
 

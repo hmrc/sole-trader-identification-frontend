@@ -41,19 +41,19 @@ trait AuthStub extends WireMockMethods {
 
   def successfulAuthResponse(enrolments: JsObject*): JsObject = Json.obj(
     "optionalCredentials" -> Json.obj(
-      "providerId" -> testCredentialId,
+      "providerId"   -> testCredentialId,
       "providerType" -> testGGProviderId
     ),
     "groupIdentifier" -> testGroupId,
-    "internalId" -> Some(testInternalId),
-    "allEnrolments" -> enrolments
+    "internalId"      -> Some(testInternalId),
+    "allEnrolments"   -> enrolments
   )
 
   def irSaEnrolment(utr: String): JsObject = Json.obj(
     "key" -> IRSaEnrolmentKey,
     "identifiers" -> Json.arr(
       Json.obj(
-        "key" -> IRSaReferenceKey,
+        "key"   -> IRSaReferenceKey,
         "value" -> utr
       )
     )

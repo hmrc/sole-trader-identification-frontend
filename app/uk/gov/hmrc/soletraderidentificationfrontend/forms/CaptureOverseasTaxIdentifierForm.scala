@@ -39,13 +39,13 @@ object CaptureOverseasTaxIdentifierForm {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
 
-      val overseasTaxIdentifierChoiceExists: Boolean = data.getOrElse(key,"").nonEmpty
+      val overseasTaxIdentifierChoiceExists: Boolean = data.getOrElse(key, "").nonEmpty
 
-      if(overseasTaxIdentifierChoiceExists) {
+      if (overseasTaxIdentifierChoiceExists) {
 
         val overseasTaxIdentifierChoice: Option[String] = data.get(key)
 
-        if(overseasTaxIdentifierChoice.get == YesNo.Yes.toString){
+        if (overseasTaxIdentifierChoice.get == YesNo.Yes.toString) {
           handleOverseasTaxIdentifier(data)
         } else {
           Right(None)
@@ -62,10 +62,11 @@ object CaptureOverseasTaxIdentifierForm {
     override def unbind(key: String, value: Option[String]): Map[String, String] = {
 
       value match {
-        case Some(overseasTaxIdentifier) => Map(
-          key -> YesNo.Yes.toString,
-          overseasTaxIdentifierKey -> overseasTaxIdentifier
-        )
+        case Some(overseasTaxIdentifier) =>
+          Map(
+            key                      -> YesNo.Yes.toString,
+            overseasTaxIdentifierKey -> overseasTaxIdentifier
+          )
         case None => Map(key -> YesNo.No.toString)
       }
 
@@ -75,17 +76,17 @@ object CaptureOverseasTaxIdentifierForm {
 
       data.get(overseasTaxIdentifierKey) match {
         case Some(id) => validateOverseasTaxIdentifier(id)
-        case None => Left(Seq(FormError(overseasTaxIdentifierKey, overseasTaxIdentifierNotEnteredErrorMsg)))
+        case None     => Left(Seq(FormError(overseasTaxIdentifierKey, overseasTaxIdentifierNotEnteredErrorMsg)))
       }
     }
 
     def validateOverseasTaxIdentifier(id: String): Either[Seq[FormError], Option[String]] = {
 
-      if(validateEntered(id)) {
+      if (validateEntered(id)) {
 
-        if(validateLength(id)) {
+        if (validateLength(id)) {
 
-          if(validateCharacters(id)){
+          if (validateCharacters(id)) {
 
             Right(Some(id))
 

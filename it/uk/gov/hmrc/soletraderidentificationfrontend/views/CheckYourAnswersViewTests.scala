@@ -19,7 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CheckYourAnswers => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CheckYourAnswers => messages, Header}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
@@ -28,7 +28,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.checkYourAn
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
 import scala.collection.JavaConverters._
-
 
 trait CheckYourAnswersViewTests {
   this: ComponentSpecHelper =>
@@ -129,7 +128,6 @@ trait CheckYourAnswersViewTests {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
-
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut
     }
@@ -211,7 +209,6 @@ trait CheckYourAnswersViewTests {
   def testCheckYourAnswersNoNinoWithOverseasTaxIdentifierView(result: => WSResponse, journeyId: String): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
-
 
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut
@@ -340,7 +337,6 @@ trait CheckYourAnswersViewTests {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
-
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut
     }
@@ -458,7 +454,6 @@ trait CheckYourAnswersViewTests {
   def testCheckYourAnswersNoNinoIndividualFlowView(result: => WSResponse, journeyId: String): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
-
 
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut

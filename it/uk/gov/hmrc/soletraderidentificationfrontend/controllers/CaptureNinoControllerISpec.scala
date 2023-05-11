@@ -26,19 +26,18 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureNinoViewTests
 
-class CaptureNinoControllerISpec extends ComponentSpecHelper
-  with CaptureNinoViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureNinoControllerISpec extends ComponentSpecHelper with CaptureNinoViewTests with SoleTraderIdentificationStub with AuthStub {
 
   "GET /national-insurance-number" when {
     "the feature switch is turned off" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
@@ -59,9 +58,10 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
           result must have(
             httpStatus(SEE_OTHER),
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fnational-insurance-number" +
-              "&origin=sole-trader-identification-frontend"
+            redirectUri(
+              "/bas-gateway/sign-in" +
+                s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fnational-insurance-number" +
+                "&origin=sole-trader-identification-frontend"
             )
           )
         }
@@ -69,11 +69,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
     }
     "the feature switch is turned on" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
@@ -95,9 +97,10 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
           result must have(
             httpStatus(SEE_OTHER),
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fnational-insurance-number" +
-              "&origin=sole-trader-identification-frontend"
+            redirectUri(
+              "/bas-gateway/sign-in" +
+                s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fnational-insurance-number" +
+                "&origin=sole-trader-identification-frontend"
             )
           )
         }
@@ -108,11 +111,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
   "POST /national-insurance-number" when {
     "the nino is correctly formatted" should {
       "redirect to check your answers page" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
@@ -129,11 +134,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
         )
       }
       "redirect to the capture sautr page" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubStoreNino(testJourneyId, testNino)(status = OK)
         stubRemoveAddress(testJourneyId)(NO_CONTENT)
@@ -153,11 +160,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "no nino is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -173,11 +182,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "an invalid nino is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -193,11 +204,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "an incomplete nino is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -211,14 +224,15 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
       testCaptureNinoErrorIncorrectFormat(result)
     }
 
-
     "there is a form error and full name is defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -230,11 +244,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "there is a form error and full name is NOT defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")("nino" -> "to simulate an error")
@@ -253,11 +269,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
   "GET /no-nino" should {
     "redirect to capture address page" when {
       "the nino is successfully removed" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveNino(testJourneyId)(NO_CONTENT)
 
@@ -272,11 +290,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "throw an exception" when {
       "the backend returns a failure" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveNino(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
 
@@ -288,11 +308,13 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper
 
     "redirect to check your answers page" when {
       "there is no nino on the individual journey" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveNino(testJourneyId)(NO_CONTENT)
 

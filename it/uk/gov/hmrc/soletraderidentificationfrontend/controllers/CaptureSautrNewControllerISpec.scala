@@ -25,18 +25,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureSautrNewViewTests
 
-class CaptureSautrNewControllerISpec extends ComponentSpecHelper
-  with CaptureSautrNewViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureSautrNewControllerISpec extends ComponentSpecHelper with CaptureSautrNewViewTests with SoleTraderIdentificationStub with AuthStub {
 
   "GET /unique-taxpayer-reference-radio-buttons" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -58,9 +57,10 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Funique-taxpayer-reference-radio-buttons" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Funique-taxpayer-reference-radio-buttons" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -68,9 +68,11 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "throw an Internal Server Error" when {
       "the user does not have an internal Id" in {
-        stubAuth(OK, Json.obj(
-          "internalId" -> None
-        ))
+        stubAuth(OK,
+                 Json.obj(
+                   "internalId" -> None
+                 )
+                )
 
         lazy val result: WSResponse = get(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")
 
@@ -83,18 +85,21 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
     "the sautr is correctly formatted" should {
       "redirect to SA postcode Page and store the data in the backend" when {
         "the user does not have a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubStoreSautr(testJourneyId, testSautr)(status = OK)
           stubRetrieveNino(testJourneyId)(NOT_FOUND)
           stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
 
           lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-            "sa-utr" -> testSautr)
+                                                                                                                                "sa-utr" -> testSautr
+                                                                                                                               )
 
           result must have(
             httpStatus(SEE_OTHER),
@@ -104,18 +109,21 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
       }
       "redirect to the CYA page" when {
         "the user has a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubStoreSautr(testJourneyId, testSautr)(status = OK)
           stubRetrieveNino(testJourneyId)(OK, testNino)
           stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
 
           lazy val result = post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-            "sa-utr" -> testSautr)
+                                                                                                                                "sa-utr" -> testSautr
+                                                                                                                               )
 
           result must have(
             httpStatus(SEE_OTHER),
@@ -127,19 +135,20 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "no sautr is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         stubRemoveSautr(testJourneyId)(NO_CONTENT)
         stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
         stubRetrieveNino(testJourneyId)(OK, testNino)
 
-        post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-          "sa-utr" -> "")
+        post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes", "sa-utr" -> "")
       }
 
       "return a bad request" in {
@@ -151,16 +160,19 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "an invalid sautr is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-          "sa-utr" -> "123456789")
+                                                                                                            "sa-utr"   -> "123456789"
+                                                                                                           )
       }
 
       "return a bad request" in {
@@ -172,11 +184,13 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "no radio option is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         stubRemoveSautr(testJourneyId)(NO_CONTENT)
@@ -195,11 +209,13 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "there is a form error and full name is defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -211,17 +227,18 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "there is a form error and full name is NOT defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(NOT_FOUND)
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "")
       }
-
 
       "return an internal server error" in {
         result.status mustBe INTERNAL_SERVER_ERROR
@@ -231,14 +248,17 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
     "the user is UNAUTHORISED" should {
       "redirect to sign in page" in {
         stubAuthFailure()
-        lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-          "sa-utr" -> testSautr)
+        lazy val result: WSResponse =
+          post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
+                                                                                                              "sa-utr"   -> testSautr
+                                                                                                             )
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Funique-taxpayer-reference-radio-buttons" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Funique-taxpayer-reference-radio-buttons" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -246,12 +266,16 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper
 
     "throw an Internal Server Error" when {
       "the user does not have an internal Id" in {
-        stubAuth(OK, Json.obj(
-          "internalId" -> None
-        ))
+        stubAuth(OK,
+                 Json.obj(
+                   "internalId" -> None
+                 )
+                )
 
-        lazy val result: WSResponse = post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
-          "sa-utr" -> testSautr)
+        lazy val result: WSResponse =
+          post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "Yes",
+                                                                                                              "sa-utr"   -> testSautr
+                                                                                                             )
 
         result.status mustBe INTERNAL_SERVER_ERROR
       }

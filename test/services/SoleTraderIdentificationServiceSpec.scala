@@ -68,7 +68,7 @@ class SoleTraderIdentificationServiceSpec extends AnyWordSpec with Matchers with
       "the call to the database times out" in {
         mockRetrieveSoleTraderInformation[String](
           journeyId = testJourneyId,
-          dataKey = "sautr"
+          dataKey   = "sautr"
         )(Future.failed(new GatewayTimeoutException("GET of '/testUrl' timed out with message 'testError'")))
 
         intercept[GatewayTimeoutException](

@@ -61,33 +61,33 @@ object CaptureDateOfBirthForm {
     }
 
     override def unbind(key: String, value: LocalDate): Map[String, String] = Map(
-      dayKey -> value.getDayOfMonth.toString,
+      dayKey   -> value.getDayOfMonth.toString,
       monthKey -> value.getMonth.toString,
-      yearKey -> value.getYear.toString
+      yearKey  -> value.getYear.toString
     )
 
     private def determineDate(inputValues: (String, String, String)): Either[Seq[FormError], LocalDate] = {
       val (day, month, year) = inputValues
 
       parseDate(day, month, year) match {
-        case None if !isInputNumerical(inputValues) => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
-        case None => Left(Seq(FormError(dayKey, notRealDateErrorMsg)))
-        case Some(date) if date.getYear <= 1900 => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
+        case None if !isInputNumerical(inputValues)        => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
+        case None                                          => Left(Seq(FormError(dayKey, notRealDateErrorMsg)))
+        case Some(date) if date.getYear <= 1900            => Left(Seq(FormError(dayKey, invalidDateErrorMsg)))
         case Some(date) if date.isAfter(timeMachine.now()) => Left(Seq(FormError(dayKey, futureDateErrorMsg)))
-        case Some(date) if invalidAge(date) => Left(Seq(FormError(dayKey, invalidAgeErrorKey)))
-        case Some(date) => Right(date)
+        case Some(date) if invalidAge(date)                => Left(Seq(FormError(dayKey, invalidAgeErrorKey)))
+        case Some(date)                                    => Right(date)
       }
     }
 
     private def manageMissingData(dayExists: Boolean, monthExists: Boolean, yearExists: Boolean): Either[Seq[FormError], LocalDate] = {
 
       (dayExists, monthExists, yearExists) match {
-        case (false, true, true) => Left(Seq(FormError(dayKey, missingDayErrorMsg)))
-        case (true, false, true) => Left(Seq(FormError(monthKey, missingMonthErrorMsg)))
-        case (true, true, false) => Left(Seq(FormError(yearKey, missingYearErrorMsg)))
-        case (false, false, true) => Left(Seq(FormError(dayKey, missingDayAndMonthErrorMsg)))
-        case (false, true, false) => Left(Seq(FormError(dayKey, missingDayAndYearErrorMsg)))
-        case (true, false, false) => Left(Seq(FormError(monthKey, missingMonthAndYearErrorMsg)))
+        case (false, true, true)   => Left(Seq(FormError(dayKey, missingDayErrorMsg)))
+        case (true, false, true)   => Left(Seq(FormError(monthKey, missingMonthErrorMsg)))
+        case (true, true, false)   => Left(Seq(FormError(yearKey, missingYearErrorMsg)))
+        case (false, false, true)  => Left(Seq(FormError(dayKey, missingDayAndMonthErrorMsg)))
+        case (false, true, false)  => Left(Seq(FormError(dayKey, missingDayAndYearErrorMsg)))
+        case (true, false, false)  => Left(Seq(FormError(monthKey, missingMonthAndYearErrorMsg)))
         case (false, false, false) => Left(Seq(FormError(dayKey, missingDateErrorMsg)))
         case (true, true, true) => throw new InternalServerException("Error : Unexpected invocation of method manageMissingData of object DateHelper")
       }
@@ -118,5 +118,3 @@ object CaptureDateOfBirthForm {
   )
 
 }
-
-

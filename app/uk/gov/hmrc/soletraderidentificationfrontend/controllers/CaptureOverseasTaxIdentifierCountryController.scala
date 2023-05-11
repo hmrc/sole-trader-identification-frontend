@@ -31,63 +31,65 @@ import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_overseas_
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class CaptureOverseasTaxIdentifierCountryController @Inject()(mcc: MessagesControllerComponents,
-                                                              journeyService: JourneyService,
-                                                              view: capture_overseas_tax_identifier_country_page,
-                                                              soleTraderIdentificationService: SoleTraderIdentificationService,
-                                                              val authConnector: AuthConnector,
-                                                              messagesHelper: MessagesHelper
-                                                             )(implicit val config: AppConfig,
-                                                               executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureOverseasTaxIdentifierCountryController @Inject() (mcc: MessagesControllerComponents,
+                                                               journeyService: JourneyService,
+                                                               view: capture_overseas_tax_identifier_country_page,
+                                                               soleTraderIdentificationService: SoleTraderIdentificationService,
+                                                               val authConnector: AuthConnector,
+                                                               messagesHelper: MessagesHelper
+                                                              )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureOverseasTaxIdentifierCountryController.submit(journeyId),
-                form = CaptureOverseasTaxIdentifierCountryForm.form,
-                countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              journeyId  = journeyId,
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureOverseasTaxIdentifierCountryController.submit(journeyId),
+              form       = CaptureOverseasTaxIdentifierCountryForm.form,
+              countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          CaptureOverseasTaxIdentifierCountryForm.form.bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        CaptureOverseasTaxIdentifierCountryForm.form
+          .bindFromRequest()
+          .fold(
             formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig =>
-                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                  BadRequest(view(
-                    journeyId = journeyId,
+              journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(
+                  view(
+                    journeyId  = journeyId,
                     pageConfig = journeyConfig.pageConfig,
                     formAction = routes.CaptureOverseasTaxIdentifierCountryController.submit(journeyId),
-                    form = formWithErrors,
-                    countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
-                  ))
+                    form       = formWithErrors,
+                    countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
+                  )
+                )
               },
             country =>
-              soleTraderIdentificationService.storeOverseasTaxIdentifiersCountry(journeyId, country).map {
-                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
+              soleTraderIdentificationService.storeOverseasTaxIdentifiersCountry(journeyId, country).map { _ =>
+                Redirect(routes.CheckYourAnswersController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
-
 
 }

@@ -26,4 +26,3 @@ object CannotConfirmBusinessErrorForm {
     "yes_no" -> of(yesNoMapping("error.no_selection"))
   )
 }
-

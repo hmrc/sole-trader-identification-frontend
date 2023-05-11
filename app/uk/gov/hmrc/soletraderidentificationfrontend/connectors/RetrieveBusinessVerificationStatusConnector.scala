@@ -27,9 +27,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveBusinessVerificationStatusConnector @Inject()(http: HttpClient,
-                                                            appConfig: AppConfig
-                                                           )(implicit ec: ExecutionContext) {
+class RetrieveBusinessVerificationStatusConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
     http.GET[BusinessVerificationStatus](appConfig.getBusinessVerificationResultUrl(journeyId))(
@@ -53,7 +51,8 @@ object RetrieveBusinessVerificationStatusParser {
             .collect(JsonValidationError("Invalid verification status returned from business verification")) {
               case BusinessVerificationPassKey => BusinessVerificationPass
               case BusinessVerificationFailKey => BusinessVerificationFail
-            }.getOrElse(throw new InternalServerException("Invalid response returned from retrieve Business Verification result"))
+            }
+            .getOrElse(throw new InternalServerException("Invalid response returned from retrieve Business Verification result"))
         case _ =>
           throw new InternalServerException("Invalid response returned from retrieve Business Verification result")
       }
@@ -61,4 +60,3 @@ object RetrieveBusinessVerificationStatusParser {
   }
 
 }
-

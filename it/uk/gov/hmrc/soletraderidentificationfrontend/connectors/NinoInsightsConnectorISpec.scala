@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.libs.json.Json
-import play.api.test.Helpers.{OK, BAD_REQUEST, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{BAD_REQUEST, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testInsightsReturnBody, testNino}
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.NinoInsightsStub

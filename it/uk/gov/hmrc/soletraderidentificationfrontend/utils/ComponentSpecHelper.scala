@@ -34,13 +34,16 @@ import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{F
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.models.FeatureSwitch
 import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository
 
-trait ComponentSpecHelper extends AnyWordSpec with Matchers
-  with CustomMatchers
-  with WiremockHelper
-  with BeforeAndAfterAll
-  with BeforeAndAfterEach
-  with GuiceOneServerPerSuite
-  with FeatureSwitching with Injecting {
+trait ComponentSpecHelper
+    extends AnyWordSpec
+    with Matchers
+    with CustomMatchers
+    with WiremockHelper
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with GuiceOneServerPerSuite
+    with FeatureSwitching
+    with Injecting {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config)
@@ -51,24 +54,24 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
   val mockUrl: String = s"http://$mockHost:$mockPort"
 
   def config: Map[String, String] = Map(
-    "auditing.enabled" -> "false",
-    "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
-    "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
-    "microservice.services.auth.host" -> mockHost,
-    "microservice.services.auth.port" -> mockPort,
-    "microservice.services.base.host" -> mockHost,
-    "microservice.services.base.port" -> mockPort,
-    "microservice.services.self.host" -> mockHost,
-    "microservice.services.self.port" -> mockPort,
-    "microservice.services.self.url" -> mockUrl,
+    "auditing.enabled"                                      -> "false",
+    "play.http.router"                                      -> "testOnlyDoNotUseInAppConf.Routes",
+    "play.filters.csrf.header.bypassHeaders.Csrf-Token"     -> "nocheck",
+    "microservice.services.auth.host"                       -> mockHost,
+    "microservice.services.auth.port"                       -> mockPort,
+    "microservice.services.base.host"                       -> mockHost,
+    "microservice.services.base.port"                       -> mockPort,
+    "microservice.services.self.host"                       -> mockHost,
+    "microservice.services.self.port"                       -> mockPort,
+    "microservice.services.self.url"                        -> mockUrl,
     "microservice.services.sole-trader-identification.host" -> mockHost,
     "microservice.services.sole-trader-identification.port" -> mockPort,
-    "microservice.services.authenticator.host" -> mockHost,
-    "microservice.services.authenticator.port" -> mockPort,
-    "microservice.services.business-verification.url" -> s"$mockUrl/business-verification",
-    "microservice.services.enrolment-store-proxy.host" -> mockHost,
-    "microservice.services.enrolment-store-proxy.port" -> mockPort,
-    "microservice.services.nino-identity-verification.url" -> s"$mockUrl/nino-identity-verification"
+    "microservice.services.authenticator.host"              -> mockHost,
+    "microservice.services.authenticator.port"              -> mockPort,
+    "microservice.services.business-verification.url"       -> s"$mockUrl/business-verification",
+    "microservice.services.enrolment-store-proxy.host"      -> mockHost,
+    "microservice.services.enrolment-store-proxy.port"      -> mockPort,
+    "microservice.services.nino-identity-verification.url"  -> s"$mockUrl/nino-identity-verification"
   )
 
   val baseUrl: String = "/identify-your-sole-trader-business"
@@ -144,11 +147,13 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
       sessionCookie.copy(value = encryptedValue.value)
     }
 
-    val mockSession = Session(Map(
-      SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
-      SessionKeys.authToken -> "mock-bearer-token",
-      SessionKeys.sessionId -> "mock-sessionid"
-    ))
+    val mockSession = Session(
+      Map(
+        SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
+        SessionKeys.authToken            -> "mock-bearer-token",
+        SessionKeys.sessionId            -> "mock-sessionid"
+      )
+    )
 
     val cookie = makeSessionCookie(mockSession)
 

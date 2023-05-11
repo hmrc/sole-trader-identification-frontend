@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
-
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.{TableFor2, Tables}
 import play.api.libs.json.Format.GenericFormat
@@ -44,7 +43,6 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
   val NinoKey = "nino"
   val SautrKey = "sautr"
 
-
   s"retrieveSoleTraderDetails($testJourneyId)" should {
     "return all possible values of SoleTraderDetailsMatchResult" in {
       val identifiersMatchScenarios: TableFor2[String, SoleTraderDetailsMatchResult] =
@@ -59,23 +57,24 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
           ("DeceasedCitizensDetails", DeceasedCitizensDetails)
         )
 
-      forAll(identifiersMatchScenarios) { (identifiersMatchStored: String, identifiersMatchRetrieved: SoleTraderDetailsMatchResult) => {
-        stubRetrieveSoleTraderDetails(testJourneyId)(
-          status = OK,
-          body = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> identifiersMatchStored)
-        )
+      forAll(identifiersMatchScenarios) { (identifiersMatchStored: String, identifiersMatchRetrieved: SoleTraderDetailsMatchResult) =>
+        {
+          stubRetrieveSoleTraderDetails(testJourneyId)(
+            status = OK,
+            body   = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> identifiersMatchStored)
+          )
 
-        val result = await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId))
+          val result = await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId))
 
-        result mustBe Some(testSoleTraderDetails.copy(identifiersMatch = identifiersMatchRetrieved))
-      }
+          result mustBe Some(testSoleTraderDetails.copy(identifiersMatch = identifiersMatchRetrieved))
+        }
       }
     }
 
     "throws an exception if SoleTraderDetailsMatchResult cannot be parsed correctly" in {
       stubRetrieveSoleTraderDetails(testJourneyId)(
         status = OK,
-        body = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> "crappy value")
+        body   = testSoleTraderDetailsJson ++ Json.obj("identifiersMatch" -> "crappy value")
       )
 
       val exception = intercept[JsValidationException](await(soleTraderIdentificationConnector.retrieveSoleTraderDetails(testJourneyId)))
@@ -102,7 +101,7 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
         val testJson = Json.obj(
           "firstName" -> testFirstName,
-          "lastName" -> testLastName
+          "lastName"  -> testLastName
         )
         val result = await(soleTraderIdentificationConnector.retrieveSoleTraderDetails[JsObject](testJourneyId, FullNameKey))
 
@@ -184,8 +183,7 @@ class SoleTraderIdentificationConnectorISpec extends ComponentSpecHelper with So
   s"storeData($testJourneyId, $FullNameKey)" should {
     "return SuccessfullyStored" in {
       stubStoreFullName(testJourneyId, FullName(testFirstName, testLastName))(status = OK)
-      val result = await(soleTraderIdentificationConnector.storeData[FullName](
-        testJourneyId, FullNameKey, FullName(testFirstName, testLastName)))
+      val result = await(soleTraderIdentificationConnector.storeData[FullName](testJourneyId, FullNameKey, FullName(testFirstName, testLastName)))
 
       result mustBe SuccessfullyStored
     }
