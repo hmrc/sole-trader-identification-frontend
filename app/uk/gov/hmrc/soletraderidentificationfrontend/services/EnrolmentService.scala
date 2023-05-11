@@ -22,12 +22,12 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.EnrolmentsHelper.getSa
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class EnrolmentService @Inject()() {
+class EnrolmentService @Inject() () {
 
   def checkSaEnrolmentMatch(enrolments: Enrolments, sautr: String): Boolean =
     getSaEnrolment(enrolments) match {
       case Some(enrolmentSautr) => enrolmentSautr == sautr
-      case None => false
+      case None                 => false
     }
 
 }

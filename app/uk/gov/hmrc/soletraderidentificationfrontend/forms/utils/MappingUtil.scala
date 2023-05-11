@@ -39,7 +39,7 @@ object MappingUtil {
     def toBoolean: Mapping[Boolean] = mapping.transform(
       {
         case Some("true") => true
-        case _ => false
+        case _            => false
       },
       x => Some(x.toString)
     )

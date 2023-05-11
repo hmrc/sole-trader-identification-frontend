@@ -28,7 +28,7 @@ object ConstraintUtil {
       constraint((data: A) =>
         cons.apply(data) match {
           case Valid => newCons.apply(data)
-          case r => r
+          case r     => r
         }
       )
 
@@ -36,10 +36,11 @@ object ConstraintUtil {
       constraint((data: A) =>
         cons.apply(data) match {
           case Valid => Valid
-          case invalid => newCons.apply(data) match {
-            case Valid => Valid
-            case _ => invalid // return the first invalid message
-          }
+          case invalid =>
+            newCons.apply(data) match {
+              case Valid => Valid
+              case _     => invalid // return the first invalid message
+            }
         }
       )
 

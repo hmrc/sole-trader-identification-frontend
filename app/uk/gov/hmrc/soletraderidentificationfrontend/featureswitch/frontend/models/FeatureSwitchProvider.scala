@@ -16,6 +16,4 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.frontend.models
 
-case class FeatureSwitchProvider(id: String,
-                                 appName: String,
-                                 url: String)
+case class FeatureSwitchProvider(id: String, appName: String, url: String)

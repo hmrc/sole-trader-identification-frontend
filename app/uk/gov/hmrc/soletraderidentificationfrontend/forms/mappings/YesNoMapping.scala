@@ -29,14 +29,14 @@ object YesNoMapping {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] = {
       data.get(key) match {
         case Some(`option_yes`) => Right(true)
-        case Some(`option_no`) => Right(false)
-        case _ => Left(Seq(FormError(key, error)))
+        case Some(`option_no`)  => Right(false)
+        case _                  => Left(Seq(FormError(key, error)))
       }
     }
 
     override def unbind(key: String, value: Boolean): Map[String, String] = {
       val stringValue = value match {
-        case true => option_yes
+        case true  => option_yes
         case false => option_no
       }
 

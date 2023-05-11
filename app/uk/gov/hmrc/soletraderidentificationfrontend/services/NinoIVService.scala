@@ -25,25 +25,24 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NinoIVService @Inject()(createNinoIVJourneyConnector: CreateNinoIVJourneyConnector,
-                              retrieveNinoIVStatusConnector: RetrieveNinoIVStatusConnector,
-                              soleTraderIdentificationService: SoleTraderIdentificationService
-                             )(implicit val executionContext: ExecutionContext) {
+class NinoIVService @Inject() (createNinoIVJourneyConnector: CreateNinoIVJourneyConnector,
+                               retrieveNinoIVStatusConnector: RetrieveNinoIVStatusConnector,
+                               soleTraderIdentificationService: SoleTraderIdentificationService
+                              )(implicit val executionContext: ExecutionContext) {
 
-  def createNinoIVJourney(journeyId: String,
-                          nino: String,
-                          journeyConfig: JourneyConfig
-                         )(implicit hc: HeaderCarrier): Future[NinoIVJourneyCreationResponse] =
+  def createNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier
+  ): Future[NinoIVJourneyCreationResponse] =
     createNinoIVJourneyConnector.createNinoIdentityVerificationJourney(journeyId, nino, journeyConfig).flatMap {
-      case success@Right(JourneyCreated(_)) =>
+      case success @ Right(JourneyCreated(_)) =>
         Future.successful(success)
       case Left(NotEnoughEvidence) =>
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map {
-          _ => Left(NotEnoughEvidence)
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map { _ =>
+          Left(NotEnoughEvidence)
         }
       case Left(UserLockedOut) =>
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map {
-          _ => Left(UserLockedOut)
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map { _ =>
+          Left(UserLockedOut)
         }
     }
 

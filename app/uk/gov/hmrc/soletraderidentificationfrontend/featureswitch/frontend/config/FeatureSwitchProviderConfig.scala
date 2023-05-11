@@ -23,7 +23,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.frontend.model
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FeatureSwitchProviderConfig @Inject()(configuration: Configuration) {
+class FeatureSwitchProviderConfig @Inject() (configuration: Configuration) {
 
   val servicesConfig = new ServicesConfig(configuration)
 
@@ -35,15 +35,15 @@ class FeatureSwitchProviderConfig @Inject()(configuration: Configuration) {
     s"${servicesConfig.baseUrl("sole-trader-identification")}/sole-trader-identification/test-only/api/feature-switches"
 
   lazy val selfFeatureSwitchProvider: FeatureSwitchProvider = FeatureSwitchProvider(
-    id = "sole-trader-identification-frontend",
+    id      = "sole-trader-identification-frontend",
     appName = "Sole Trader Identification Frontend",
-    url = selfFeatureSwitchUrl
+    url     = selfFeatureSwitchUrl
   )
 
   lazy val soleTraderIdentificationFeatureSwitchProvider: FeatureSwitchProvider = FeatureSwitchProvider(
-    id = "sole-trader-identification",
+    id      = "sole-trader-identification",
     appName = "Sole Trader Identification",
-    url = soleTraderIdentificationFeatureSwitchUrl
+    url     = soleTraderIdentificationFeatureSwitchUrl
   )
 
   lazy val featureSwitchProviders: Seq[FeatureSwitchProvider] =

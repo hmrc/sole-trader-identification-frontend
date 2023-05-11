@@ -26,21 +26,22 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                                  soleTraderIdentificationConnector: SoleTraderIdentificationConnector,
-                                                  val authConnector: AuthConnector
-                                                 )(implicit ec: ExecutionContext) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+class TestRetrieveJourneyDataController @Inject() (messagesControllerComponents: MessagesControllerComponents,
+                                                   soleTraderIdentificationConnector: SoleTraderIdentificationConnector,
+                                                   val authConnector: AuthConnector
+                                                  )(implicit ec: ExecutionContext)
+    extends FrontendController(messagesControllerComponents)
+    with AuthorisedFunctions {
 
-  def retrieveSoleTraderDetails(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        soleTraderIdentificationConnector.retrieveSoleTraderDetails(journeyId).map {
-          case Some(journeyData) =>
-            Ok(SoleTraderDetails.jsonWriterForCallingServices(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
-          case None =>
-            NotFound
-        }
+  def retrieveSoleTraderDetails(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      soleTraderIdentificationConnector.retrieveSoleTraderDetails(journeyId).map {
+        case Some(journeyData) =>
+          Ok(SoleTraderDetails.jsonWriterForCallingServices(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
+        case None =>
+          NotFound
       }
+    }
   }
 
 }

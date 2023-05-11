@@ -31,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificationConnector) {
+class SoleTraderIdentificationService @Inject() (connector: SoleTraderIdentificationConnector) {
 
   def storeFullName(journeyId: String, fullName: FullName)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[FullName](journeyId, FullNameKey, fullName)
@@ -51,32 +51,32 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def storeSaPostcode(journeyId: String, saPostcode: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[String](journeyId, SaPostcodeKey, saPostcode)
 
-  def storeIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
     connector.storeData[SoleTraderDetailsMatchResult](journeyId, IdentifiersMatchKey, identifiersMatch)
 
-  def storeAuthenticatorFailureResponse(journeyId: String,
-                                        authenticatorFailureResponse: SoleTraderDetailsMatchFailure
-                                       )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
     connector.storeData[String](journeyId, AuthenticatorFailureResponseKey, authenticatorFailureResponse.toString)
 
-  def storeAuthenticatorDetails(journeyId: String,
-                                authenticatorDetails: IndividualDetails
-                               )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
     connector.storeData[IndividualDetails](journeyId, AuthenticatorDetailsKey, authenticatorDetails)
 
-  def storeES20Details(journeyId: String,
-                       es20Details: KnownFactsResponse
-                      )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeES20Details(journeyId: String, es20Details: KnownFactsResponse)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[KnownFactsResponse](journeyId, Es20DetailsKey, es20Details)
 
-  def storeBusinessVerificationStatus(journeyId: String,
-                                      businessVerification: BusinessVerificationStatus
-                                     )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeBusinessVerificationStatus(journeyId: String, businessVerification: BusinessVerificationStatus)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
     connector.storeData[BusinessVerificationStatus](journeyId, VerificationStatusKey, businessVerification)
 
-  def storeRegistrationStatus(journeyId: String,
-                              registrationStatus: RegistrationStatus
-                             )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+  def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
     connector.storeData[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 
   def storeTrn(journeyId: String, trn: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
@@ -112,27 +112,22 @@ class SoleTraderIdentificationService @Inject()(connector: SoleTraderIdentificat
   def retrieveIndividualDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[IndividualDetails]] =
     connector.retrieveIndividualDetails(journeyId)
 
-  def retrieveBusinessVerificationStatus(journeyId: String
-                                        )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
+  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
     connector.retrieveSoleTraderDetails[BusinessVerificationStatus](journeyId, VerificationStatusKey)
 
-  def retrieveIdentifiersMatch(journeyId: String
-                              )(implicit hc: HeaderCarrier): Future[Option[SoleTraderDetailsMatchResult]] =
+  def retrieveIdentifiersMatch(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[SoleTraderDetailsMatchResult]] =
     connector.retrieveSoleTraderDetails[SoleTraderDetailsMatchResult](journeyId, IdentifiersMatchKey)
 
-  def retrieveAuthenticatorDetails(journeyId: String
-                                  )(implicit hc: HeaderCarrier): Future[Option[IndividualDetails]] =
+  def retrieveAuthenticatorDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[IndividualDetails]] =
     connector.retrieveSoleTraderDetails[IndividualDetails](journeyId, AuthenticatorDetailsKey)
 
   def retrieveRegistrationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[RegistrationStatus]] =
     connector.retrieveSoleTraderDetails[RegistrationStatus](journeyId, RegistrationKey)
 
-  def retrieveAuthenticatorFailureResponse(journeyId: String
-                                          )(implicit hc: HeaderCarrier): Future[Option[String]] =
+  def retrieveAuthenticatorFailureResponse(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, AuthenticatorFailureResponseKey)
 
-  def retrieveAddress(journeyId: String
-                     )(implicit hc: HeaderCarrier): Future[Option[Address]] =
+  def retrieveAddress(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Address]] =
     connector.retrieveSoleTraderDetails[Address](journeyId, AddressKey)
 
   def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =

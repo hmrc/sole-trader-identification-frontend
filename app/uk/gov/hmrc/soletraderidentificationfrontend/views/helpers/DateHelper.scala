@@ -26,7 +26,8 @@ object DateHelper {
   private val missingMonthErrorMessages: Seq[String] = Seq(missingMonthErrorMsg, missingDayAndMonthErrorMsg, missingMonthAndYearErrorMsg)
   private val missingYearErrorMessages: Seq[String] = Seq(missingYearErrorMsg, missingDayAndYearErrorMsg, missingMonthAndYearErrorMsg)
 
-  private val wholeDateErrorMessages: Seq[String] = Seq(missingDateErrorMsg, invalidDateErrorMsg, futureDateErrorMsg, invalidAgeErrorKey, notRealDateErrorMsg)
+  private val wholeDateErrorMessages: Seq[String] =
+    Seq(missingDateErrorMsg, invalidDateErrorMsg, futureDateErrorMsg, invalidAgeErrorKey, notRealDateErrorMsg)
 
   def addDayErrorClass(form: Form[_]): String = addErrorClass(missingDayErrorMessages, form)
 
@@ -36,7 +37,7 @@ object DateHelper {
 
   private def addErrorClass(fieldErrorMsgs: Seq[String], form: Form[_]): String = {
 
-    if(form.hasErrors) {
+    if (form.hasErrors) {
 
       if (searchFormErrors(wholeDateErrorMessages, form) || searchFormErrors(fieldErrorMsgs, form)) " govuk-input--error" else ""
 

@@ -29,44 +29,45 @@ class BusinessVerificationStubController extends InjectedController {
   private val origin = "vat"
   private val businessVerificationJourneyId = UUID.randomUUID.toString
 
-  def createBusinessVerificationJourney: Action[JsValue] = Action.async(parse.json) {
-    implicit request =>
-      val jsonBody = for {
-        _ <- (request.body \ "journeyType").validate[String]
-        origin <- (request.body \ "origin").validate[String]
-        _ <-  ((request.body \ "identifiers").head \ "saUtr").validate[String]
-        continueUrl <- (request.body \ "continueUrl").validate[String]
-        _ <- (request.body \ "accessibilityStatementUrl").validate[String]
-        _ <- (request.body \ "pageTitle").validate[String]
-        _ <- (request.body \ "deskproServiceName").validate[String]
-      } yield (origin, continueUrl)
-      jsonBody match {
-        case JsSuccess((origin, _), _) if !origin.equals(origin.toLowerCase) =>
-          Future.failed(new IllegalArgumentException(s"origin value $origin has to be lower case, but it was not"))
-        case JsSuccess((_, continueUrl), _) =>
-          Future.successful {
-            Created(Json.obj(
+  def createBusinessVerificationJourney: Action[JsValue] = Action.async(parse.json) { implicit request =>
+    val jsonBody = for {
+      _           <- (request.body \ "journeyType").validate[String]
+      origin      <- (request.body \ "origin").validate[String]
+      _           <- ((request.body \ "identifiers").head \ "saUtr").validate[String]
+      continueUrl <- (request.body \ "continueUrl").validate[String]
+      _           <- (request.body \ "accessibilityStatementUrl").validate[String]
+      _           <- (request.body \ "pageTitle").validate[String]
+      _           <- (request.body \ "deskproServiceName").validate[String]
+    } yield (origin, continueUrl)
+    jsonBody match {
+      case JsSuccess((origin, _), _) if !origin.equals(origin.toLowerCase) =>
+        Future.failed(new IllegalArgumentException(s"origin value $origin has to be lower case, but it was not"))
+      case JsSuccess((_, continueUrl), _) =>
+        Future.successful {
+          Created(
+            Json.obj(
               "redirectUri" -> (continueUrl + s"?journeyId=$businessVerificationJourneyId")
-            ))
-          }
-        case _ =>
-          Future.failed(new IllegalArgumentException(s"Request body for CreateBusinessVerification stub failed verification"))
-      }
+            )
+          )
+        }
+      case _ =>
+        Future.failed(new IllegalArgumentException(s"Request body for CreateBusinessVerification stub failed verification"))
+    }
   }
 
   def retrieveVerificationResult(businessVerificationJourneyId: String): Action[AnyContent] = Action.async {
     Future.successful {
-      Ok(Json.obj(
-        "journeyType" -> "BUSINESS_VERIFICATION",
-        "origin" -> origin,
-        "identifier" -> {
-          "saUtr" -> "1234567890"
-        },
-        "verificationStatus" -> "PASS"
-      ))
+      Ok(
+        Json.obj(
+          "journeyType" -> "BUSINESS_VERIFICATION",
+          "origin"      -> origin,
+          "identifier" -> {
+            "saUtr" -> "1234567890"
+          },
+          "verificationStatus" -> "PASS"
+        )
+      )
     }
   }
 
 }
-
-
