@@ -47,7 +47,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig)
-    .build
+    .build()
 
   override def beforeEach(): Unit = {
     await(journeyConfigRepository.drop)

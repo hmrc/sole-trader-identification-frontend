@@ -4,7 +4,7 @@ import scoverage.ScoverageKeys
 
 val appName = "sole-trader-identification-frontend"
 
-val silencerVersion = "1.7.0"
+val silencerVersion = "1.7.12"
 
 lazy val scoverageSettings = {
 
@@ -69,4 +69,4 @@ addTestReportOption(IntegrationTest, "int-test-reports")
 IntegrationTest / parallelExecution := false
 majorVersion := 1
 
-scalaVersion :=  "2.12.12"
+scalaVersion :=  "2.13.8"

@@ -129,7 +129,7 @@ object WiremockHelper extends Eventually with IntegrationPatience {
       })
 
     eventually {
-      import scala.collection.JavaConverters.asScalaIteratorConverter
+      import scala.jdk.CollectionConverters._
       val allAuditRequests = WireMock.findAll(auditRequest)
         .listIterator
         .asScala

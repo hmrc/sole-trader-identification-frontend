@@ -69,7 +69,7 @@ class CaptureDateOfBirthController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          captureDateOfBirthForm().bindFromRequest.fold(
+          captureDateOfBirthForm().bindFromRequest().fold(
             formWithErrors => {
               for {
                 journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)

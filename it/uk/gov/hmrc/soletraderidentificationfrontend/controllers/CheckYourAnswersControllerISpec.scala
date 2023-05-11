@@ -48,7 +48,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig)
-    .build
+    .build()
 
   def extraConfig: Map[String, String] = Map(
     "auditing.enabled" -> "true",

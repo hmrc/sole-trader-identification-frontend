@@ -25,7 +25,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
 
 import java.io.IOException
 import javax.inject.{Inject, Singleton}
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters._
 
 @Singleton
 class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {

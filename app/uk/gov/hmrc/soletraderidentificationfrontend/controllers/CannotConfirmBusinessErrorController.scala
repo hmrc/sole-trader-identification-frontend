@@ -66,7 +66,7 @@ class CannotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComp
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          cannotConfirmBusinessForm.bindFromRequest.fold(
+          cannotConfirmBusinessForm.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>
@@ -83,7 +83,7 @@ class CannotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComp
                 for {
                   optNino <- soleTraderIdentificationService.retrieveNino(journeyId)
                   _ <- if (optNino.isEmpty) trnService.createTrn(journeyId) //Create TRN at end of journey to avoid duplication
-                  else Future.successful(Unit)
+                  else Future.unit
                   journeyConfig <- journeyService.getJourneyConfig(journeyId,authInternalId)
                 } yield Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
               } else {
