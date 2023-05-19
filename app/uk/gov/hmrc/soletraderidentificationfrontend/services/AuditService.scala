@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,22 +27,26 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject()(appConfig: AppConfig,
-                             auditConnector: AuditConnector,
-                             soleTraderIdentificationService: SoleTraderIdentificationService) {
+class AuditService @Inject() (appConfig: AppConfig,
+                              auditConnector: AuditConnector,
+                              soleTraderIdentificationService: SoleTraderIdentificationService
+                             ) {
 
-  def auditJourney(journeyId: String, journeyConfig: JourneyConfig)
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = if (journeyConfig.pageConfig.enableSautrCheck)
+  def auditJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = if (
+    journeyConfig.pageConfig.enableSautrCheck
+  )
     auditSoleTraderJourney(journeyId, journeyConfig)
   else
     auditIndividualJourney(journeyId, journeyConfig)
 
-  private def auditSoleTraderJourney(journeyId: String, journeyConfig: JourneyConfig)
-                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  private def auditSoleTraderJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] = {
 
     val soleTraderAudit: Future[JsObject] = for {
       optSoleTraderRecord <- soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId)
-      optES20Response <- soleTraderIdentificationService.retrieveES20Details(journeyId)
+      optES20Response     <- soleTraderIdentificationService.retrieveES20Details(journeyId)
       optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
       optAuthenticatorResponse <-
         optIdentifiersMatch match {
@@ -55,99 +59,102 @@ class AuditService @Inject()(appConfig: AppConfig,
     } yield {
       (optSoleTraderRecord, optES20Response, optIdentifiersMatch, optAuthenticatorResponse) match {
         case (Some(soleTraderRecord), optES20Response, Some(identifiersMatch), optAuthenticatorResponse) =>
-
           val callingService: String = journeyConfig.pageConfig.labels
             .flatMap(_.optEnglishServiceName)
-            .getOrElse(journeyConfig.pageConfig.optServiceName
-              .getOrElse(appConfig.defaultServiceName)
+            .getOrElse(
+              journeyConfig.pageConfig.optServiceName
+                .getOrElse(appConfig.defaultServiceName)
             )
 
           val registrationStatusBlock =
             soleTraderRecord.registrationStatus match {
-              case Some(registrationStatus) => registrationStatus match {
-                case Registered(_) => Json.obj("RegisterApiStatus" -> "success")
-                case RegistrationFailed(_) => Json.obj("RegisterApiStatus" -> "fail")
-                case RegistrationNotCalled => Json.obj("RegisterApiStatus" -> "not called")
-              }
+              case Some(registrationStatus) =>
+                registrationStatus match {
+                  case Registered(_)         => Json.obj("RegisterApiStatus" -> "success")
+                  case RegistrationFailed(_) => Json.obj("RegisterApiStatus" -> "fail")
+                  case RegistrationNotCalled => Json.obj("RegisterApiStatus" -> "not called")
+                }
               case _ => Json.obj()
             }
 
           val sautrBlock =
             soleTraderRecord.optSautr match {
               case Some(sautr) => Json.obj("userSAUTR" -> sautr)
-              case _ => Json.obj()
+              case _           => Json.obj()
             }
 
           val addressBlock =
             soleTraderRecord.address match {
               case Some(address) => Json.obj("address" -> Json.toJson(address))
-              case _ => Json.obj()
+              case _             => Json.obj()
             }
 
           val trnBlock =
             soleTraderRecord.optTrn match {
               case Some(trn) => Json.obj("TempNI" -> trn)
-              case _ => Json.obj()
+              case _         => Json.obj()
             }
 
           val saPostCodeBlock =
             soleTraderRecord.optSaPostcode match {
               case Some(postcode) => Json.obj("SAPostcode" -> postcode)
-              case _ => Json.obj()
+              case _              => Json.obj()
             }
 
           val eS20Block =
             optES20Response match {
               case Some(eSReponse) => Json.obj("ES20Response" -> eSReponse)
-              case _ => Json.obj()
+              case _               => Json.obj()
             }
 
           val authenticatorResponseBlock =
             optAuthenticatorResponse match {
               case Some(authenticatorDetails: IndividualDetails) => Json.obj("authenticatorResponse" -> Json.toJson(authenticatorDetails))
-              case Some(authenticatorFailureResponse: String) => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
-              case _ => Json.obj()
+              case Some(authenticatorFailureResponse: String)    => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
+              case _                                             => Json.obj()
             }
 
-          val overseasIdentifiersBlock: JsObject = (soleTraderRecord.optOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
-            case (Some(taxIdentifier), Some(country)) => Json.obj(
-              "overseasTaxIdentifier" -> taxIdentifier,
-              "overseasTaxIdentifierCountry" -> country
-            )
-            case (None, None) => Json.obj()
-            case _ => throw new InternalServerException("Error: Invalid tax identifier and country")
-          }
+          val overseasIdentifiersBlock: JsObject =
+            (soleTraderRecord.optOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
+              case (Some(taxIdentifier), Some(country)) =>
+                Json.obj(
+                  "overseasTaxIdentifier"        -> taxIdentifier,
+                  "overseasTaxIdentifierCountry" -> country
+                )
+              case (None, None) => Json.obj()
+              case _            => throw new InternalServerException("Error: Invalid tax identifier and country")
+            }
 
           val businessVerificationStatus: String =
             if (!journeyConfig.businessVerificationCheck) "not requested"
             else {
               soleTraderRecord.businessVerification match {
-                case Some(BusinessVerificationPass) => "success"
-                case Some(BusinessVerificationFail) => "fail"
+                case Some(BusinessVerificationPass)                                => "success"
+                case Some(BusinessVerificationFail)                                => "fail"
                 case Some(BusinessVerificationNotEnoughInformationToCallBV) | None => "Not Enough Information to call BV"
-                case Some(BusinessVerificationNotEnoughInformationToChallenge) => "Not Enough Information to challenge"
-                case Some(SaEnrolled) => "Enrolled"
+                case Some(BusinessVerificationNotEnoughInformationToChallenge)     => "Not Enough Information to challenge"
+                case Some(SaEnrolled)                                              => "Enrolled"
               }
             }
 
           val identifiersMatchStatus: String = identifiersMatch match {
-            case SuccessfulMatch => "true"
+            case SuccessfulMatch             => "true"
             case NotEnoughInformationToMatch => "unmatchable"
-            case _ => "false"
+            case _                           => "false"
           }
 
           val reputationBlock = soleTraderRecord.optNinoInsights match {
             case Some(insights) => Json.obj("ninoReputation" -> insights)
-            case None => Json.obj()
+            case None           => Json.obj()
           }
 
           Json.obj(
-            "callingService" -> JsString(callingService),
-            "businessType" -> "Sole Trader",
-            "firstName" -> soleTraderRecord.fullName.firstName,
-            "lastName" -> soleTraderRecord.fullName.lastName,
-            "dateOfBirth" -> soleTraderRecord.dateOfBirth,
-            "isMatch" -> identifiersMatchStatus,
+            "callingService"     -> JsString(callingService),
+            "businessType"       -> "Sole Trader",
+            "firstName"          -> soleTraderRecord.fullName.firstName,
+            "lastName"           -> soleTraderRecord.fullName.lastName,
+            "dateOfBirth"        -> soleTraderRecord.dateOfBirth,
+            "isMatch"            -> identifiersMatchStatus,
             "VerificationStatus" -> businessVerificationStatus
           ) ++ registrationStatusBlock ++
             sautrBlock ++
@@ -164,23 +171,26 @@ class AuditService @Inject()(appConfig: AppConfig,
       }
     }
 
-    soleTraderAudit.map {
-      soleTraderAuditJson => auditConnector.sendExplicitAudit(auditType = "SoleTraderRegistration", detail = soleTraderAuditJson)
+    soleTraderAudit.map { soleTraderAuditJson =>
+      auditConnector.sendExplicitAudit(auditType = "SoleTraderRegistration", detail = soleTraderAuditJson)
     }
   }
 
-  private def auditIndividualJourney(journeyId: String, journeyConfig: JourneyConfig)
-                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  private def auditIndividualJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] = {
 
     val callingService: String = journeyConfig.pageConfig.labels
       .flatMap(_.optEnglishServiceName)
-      .getOrElse(journeyConfig.pageConfig.optServiceName
-        .getOrElse(appConfig.defaultServiceName)
+      .getOrElse(
+        journeyConfig.pageConfig.optServiceName
+          .getOrElse(appConfig.defaultServiceName)
       )
 
     val individualAudit: Future[JsObject] = for {
       optIndividualDetails <- soleTraderIdentificationService.retrieveIndividualDetails(journeyId)
-      optIdentifiersMatch <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
+      optIdentifiersMatch  <- soleTraderIdentificationService.retrieveIdentifiersMatch(journeyId)
       optAuthenticatorResponse <-
         (optIndividualDetails, optIdentifiersMatch) match {
           case (Some(_), Some(SuccessfulMatch)) =>
@@ -194,28 +204,28 @@ class AuditService @Inject()(appConfig: AppConfig,
       val authenticatorResponseBlock =
         optAuthenticatorResponse match {
           case Some(authenticatorDetails: IndividualDetails) => Json.obj("authenticatorResponse" -> Json.toJson(authenticatorDetails))
-          case Some(authenticatorFailureResponse: String) => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
-          case _ => Json.obj()
+          case Some(authenticatorFailureResponse: String)    => Json.obj("authenticatorResponse" -> authenticatorFailureResponse)
+          case _                                             => Json.obj()
         }
       val identifiersMatchStatus: String = optIdentifiersMatch match {
-        case Some(SuccessfulMatch) => "true"
+        case Some(SuccessfulMatch)             => "true"
         case Some(NotEnoughInformationToMatch) => "unmatchable"
-        case _ => "false"
+        case _                                 => "false"
       }
 
       val reputationBlock = optNinoInsights match {
         case Some(insights) => Json.obj("ninoReputation" -> insights)
-        case None => Json.obj()
+        case None           => Json.obj()
       }
 
       optIndividualDetails match {
         case Some(IndividualDetails(firstName, lastName, dateOfBirth, optNino, None)) =>
           Json.obj(
             "callingService" -> JsString(callingService),
-            "firstName" -> firstName,
-            "lastName" -> lastName,
-            "dateOfBirth" -> dateOfBirth,
-            "isMatch" -> identifiersMatchStatus
+            "firstName"      -> firstName,
+            "lastName"       -> lastName,
+            "dateOfBirth"    -> dateOfBirth,
+            "isMatch"        -> identifiersMatchStatus
           ) ++ authenticatorResponseBlock ++
             ninoBlock(optNino) ++
             reputationBlock
@@ -224,14 +234,14 @@ class AuditService @Inject()(appConfig: AppConfig,
       }
     }
 
-    individualAudit.map {
-      individualAuditJson => auditConnector.sendExplicitAudit(auditType = "IndividualIdentification", detail = individualAuditJson)
+    individualAudit.map { individualAuditJson =>
+      auditConnector.sendExplicitAudit(auditType = "IndividualIdentification", detail = individualAuditJson)
     }
   }
 
   private def ninoBlock(optNino: Option[String]): JsObject = optNino match {
     case Some(nino) => Json.obj("nino" -> nino)
-    case _ => Json.obj()
+    case _          => Json.obj()
   }
 
 }

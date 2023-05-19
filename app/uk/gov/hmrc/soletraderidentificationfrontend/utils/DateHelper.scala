@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,15 @@ object DateHelper {
 
   def formatDate(localDate: LocalDate)(implicit messages: Messages): String = {
 
-    if(messages.lang.code == "cy") {
+    if (messages.lang.code == "cy") {
 
       val monthAsNumber: Int = localDate.getMonthValue
 
-      val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
-        s"""d '${messages(s"date.month.name.$monthAsNumber")}' yyyy"""
-      ).withResolverStyle(ResolverStyle.STRICT)
+      val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter
+        .ofPattern(
+          s"""d '${messages(s"date.month.name.$monthAsNumber")}' yyyy"""
+        )
+        .withResolverStyle(ResolverStyle.STRICT)
 
       localDate.format(dateTimeFormatter)
     } else {

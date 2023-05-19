@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ case class JourneyLabels(optWelshServiceName: Option[String],
                          optEnglishServiceName: Option[String],
                          optWelshFullNamePageLabel: Option[String],
                          optEnglishFullNamePageLabel: Option[String]
-                         ) {
+                        ) {
 
   def nonEmpty: Boolean =
     this.optWelshServiceName.exists(_.nonEmpty) || this.optEnglishServiceName.exists(_.nonEmpty) ||
@@ -37,26 +37,25 @@ object JourneyLabels {
   val optServiceNameLabelKey: String = "optServiceName"
   val optFullNameLabelKey: String = "optFullNamePageLabel"
 
-
   implicit val reads: Reads[JourneyLabels] = (
     (JsPath \ welshLabelsKey \ optServiceNameLabelKey).readNullable[String] and
       (JsPath \ englishLabelsKey \ optServiceNameLabelKey).readNullable[String] and
       (JsPath \ welshLabelsKey \ optFullNameLabelKey).readNullable[String] and
       (JsPath \ englishLabelsKey \ optFullNameLabelKey).readNullable[String]
-    ) (JourneyLabels.apply _)
+  )(JourneyLabels.apply _)
 
   implicit val writes: OWrites[JourneyLabels] = (
     (JsPath \ welshLabelsKey \ optServiceNameLabelKey).writeNullable[String] and
       (JsPath \ englishLabelsKey \ optServiceNameLabelKey).writeNullable[String] and
       (JsPath \ welshLabelsKey \ optFullNameLabelKey).writeNullable[String] and
       (JsPath \ englishLabelsKey \ optFullNameLabelKey).writeNullable[String]
-    ) (unlift(JourneyLabels.unapply))
+  )(unlift(JourneyLabels.unapply))
 
   val format: OFormat[JourneyLabels] = OFormat(reads, writes)
 
   def toMap(optServiceName: Option[String], optFullNameLabel: Option[String]): Map[String, String] =
     Map(optServiceNameLabelKey -> optServiceName, optFullNameLabelKey -> optFullNameLabel)
-      .collect {
-        case (key, Some(value)) => key -> value
+      .collect { case (key, Some(value)) =>
+        key -> value
       }
 }

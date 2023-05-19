@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,30 +31,31 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class DetailsDidNotMatchController @Inject()(mcc: MessagesControllerComponents,
-                                             view: details_did_not_match_page,
-                                             val authConnector: AuthConnector,
-                                             journeyService: JourneyService,
-                                             messagesHelper: MessagesHelper
-                                            )(implicit val config: AppConfig,
-                                              executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class DetailsDidNotMatchController @Inject() (mcc: MessagesControllerComponents,
+                                              view: details_did_not_match_page,
+                                              val authConnector: AuthConnector,
+                                              journeyService: JourneyService,
+                                              messagesHelper: MessagesHelper
+                                             )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(
-                pageConfig = journeyConfig.pageConfig,
-                redirectLocation = journeyConfig.pageConfig.signOutUrl,
-                journeyId = journeyId
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              pageConfig       = journeyConfig.pageConfig,
+              redirectLocation = journeyConfig.pageConfig.signOutUrl,
+              journeyId        = journeyId
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 }

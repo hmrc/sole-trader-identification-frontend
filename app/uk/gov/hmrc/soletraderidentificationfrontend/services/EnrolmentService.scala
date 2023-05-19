@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.EnrolmentsHelper.getSa
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class EnrolmentService @Inject()() {
+class EnrolmentService @Inject() () {
 
   def checkSaEnrolmentMatch(enrolments: Enrolments, sautr: String): Boolean =
     getSaEnrolment(enrolments) match {
       case Some(enrolmentSautr) => enrolmentSautr == sautr
-      case None => false
+      case None                 => false
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,13 @@ trait MockCreateTrnConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockCreateTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address)(response: Future[String]): OngoingStubbing[_] = {
-    when(mockCreateTrnConnector.createTrn(
-      ArgumentMatchers.eq(dateOfBirth),
-      ArgumentMatchers.eq(fullName),
-      ArgumentMatchers.eq(address)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+    when(
+      mockCreateTrnConnector.createTrn(
+        ArgumentMatchers.eq(dateOfBirth),
+        ArgumentMatchers.eq(fullName),
+        ArgumentMatchers.eq(address)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
   }
 
   def verifyCreateTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address): Unit = {
@@ -55,4 +57,3 @@ trait MockCreateTrnConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
 }
-

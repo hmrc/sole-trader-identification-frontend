@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ trait MockCreateTrnService extends MockitoSugar with BeforeAndAfterEach {
 
   def mockCreateTrn(journeyId: String)(response: Future[String]): OngoingStubbing[_] =
     when(
-      mockCreateTrnService.createTrn(ArgumentMatchers.eq(journeyId)
-      )(ArgumentMatchers.any[HeaderCarrier])
+      mockCreateTrnService.createTrn(ArgumentMatchers.eq(journeyId))(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def verifyCreateTrn(journeyId: String): Unit =

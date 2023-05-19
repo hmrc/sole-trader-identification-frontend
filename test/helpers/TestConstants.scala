@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import java.time.LocalDate
 import java.util.UUID
 import scala.util.Random
-
 
 object TestConstants {
 
@@ -62,23 +61,22 @@ object TestConstants {
   val validNinoLastLetterSeq: Seq[String] = ('A' to 'D').map(_.toString)
   val invalidNinoAdditionalPrefixesSeq: Seq[String] = Seq("BG", "GB", "KN", "NK", "NT", "TN", "ZZ")
   val invalidNinoPrefixesSeq: Seq[String] = (for {
-    firstLetter <- invalidNinoFirstLetterSeq
+    firstLetter  <- invalidNinoFirstLetterSeq
     secondLetter <- invalidNinoSecondLetterSeq
   } yield firstLetter + secondLetter) ++ invalidNinoAdditionalPrefixesSeq
-  val ninoWithInvalidPrefixSeq: Seq[String] = invalidNinoPrefixesSeq.map(prefix =>
-    prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
-  val ninoWithInvalidSuffixSeq: Seq[String] = invalidNinoLastLetterSeq.map(suffix =>
-    "AA123456" + suffix)
+  val ninoWithInvalidPrefixSeq: Seq[String] =
+    invalidNinoPrefixesSeq.map(prefix => prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
+  val ninoWithInvalidSuffixSeq: Seq[String] = invalidNinoLastLetterSeq.map(suffix => "AA123456" + suffix)
 
   val validNinoFirstLetterSeq: Seq[String] = ('A' to 'Z').map(_.toString).diff(invalidNinoFirstLetterSeq)
   val validNinoSecondLetterSeq: Seq[String] = ('A' to 'Z').map(_.toString).diff(invalidNinoSecondLetterSeq)
   val validNinoPrefixesSeq: Seq[String] = (for {
-    firstLetter <- validNinoFirstLetterSeq
+    firstLetter  <- validNinoFirstLetterSeq
     secondLetter <- validNinoSecondLetterSeq
   } yield firstLetter + secondLetter).diff(invalidNinoAdditionalPrefixesSeq)
 
-  val ninoWithValidPrefixSeq: Seq[String] = validNinoPrefixesSeq.map(prefix =>
-    prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
+  val ninoWithValidPrefixSeq: Seq[String] =
+    validNinoPrefixesSeq.map(prefix => prefix + "123456" + validNinoLastLetterSeq(Random.nextInt(validNinoLastLetterSeq.length)))
 
   val testValidNinoAdditionalSeq: Seq[String] = Seq("aa111111a", "aA 11 11 11A", " AA 11 11 11 A", "AA1111 11 A ")
   val testInvalidNinoAdditionalSeq: Seq[String] =
@@ -101,184 +99,185 @@ object TestConstants {
 
   val testInsightsReturnBody: JsObject = Json.obj(
     "ninoInsightsCorrelationId" -> testCorrelationId,
-    "code" -> 0,
-    "reason" -> "0 code"
+    "code"                      -> 0,
+    "reason"                    -> "0 code"
   )
 
   val testSoleTraderDetails: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = Some(testSautr),
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = Some(BusinessVerificationPass),
-      registrationStatus = Some(Registered(testSafeId)),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = Some(BusinessVerificationPass),
+      registrationStatus              = Some(Registered(testSafeId)),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsNoMatch: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = Some(testSautr),
-      identifiersMatch = DetailsMismatch,
-      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
-      registrationStatus = Some(RegistrationNotCalled),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = DetailsMismatch,
+      businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus              = Some(RegistrationNotCalled),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsNoSautr: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = None,
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
-      registrationStatus = Some(RegistrationNotCalled),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = None,
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus              = Some(RegistrationNotCalled),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   def testSoleTraderDetailsNoNino(optSautr: Option[String] = Some(testSautr)): SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = None,
-      address = Some(testAddress),
-      optSaPostcode = Some(testSaPostcode),
-      optSautr = optSautr,
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
-      registrationStatus = Some(RegistrationNotCalled),
-      optTrn = Some(testTrn),
-      optOverseasTaxIdentifier = Some(testOverseasIdentifier),
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = None,
+      address                         = Some(testAddress),
+      optSaPostcode                   = Some(testSaPostcode),
+      optSautr                        = optSautr,
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus              = Some(RegistrationNotCalled),
+      optTrn                          = Some(testTrn),
+      optOverseasTaxIdentifier        = Some(testOverseasIdentifier),
       optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
-      optNinoInsights = None
+      optNinoInsights                 = None
     )
 
   def testSoleTraderDetailsNoNinoKnownFactsNoContent(optSautr: Option[String] = Some(testSautr)): SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = None,
-      address = Some(testAddress),
-      optSaPostcode = Some(testSaPostcode),
-      optSautr = optSautr,
-      identifiersMatch = KnownFactsNoContent,
-      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
-      registrationStatus = Some(RegistrationNotCalled),
-      optTrn = None,
-      optOverseasTaxIdentifier = Some(testOverseasIdentifier),
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = None,
+      address                         = Some(testAddress),
+      optSaPostcode                   = Some(testSaPostcode),
+      optSautr                        = optSautr,
+      identifiersMatch                = KnownFactsNoContent,
+      businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus              = Some(RegistrationNotCalled),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = Some(testOverseasIdentifier),
       optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
-      optNinoInsights = None
+      optNinoInsights                 = None
     )
 
   val testSoleTraderWithoutBVCheckDetails: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = Some(testSautr),
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = None,
-      registrationStatus = Some(Registered(testSafeId)),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = None,
+      registrationStatus              = Some(Registered(testSafeId)),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsRegistrationFailed: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = Some(testSautr),
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = Some(BusinessVerificationPass),
-      registrationStatus = Some(RegistrationFailed(testRegistrationFailure)),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = Some(BusinessVerificationPass),
+      registrationStatus              = Some(RegistrationFailed(testRegistrationFailure)),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsNoNinoAndOverseas: SoleTraderDetails = testSoleTraderDetailsNoNino().copy(address = Some(testOverseasAddress))
 
   val testIndividualDetails: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      optSautr = Some(testSautr)
+      optNino     = Some(testNino),
+      optSautr    = Some(testSautr)
     )
 
   val testIndividualDetailsNoSautr: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      optSautr = None
+      optNino     = Some(testNino),
+      optSautr    = None
     )
 
   val testIndividualDetailsNoNinoNoSautr: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = None,
-      optSautr = None
+      optNino     = None,
+      optSautr    = None
     )
 
   val testIndividualDetailsNoNino: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = None,
-      optSautr = Some(testSautr)
+      optNino     = None,
+      optSautr    = Some(testSautr)
     )
 
   val testKnownFactsResponseOverseas: KnownFactsResponse =
     KnownFactsResponse(
       postcode = None,
       isAbroad = Some(true),
-      nino = None
+      nino     = None
     )
 
   val testKnownFactsResponseUK: KnownFactsResponse =
     KnownFactsResponse(
       postcode = Some("AA1 1AA"),
       isAbroad = Some(false),
-      nino = None
+      nino     = None
     )
 
   val testSoleTraderJourneyConfig: JourneyConfig = testJourneyConfig(enableSautrCheck = true)
 
-  val testSoleTraderJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(enableSautrCheck = true, optServiceName = Some(testServiceName))
+  val testSoleTraderJourneyConfigWithCallingService: JourneyConfig =
+    testJourneyConfig(enableSautrCheck = true, optServiceName = Some(testServiceName))
 
   val testSoleTraderJourneyConfigWithBVCheckDisabled: JourneyConfig = testJourneyConfig(enableSautrCheck = true, businessVerificationCheck = false)
 
@@ -287,172 +286,172 @@ object TestConstants {
   val testIndividualJourneyConfigWithCallingService: JourneyConfig = testJourneyConfig(optServiceName = Some(testServiceName))
 
   val testIndividualSuccessfulAuditEventJson: JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "dateOfBirth" -> testDateOfBirth,
-    "nino" -> testNino,
-    "isMatch" -> "true",
+    "callingService"        -> testDefaultServiceName,
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "dateOfBirth"           -> testDateOfBirth,
+    "nino"                  -> testNino,
+    "isMatch"               -> "true",
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
-    "ninoReputation" -> testInsightsReturnBody
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   val testIndividualSuccessfulWithCallingServiceAuditEventJson: JsObject =
     testIndividualSuccessfulAuditEventJson ++ Json.obj("callingService" -> testServiceName)
 
-  def testJourneyConfig(
-                         enableSautrCheck: Boolean = false,
-                         optServiceName: Option[String] = None,
-                         businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
-    continueUrl = testContinueUrl,
+  def testJourneyConfig(enableSautrCheck: Boolean = false,
+                        optServiceName: Option[String] = None,
+                        businessVerificationCheck: Boolean = true
+                       ): JourneyConfig = JourneyConfig(
+    continueUrl               = testContinueUrl,
     businessVerificationCheck = businessVerificationCheck,
     pageConfig = PageConfig(
-      optServiceName = optServiceName,
-      deskProServiceId = "vrs",
-      signOutUrl = testSignOutUrl,
-      enableSautrCheck = enableSautrCheck,
-      accessibilityUrl = testAccessibilityUrl,
+      optServiceName       = optServiceName,
+      deskProServiceId     = "vrs",
+      signOutUrl           = testSignOutUrl,
+      enableSautrCheck     = enableSautrCheck,
+      accessibilityUrl     = testAccessibilityUrl,
       optFullNamePageLabel = None
     ),
     testRegime
   )
 
   def testSoleTraderAuditEventJson(identifiersMatch: String = "true"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "nino" -> testNino,
-    "dateOfBirth" -> testDateOfBirth,
+    "callingService"        -> testDefaultServiceName,
+    "businessType"          -> "Sole Trader",
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "nino"                  -> testNino,
+    "dateOfBirth"           -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "success",
-    "RegisterApiStatus" -> testRegistrationSuccess,
-    "ninoReputation" -> testInsightsReturnBody
+    "userSAUTR"             -> testSautr,
+    "isMatch"               -> identifiersMatch,
+    "VerificationStatus"    -> "success",
+    "RegisterApiStatus"     -> testRegistrationSuccess,
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   def testSoleTraderWithCallingServiceAuditEventJson(identifiersMatch: String = "false"): JsObject =
     testSoleTraderAuditEventJson(identifiersMatch) ++ Json.obj("callingService" -> testServiceName)
 
   def testSoleTraderAuditEventJsonNoSautr(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "nino" -> testNino,
-    "dateOfBirth" -> testDateOfBirth,
+    "callingService"        -> testDefaultServiceName,
+    "businessType"          -> "Sole Trader",
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "nino"                  -> testNino,
+    "dateOfBirth"           -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetailsNoSautr),
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "ninoReputation" -> testInsightsReturnBody
+    "isMatch"               -> identifiersMatch,
+    "VerificationStatus"    -> "Not Enough Information to call BV",
+    "RegisterApiStatus"     -> testRegistrationNotCalled,
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   def testSoleTraderAuditEventJsonNoNino(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "dateOfBirth" -> testDateOfBirth,
-    "address" -> testAddress,
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "TempNI" -> testTrn,
-    "ES20Response" -> testKnownFactsResponseUK,
-    "SAPostcode" -> testSaPostcode,
-    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "callingService"               -> testDefaultServiceName,
+    "businessType"                 -> "Sole Trader",
+    "firstName"                    -> testFirstName,
+    "lastName"                     -> testLastName,
+    "dateOfBirth"                  -> testDateOfBirth,
+    "address"                      -> testAddress,
+    "userSAUTR"                    -> testSautr,
+    "isMatch"                      -> identifiersMatch,
+    "VerificationStatus"           -> "Not Enough Information to call BV",
+    "RegisterApiStatus"            -> testRegistrationNotCalled,
+    "TempNI"                       -> testTrn,
+    "ES20Response"                 -> testKnownFactsResponseUK,
+    "SAPostcode"                   -> testSaPostcode,
+    "overseasTaxIdentifier"        -> testOverseasIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
   )
 
   def testSoleTraderAuditEventNoNinoKnownFactsNoContent(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "dateOfBirth" -> testDateOfBirth,
-    "address" -> testAddress,
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "SAPostcode" -> testSaPostcode,
-    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "callingService"               -> testDefaultServiceName,
+    "businessType"                 -> "Sole Trader",
+    "firstName"                    -> testFirstName,
+    "lastName"                     -> testLastName,
+    "dateOfBirth"                  -> testDateOfBirth,
+    "address"                      -> testAddress,
+    "userSAUTR"                    -> testSautr,
+    "isMatch"                      -> identifiersMatch,
+    "VerificationStatus"           -> "Not Enough Information to call BV",
+    "RegisterApiStatus"            -> testRegistrationNotCalled,
+    "SAPostcode"                   -> testSaPostcode,
+    "overseasTaxIdentifier"        -> testOverseasIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
   )
 
   def testSoleTraderAuditEventJsonNoNinoOverseas(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "dateOfBirth" -> testDateOfBirth,
-    "address" -> testOverseasAddress,
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "TempNI" -> testTrn,
-    "ES20Response" -> testKnownFactsResponseOverseas,
-    "SAPostcode" -> testSaPostcode,
-    "overseasTaxIdentifier" -> testOverseasIdentifier,
+    "callingService"               -> testDefaultServiceName,
+    "businessType"                 -> "Sole Trader",
+    "firstName"                    -> testFirstName,
+    "lastName"                     -> testLastName,
+    "dateOfBirth"                  -> testDateOfBirth,
+    "address"                      -> testOverseasAddress,
+    "userSAUTR"                    -> testSautr,
+    "isMatch"                      -> identifiersMatch,
+    "VerificationStatus"           -> "Not Enough Information to call BV",
+    "RegisterApiStatus"            -> testRegistrationNotCalled,
+    "TempNI"                       -> testTrn,
+    "ES20Response"                 -> testKnownFactsResponseOverseas,
+    "SAPostcode"                   -> testSaPostcode,
+    "overseasTaxIdentifier"        -> testOverseasIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseasIdentifierCountry
   )
 
   def testSoleTraderFailureAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "nino" -> testNino,
-    "dateOfBirth" -> testDateOfBirth,
+    "callingService"        -> testDefaultServiceName,
+    "businessType"          -> "Sole Trader",
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "nino"                  -> testNino,
+    "dateOfBirth"           -> testDateOfBirth,
     "authenticatorResponse" -> DetailsMismatch.toString,
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "Not Enough Information to call BV",
-    "RegisterApiStatus" -> testRegistrationNotCalled,
-    "ninoReputation" -> testInsightsReturnBody
+    "userSAUTR"             -> testSautr,
+    "isMatch"               -> identifiersMatch,
+    "VerificationStatus"    -> "Not Enough Information to call BV",
+    "RegisterApiStatus"     -> testRegistrationNotCalled,
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   def testSoleTraderWithoutBVCheckAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "nino" -> testNino,
-    "dateOfBirth" -> testDateOfBirth,
+    "callingService"        -> testDefaultServiceName,
+    "businessType"          -> "Sole Trader",
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "nino"                  -> testNino,
+    "dateOfBirth"           -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "not requested",
-    "RegisterApiStatus" -> testRegistrationSuccess,
-    "ninoReputation" -> testInsightsReturnBody
+    "userSAUTR"             -> testSautr,
+    "isMatch"               -> identifiersMatch,
+    "VerificationStatus"    -> "not requested",
+    "RegisterApiStatus"     -> testRegistrationSuccess,
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   def testSoleTraderRegistrationFailedAuditEventJson(identifiersMatch: String = "false"): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Sole Trader",
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "nino" -> testNino,
-    "dateOfBirth" -> testDateOfBirth,
+    "callingService"        -> testDefaultServiceName,
+    "businessType"          -> "Sole Trader",
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "nino"                  -> testNino,
+    "dateOfBirth"           -> testDateOfBirth,
     "authenticatorResponse" -> Json.toJson(testIndividualDetails),
-    "userSAUTR" -> testSautr,
-    "isMatch" -> identifiersMatch,
-    "VerificationStatus" -> "success",
-    "RegisterApiStatus" -> testRegistrationFailed,
-    "ninoReputation" -> testInsightsReturnBody
+    "userSAUTR"             -> testSautr,
+    "isMatch"               -> identifiersMatch,
+    "VerificationStatus"    -> "success",
+    "RegisterApiStatus"     -> testRegistrationFailed,
+    "ninoReputation"        -> testInsightsReturnBody
   )
 
   def testIndividualFailureAuditEventJson(isMatch: String): JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "firstName" -> testFirstName,
-    "lastName" -> testLastName,
-    "dateOfBirth" -> testDateOfBirth,
-    "nino" -> testNino,
-    "isMatch" -> isMatch,
+    "callingService"        -> testDefaultServiceName,
+    "firstName"             -> testFirstName,
+    "lastName"              -> testLastName,
+    "dateOfBirth"           -> testDateOfBirth,
+    "nino"                  -> testNino,
+    "isMatch"               -> isMatch,
     "authenticatorResponse" -> DetailsMismatch.toString
   )
 

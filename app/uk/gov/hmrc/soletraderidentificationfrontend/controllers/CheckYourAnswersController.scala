@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,69 +35,79 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CheckYourAnswersController @Inject()(mcc: MessagesControllerComponents,
-                                           view: check_your_answers_page,
-                                           soleTraderIdentificationService: SoleTraderIdentificationService,
-                                           journeyService: JourneyService,
-                                           submissionService: SubmissionService,
-                                           auditService: AuditService,
-                                           rowBuilder: CheckYourAnswersRowBuilder,
-                                           val authConnector: AuthConnector,
-                                           messagesHelper: MessagesHelper
-                                          )(implicit val config: AppConfig,
-                                            executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
+class CheckYourAnswersController @Inject() (mcc: MessagesControllerComponents,
+                                            view: check_your_answers_page,
+                                            soleTraderIdentificationService: SoleTraderIdentificationService,
+                                            journeyService: JourneyService,
+                                            submissionService: SubmissionService,
+                                            auditService: AuditService,
+                                            rowBuilder: CheckYourAnswersRowBuilder,
+                                            val authConnector: AuthConnector,
+                                            messagesHelper: MessagesHelper
+                                           )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions
+    with FeatureSwitching {
 
-
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            individualDetails <- soleTraderIdentificationService.retrieveIndividualDetails(journeyId)
-              .map(_.getOrElse(throw new InternalServerException(s"Individual details not found for journeyId: $journeyId")))
-            optAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
-            optSaPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
-            optOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
-            optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
-            summaryRows = rowBuilder.buildSummaryListRows(
-              journeyId, individualDetails, optAddress, optSaPostcode, optOverseasTaxId, optOverseasTaxIdCountry, journeyConfig.pageConfig.enableSautrCheck)
-          } yield {
-            val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-            implicit val messages: Messages = remoteMessagesApi.preferred(request)
-            Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CheckYourAnswersController.submit(journeyId),
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          individualDetails <- soleTraderIdentificationService
+                                 .retrieveIndividualDetails(journeyId)
+                                 .map(_.getOrElse(throw new InternalServerException(s"Individual details not found for journeyId: $journeyId")))
+          optAddress              <- soleTraderIdentificationService.retrieveAddress(journeyId)
+          optSaPostcode           <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
+          optOverseasTaxId        <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
+          optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
+          summaryRows = rowBuilder.buildSummaryListRows(journeyId,
+                                                        individualDetails,
+                                                        optAddress,
+                                                        optSaPostcode,
+                                                        optOverseasTaxId,
+                                                        optOverseasTaxIdCountry,
+                                                        journeyConfig.pageConfig.enableSautrCheck
+                                                       )
+        } yield {
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              pageConfig  = journeyConfig.pageConfig,
+              formAction  = routes.CheckYourAnswersController.submit(journeyId),
               summaryRows = summaryRows
-            ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId and allEnrolments) {
-        case Some(authInternalId) ~ enrolments =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
-            journeyConfig =>
-              for {
-                (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig, enrolments).map({
-                  case StartBusinessVerification(businessVerificationUrl) => (businessVerificationUrl, DoNotAuditJourney)
-                  case JourneyCompleted(continueUrl) => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
-                  case SoleTraderDetailsMismatch(NinoNotFound) => (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
-                  case SoleTraderDetailsMismatch(NinoNotDeclaredButFound) => (routes.CouldNotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
-                  case SoleTraderDetailsMismatch(_) => (routes.CannotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
-                })
-              } yield {
-                if (shouldAuditJourney == AuditJourney) auditService.auditJourney(journeyId, journeyConfig) else ()
-                Redirect(nextUrl)
-              }
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId and allEnrolments) {
+      case Some(authInternalId) ~ enrolments =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).flatMap { journeyConfig =>
+          for {
+            (nextUrl, shouldAuditJourney) <- submissionService.submit(journeyId, journeyConfig, enrolments).map {
+                                               case StartBusinessVerification(businessVerificationUrl) => (businessVerificationUrl, DoNotAuditJourney)
+                                               case JourneyCompleted(continueUrl) => (continueUrl + s"?journeyId=$journeyId", AuditJourney)
+                                               case SoleTraderDetailsMismatch(NinoNotFound) =>
+                                                 (routes.DetailsNotFoundController.show(journeyId).url, AuditJourney)
+                                               case SoleTraderDetailsMismatch(NinoNotDeclaredButFound) =>
+                                                 (routes.CouldNotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
+                                               case SoleTraderDetailsMismatch(_) =>
+                                                 (routes.CannotConfirmBusinessErrorController.show(journeyId).url, AuditJourney)
+                                             }
+          } yield {
+            if (shouldAuditJourney == AuditJourney) auditService.auditJourney(journeyId, journeyConfig) else ()
+            Redirect(nextUrl)
           }
-        case None ~ _ =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+        }
+      case None ~ _ =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
   sealed trait JourneyState

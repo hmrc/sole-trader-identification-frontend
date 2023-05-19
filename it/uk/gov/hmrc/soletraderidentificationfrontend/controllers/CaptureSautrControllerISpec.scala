@@ -25,18 +25,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureSautrViewTests
 
-class CaptureSautrControllerISpec extends ComponentSpecHelper
-  with CaptureSautrViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureSautrControllerISpec extends ComponentSpecHelper with CaptureSautrViewTests with SoleTraderIdentificationStub with AuthStub {
 
   "GET /sa-utr" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -58,9 +57,10 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fsa-utr" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Fsa-utr" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -71,11 +71,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
     "the sautr is correctly formatted" should {
       "redirect to SA postcode Page and store the data in the backend" when {
         "the user does not have a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubStoreSautr(testJourneyId, testSautr)(status = OK)
           stubRetrieveNino(testJourneyId)(NOT_FOUND)
@@ -91,11 +93,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
       "redirect to the CYA page" when {
         "the user has a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubStoreSautr(testJourneyId, testSautr)(status = OK)
           stubRetrieveNino(testJourneyId)(OK, testNino)
@@ -113,11 +117,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     "no sautr is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -133,11 +139,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     "an invalid sautr is submitted" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -153,11 +161,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     "there is a form error and full name is defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -169,16 +179,17 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     "there is a form error and full name is NOT defined" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
 
         post(s"/identify-your-sole-trader-business/$testJourneyId/sa-utr")("sa-utr" -> "to simulate an error")
       }
-
 
       "return an internal server error" in {
         result.status mustBe INTERNAL_SERVER_ERROR
@@ -192,11 +203,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
   "GET /no-sa-utr" should {
     "redirect to CYA page" when {
       "the user has a nino" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveSautr(testJourneyId)(NO_CONTENT)
         stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
@@ -211,11 +224,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
       "redirect to the Overseas Tax Identifiers page" when {
         "the user does not have a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           stubAuth(OK, successfulAuthResponse())
           stubRemoveSautr(testJourneyId)(NO_CONTENT)
           stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
@@ -233,11 +248,13 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     "throw an exception" when {
       "the backend returns a failure" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testIndividualJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig
+          )
+        )
         stubAuth(OK, successfulAuthResponse())
         stubRemoveSautr(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
 

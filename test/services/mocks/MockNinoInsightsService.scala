@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,10 @@ trait MockNinoInsightsService extends MockitoSugar with BeforeAndAfterEach {
   val mockNinoInsightsService: NinoInsightsService = mock[NinoInsightsService]
 
   def mockNinoInsights(journeyId: String, nino: String)(response: Future[JsObject]): OngoingStubbing[_] =
-    when(mockNinoInsightsService.ninoInsights(
-      ArgumentMatchers.eq(journeyId), ArgumentMatchers.eq(nino)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+    when(
+      mockNinoInsightsService.ninoInsights(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(nino)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
 }

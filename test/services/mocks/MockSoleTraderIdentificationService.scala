@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,185 +42,197 @@ trait MockSoleTraderIdentificationService extends MockitoSugar with BeforeAndAft
     reset(mockSoleTraderIdentificationService)
   }
 
-  def mockRetrieveSautr(journeyId: String)
-                       (response: Future[Option[String]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveSautr(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveSautr(journeyId: String)(response: Future[Option[String]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveSautr(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveNino(journeyId: String)
-                      (response: Future[Option[String]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveNino(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveNino(journeyId: String)(response: Future[Option[String]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveNino(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveFullName(journeyId: String)
-                          (response: Future[Option[FullName]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveFullName(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveFullName(journeyId: String)(response: Future[Option[FullName]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveFullName(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveDateOfBirth(journeyId: String)
-                             (response: Future[Option[LocalDate]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveDateOfBirth(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveDateOfBirth(journeyId: String)(response: Future[Option[LocalDate]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveDateOfBirth(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveIdentifiersMatch(journeyId: String)
-                                  (response: Future[Option[SoleTraderDetailsMatchResult]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveIdentifiersMatch(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveIdentifiersMatch(journeyId: String)(response: Future[Option[SoleTraderDetailsMatchResult]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveIdentifiersMatch(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveAuthenticatorDetails(journeyId: String)
-                                      (response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveAuthenticatorDetails(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveAuthenticatorDetails(journeyId: String)(response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveAuthenticatorDetails(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveIndividualDetails(journeyId: String)
-                                   (response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveIndividualDetails(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveIndividualDetails(journeyId: String)(response: Future[Option[IndividualDetails]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveIndividualDetails(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveSoleTraderDetails(journeyId: String)
-                                   (response: Future[Option[SoleTraderDetails]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveSoleTraderDetails(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveSoleTraderDetails(journeyId: String)(response: Future[Option[SoleTraderDetails]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveSoleTraderDetails(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveAuthenticatorFailureResponse(journeyId: String)
-                                              (response: Future[Option[String]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveAuthenticatorFailureResponse(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveAuthenticatorFailureResponse(journeyId: String)(response: Future[Option[String]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveAuthenticatorFailureResponse(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveBusinessVerificationStatus(journeyId: String)
-                                            (response: Future[Option[BusinessVerificationStatus]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveBusinessVerificationStatus(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveBusinessVerificationStatus(journeyId: String)(response: Future[Option[BusinessVerificationStatus]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveBusinessVerificationStatus(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveRegistrationResponse(journeyId: String)
-                                      (response: Future[Option[RegistrationStatus]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveRegistrationStatus(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveRegistrationResponse(journeyId: String)(response: Future[Option[RegistrationStatus]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveRegistrationStatus(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveAddress(journeyId: String)
-                         (response: Future[Option[Address]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveAddress(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveAddress(journeyId: String)(response: Future[Option[Address]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveAddress(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveSaPostcode(journeyId: String)
-                            (response: Future[Option[String]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveSaPostcode(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveSaPostcode(journeyId: String)(response: Future[Option[String]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveSaPostcode(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveES20Response(journeyId: String)
-                              (response: Future[Option[KnownFactsResponse]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveES20Details(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveES20Response(journeyId: String)(response: Future[Option[KnownFactsResponse]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveES20Details(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockRetrieveTrn(journeyId: String)
-                     (response: Future[Option[String]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveTrn(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockRetrieveTrn(journeyId: String)(response: Future[Option[String]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.retrieveTrn(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreRegistrationResponse(journeyId: String, registrationStatus: RegistrationStatus)
-                                   (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeRegistrationStatus(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(registrationStatus)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreRegistrationResponse(journeyId: String, registrationStatus: RegistrationStatus)(
+    response: Future[SuccessfullyStored.type]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeRegistrationStatus(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(registrationStatus)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus)
-                                         (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeBusinessVerificationStatus(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(businessVerificationStatus)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus)(
+    response: Future[SuccessfullyStored.type]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeBusinessVerificationStatus(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(businessVerificationStatus)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)
-                               (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeIdentifiersMatch(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(identifiersMatch)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(
+    response: Future[SuccessfullyStored.type]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeIdentifiersMatch(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(identifiersMatch)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure)
-                                           (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeAuthenticatorFailureResponse(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(authenticatorFailureResponse)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure)(
+    response: Future[SuccessfullyStored.type]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeAuthenticatorFailureResponse(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(authenticatorFailureResponse)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails)
-                                   (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeAuthenticatorDetails(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(authenticatorDetails)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails)(
+    response: Future[SuccessfullyStored.type]
+  ): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeAuthenticatorDetails(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(authenticatorDetails)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreES20Details(journeyId: String, es20Details: KnownFactsResponse)
-                          (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeES20Details(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(es20Details)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreES20Details(journeyId: String, es20Details: KnownFactsResponse)(response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeES20Details(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(es20Details)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreTrn(journeyId: String, trn: String)
-                  (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeTrn(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(trn)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreTrn(journeyId: String, trn: String)(response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeTrn(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(trn)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def mockStoreInsights(journeyId: String, insights: JsObject)
-                  (response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.storeInsights(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(insights)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockStoreInsights(journeyId: String, insights: JsObject)(response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationService.storeInsights(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(insights)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def mockRetrieveInsights(journeyId: String)(response: Future[Option[JsObject]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.retrieveInsights(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+    when(
+      mockSoleTraderIdentificationService.retrieveInsights(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def mockRemoveInsights(journeyId: String)(response: Future[SuccessfullyRemoved.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationService.removeInsights(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
+    when(
+      mockSoleTraderIdentificationService.removeInsights(
+        ArgumentMatchers.eq(journeyId)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
   def verifyStoreRegistrationResponse(journeyId: String, registrationStatus: RegistrationStatus): Unit =

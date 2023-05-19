@@ -23,9 +23,8 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureOverseasTaxIdentifier => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureOverseasTaxIdentifier => messages, Header}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
-
 
 trait CaptureOverseasTaxIdentifierViewTests {
   this: ComponentSpecHelper =>

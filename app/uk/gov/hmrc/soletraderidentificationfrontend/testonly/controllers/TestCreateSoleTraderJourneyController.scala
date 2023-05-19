@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,39 +29,46 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateSoleTraderJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                                      testCreateJourneyConnector: TestCreateJourneyConnector,
-                                                      view: test_create_sole_trader_journey,
-                                                      val authConnector: AuthConnector
-                                                     )(implicit ec: ExecutionContext,
-                                                       appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+class TestCreateSoleTraderJourneyController @Inject() (messagesControllerComponents: MessagesControllerComponents,
+                                                       testCreateJourneyConnector: TestCreateJourneyConnector,
+                                                       view: test_create_sole_trader_journey,
+                                                       val authConnector: AuthConnector
+                                                      )(implicit ec: ExecutionContext, appConfig: AppConfig)
+    extends FrontendController(messagesControllerComponents)
+    with AuthorisedFunctions {
 
   private val defaultPageConfig = Utils.defaultPageConfig(appConfig)
 
   private val defaultJourneyConfig = Utils.defaultJourneyConfig(appConfig, defaultPageConfig, regime = "VATC")
 
-  val show: Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(enableSautrCheck = true).fill(defaultJourneyConfig), routes.TestCreateSoleTraderJourneyController.submit))
+  val show: Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      Future.successful(
+        Ok(
+          view(defaultPageConfig,
+               TestCreateJourneyForm.form(enableSautrCheck = true).fill(defaultJourneyConfig),
+               routes.TestCreateSoleTraderJourneyController.submit
+              )
         )
-      }
+      )
+    }
   }
 
-  val submit: Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        TestCreateJourneyForm.form(enableSautrCheck = true).bindFromRequest().fold(
+  val submit: Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      TestCreateJourneyForm
+        .form(enableSautrCheck = true)
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateSoleTraderJourneyController.submit))
             ),
           journeyConfig =>
-            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map {
-              journeyUrl => SeeOther(journeyUrl)
+            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map { journeyUrl =>
+              SeeOther(journeyUrl)
             }
         )
-      }
+    }
   }
 }

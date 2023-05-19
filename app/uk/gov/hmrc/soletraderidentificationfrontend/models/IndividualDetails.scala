@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,7 @@ import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
 import java.time.LocalDate
 
-case class IndividualDetails(firstName: String,
-                             lastName: String,
-                             dateOfBirth: LocalDate,
-                             optNino: Option[String],
-                             optSautr: Option[String])
+case class IndividualDetails(firstName: String, lastName: String, dateOfBirth: LocalDate, optNino: Option[String], optSautr: Option[String])
 
 object IndividualDetails {
 
@@ -41,7 +37,7 @@ object IndividualDetails {
       (JsPath \ DateOfBirthKey).read[LocalDate] and
       (JsPath \ NinoKey).readNullable[String] and
       (JsPath \ SautrKey).readNullable[String]
-    ) (IndividualDetails.apply _)
+  )(IndividualDetails.apply _)
 
   implicit val writes: OWrites[IndividualDetails] = (
     (JsPath \ FirstNameKey).write[String] and
@@ -49,7 +45,7 @@ object IndividualDetails {
       (JsPath \ DateOfBirthKey).write[LocalDate] and
       (JsPath \ NinoKey).writeNullable[String] and
       (JsPath \ SautrKey).writeNullable[String]
-    ) (unlift(IndividualDetails.unapply))
+  )(unlift(IndividualDetails.unapply))
 
   val format: OFormat[IndividualDetails] = OFormat(reads, writes)
 

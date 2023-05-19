@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,13 @@ import uk.gov.hmrc.soletraderidentificationfrontend.services.NinoInsightsService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NinoInsightsServiceSpec extends AnyWordSpec
-  with Matchers
-  with MockSoleTraderIdentificationService
-  with MockInsightsConnector {
+class NinoInsightsServiceSpec extends AnyWordSpec with Matchers with MockSoleTraderIdentificationService with MockInsightsConnector {
 
-  object TestService extends NinoInsightsService(
-    mockNinoInsightsConnector,
-    mockSoleTraderIdentificationService
-  )
+  object TestService
+      extends NinoInsightsService(
+        mockNinoInsightsConnector,
+        mockSoleTraderIdentificationService
+      )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 

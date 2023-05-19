@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,17 +34,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SoleTraderMatchingServiceSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with MockAuthenticatorConnector
     with MockRetrieveKnownFactsConnector
     with MockSoleTraderIdentificationService
     with org.scalatest.prop.TableDrivenPropertyChecks {
 
-  object TestService extends SoleTraderMatchingService(mockAuthenticatorConnector,
-    mockRetrieveKnownFactsConnector,
-    mockSoleTraderIdentificationService
-  )
+  object TestService
+      extends SoleTraderMatchingService(mockAuthenticatorConnector, mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -142,7 +140,8 @@ class SoleTraderMatchingServiceSpec
         mockStoreAuthenticatorFailureResponse(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
         mockStoreIdentifiersMatch(testJourneyId, DetailsMismatch)(Future.successful(SuccessfullyStored))
 
-        val result = await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig(enableSautrCheck = true)))
+        val result =
+          await(TestService.matchSoleTraderDetails(testJourneyId, testIndividualDetailsNoSautr, testJourneyConfig(enableSautrCheck = true)))
 
         result mustBe DetailsMismatch
 
@@ -186,7 +185,6 @@ class SoleTraderMatchingServiceSpec
 
   }
 
-
   "matchSoleTraderDetailsNoNino" should {
     "return NinoNotDeclaredButFound" when {
       "the user declares no NINO but retrieveKnownFacts find one" in {
@@ -201,23 +199,24 @@ class SoleTraderMatchingServiceSpec
             (None, None)
           )
 
-        forAll(knownFactsResponseScenarios) { (optPostCode: Option[String], optIsAbroad: Option[Boolean]) => {
+        forAll(knownFactsResponseScenarios) { (optPostCode: Option[String], optIsAbroad: Option[Boolean]) =>
+          {
 
-          val incomingKnownFactsResponse = KnownFactsResponse(optPostCode, optIsAbroad, nino = Some(testKnownFactsRecordedNino))
+            val incomingKnownFactsResponse = KnownFactsResponse(optPostCode, optIsAbroad, nino = Some(testKnownFactsRecordedNino))
 
-          mockRetrieveSaPostcode(testJourneyId)(Future.successful(None))
-          mockRetrieveKnownFacts(testSautr)(Future.successful(Right(incomingKnownFactsResponse)))
-          mockStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(Future.successful(SuccessfullyStored))
-          mockStoreES20Details(testJourneyId, incomingKnownFactsResponse)(Future.successful(SuccessfullyStored))
+            mockRetrieveSaPostcode(testJourneyId)(Future.successful(None))
+            mockRetrieveKnownFacts(testSautr)(Future.successful(Right(incomingKnownFactsResponse)))
+            mockStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)(Future.successful(SuccessfullyStored))
+            mockStoreES20Details(testJourneyId, incomingKnownFactsResponse)(Future.successful(SuccessfullyStored))
 
-          val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
+            val result = await(TestService.matchSoleTraderDetailsNoNino(testJourneyId, testIndividualDetailsNoNino))
 
-          result mustBe NinoNotDeclaredButFound
+            result mustBe NinoNotDeclaredButFound
 
-          verifyRetrieveKnownFacts(testSautr)
-          verifyStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)
-          reset(mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
-        }
+            verifyRetrieveKnownFacts(testSautr)
+            verifyStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)
+            reset(mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
+          }
         }
       }
     }

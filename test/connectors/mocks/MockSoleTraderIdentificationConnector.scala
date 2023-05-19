@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,55 +39,43 @@ trait MockSoleTraderIdentificationConnector extends MockitoSugar with BeforeAndA
     reset(mockSoleTraderIdentificationConnector)
   }
 
-  def mockRetrieveSoleTraderInformation[T](journeyId: String,
-                                           dataKey: String
-                                          )(response: Future[Option[T]]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationConnector.retrieveSoleTraderDetails[T](
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(dataKey)
-    )(ArgumentMatchers.any[Reads[T]],
-      ArgumentMatchers.any[Manifest[T]],
-      ArgumentMatchers.any[HeaderCarrier]
-    )).thenReturn(response)
+  def mockRetrieveSoleTraderInformation[T](journeyId: String, dataKey: String)(response: Future[Option[T]]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationConnector.retrieveSoleTraderDetails[T](
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(dataKey)
+      )(ArgumentMatchers.any[Reads[T]], ArgumentMatchers.any[Manifest[T]], ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
 
   def verifyRetrieveSoleTraderInformation[T](journeyId: String, dataKey: String): Unit =
     verify(mockSoleTraderIdentificationConnector).retrieveSoleTraderDetails[T](
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(dataKey)
-    )(ArgumentMatchers.any[Reads[T]],
-      ArgumentMatchers.any[Manifest[T]],
-      ArgumentMatchers.any[HeaderCarrier])
+    )(ArgumentMatchers.any[Reads[T]], ArgumentMatchers.any[Manifest[T]], ArgumentMatchers.any[HeaderCarrier])
 
-  def mockStoreData[T](journeyId: String,
-                       dataKey: String,
-                       data: T
-                      )(response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationConnector.storeData[T](
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(dataKey),
-      ArgumentMatchers.eq(data)
-    )(ArgumentMatchers.any[Writes[T]],
-      ArgumentMatchers.any[HeaderCarrier]
-    )).thenReturn(response)
+  def mockStoreData[T](journeyId: String, dataKey: String, data: T)(response: Future[SuccessfullyStored.type]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationConnector.storeData[T](
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(dataKey),
+        ArgumentMatchers.eq(data)
+      )(ArgumentMatchers.any[Writes[T]], ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
 
-  def verifyStoreData[T](journeyId: String,
-                         dataKey: String,
-                         data: T): Unit =
+  def verifyStoreData[T](journeyId: String, dataKey: String, data: T): Unit =
     verify(mockSoleTraderIdentificationConnector).storeData(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(dataKey),
       ArgumentMatchers.eq(data)
-    )(ArgumentMatchers.any[Writes[T]],
-      ArgumentMatchers.any[HeaderCarrier])
+    )(ArgumentMatchers.any[Writes[T]], ArgumentMatchers.any[HeaderCarrier])
 
-  def mockRemoveSoleTraderDetails[T](journeyId: String,
-                                     dataKey: String
-                                    )(response: Future[SuccessfullyRemoved.type]): OngoingStubbing[_] =
-    when(mockSoleTraderIdentificationConnector.removeSoleTraderDetails(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(dataKey)
-    )(ArgumentMatchers.any[HeaderCarrier]
-    )).thenReturn(response)
+  def mockRemoveSoleTraderDetails[T](journeyId: String, dataKey: String)(response: Future[SuccessfullyRemoved.type]): OngoingStubbing[_] =
+    when(
+      mockSoleTraderIdentificationConnector.removeSoleTraderDetails(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(dataKey)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
 
   def verifyRemoveSoleTraderDetails[T](journeyId: String, dataKey: String): Unit =
     verify(mockSoleTraderIdentificationConnector).removeSoleTraderDetails(

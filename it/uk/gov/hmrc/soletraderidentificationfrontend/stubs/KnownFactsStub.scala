@@ -22,15 +22,13 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.{WireMockMethods, Wire
 
 trait KnownFactsStub extends WireMockMethods {
 
-  def stubGetEacdKnownFacts(sautr: String
-                           )(status: Int,
-                             body: JsObject = Json.obj()): StubMapping = {
+  def stubGetEacdKnownFacts(sautr: String)(status: Int, body: JsObject = Json.obj()): StubMapping = {
 
     val json: JsObject = Json.obj(
       "service" -> "IR-SA",
       "knownFacts" -> Json.arr(
         Json.obj(
-          "key" -> "UTR",
+          "key"   -> "UTR",
           "value" -> sautr
         )
       )
@@ -39,19 +37,17 @@ trait KnownFactsStub extends WireMockMethods {
     when(method = POST, uri = "/enrolment-store-proxy/enrolment-store/enrolments", body = json)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 
-  def stubGetEacdKnownFactsFromStub(sautr: String)
-                                   (status: Int,
-                                    body: JsObject = Json.obj()): StubMapping = {
+  def stubGetEacdKnownFactsFromStub(sautr: String)(status: Int, body: JsObject = Json.obj()): StubMapping = {
 
     val json: JsObject = Json.obj(
       "service" -> "IR-SA",
       "knownFacts" -> Json.arr(
         Json.obj(
-          "key" -> "UTR",
+          "key"   -> "UTR",
           "value" -> sautr
         )
       )
@@ -60,7 +56,7 @@ trait KnownFactsStub extends WireMockMethods {
     when(method = POST, uri = "/identify-your-sole-trader-business/test-only/enrolment-store/enrolments", body = json)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 
@@ -69,7 +65,7 @@ trait KnownFactsStub extends WireMockMethods {
       "service" -> "IR-SA",
       "knownFacts" -> Json.arr(
         Json.obj(
-          "key" -> "UTR",
+          "key"   -> "UTR",
           "value" -> sautr
         )
       )
@@ -85,7 +81,7 @@ trait KnownFactsStub extends WireMockMethods {
       "service" -> "IR-SA",
       "knownFacts" -> Json.arr(
         Json.obj(
-          "key" -> "UTR",
+          "key"   -> "UTR",
           "value" -> sautr
         )
       )

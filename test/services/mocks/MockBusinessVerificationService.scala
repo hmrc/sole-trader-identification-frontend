@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,22 +38,21 @@ trait MockBusinessVerificationService extends MockitoSugar with BeforeAndAfterEa
     reset(mockBusinessVerificationService)
   }
 
-  def mockCreateBusinessVerificationJourney(journeyId: String,
-                                            sautr: String,
-                                            journeyConfig: JourneyConfig
-                                           )(response: Future[BusinessVerificationJourneyCreationResponse]): OngoingStubbing[_] =
-    when(mockBusinessVerificationService.createBusinessVerificationJourney(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockCreateBusinessVerificationJourney(journeyId: String, sautr: String, journeyConfig: JourneyConfig)(
+    response: Future[BusinessVerificationJourneyCreationResponse]
+  ): OngoingStubbing[_] =
+    when(
+      mockBusinessVerificationService.createBusinessVerificationJourney(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(sautr),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyCreateBusinessVerificationJourney(journeyId: String,
-                                              sautr: String,
-                                              journeyConfig: JourneyConfig): Unit =
+  def verifyCreateBusinessVerificationJourney(journeyId: String, sautr: String, journeyConfig: JourneyConfig): Unit =
     verify(mockBusinessVerificationService).createBusinessVerificationJourney(ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(journeyConfig))(ArgumentMatchers.any[HeaderCarrier])
+                                                                              ArgumentMatchers.eq(sautr),
+                                                                              ArgumentMatchers.eq(journeyConfig)
+                                                                             )(ArgumentMatchers.any[HeaderCarrier])
 
 }

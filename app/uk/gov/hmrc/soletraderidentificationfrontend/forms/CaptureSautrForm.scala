@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,17 @@ import scala.util.matching.Regex
 object CaptureSautrForm {
   val sautrRegex: Regex = "[0-9]{10}".r
 
-  val saUtrNotEntered: Constraint[String] = Constraint("sa-utr.not-entered")(
-    saUtr => validate(
+  val saUtrNotEntered: Constraint[String] = Constraint("sa-utr.not-entered")(saUtr =>
+    validate(
       constraint = saUtr.isEmpty,
-      errMsg = "sa-utr.not.entered.error"
+      errMsg     = "sa-utr.not.entered.error"
     )
   )
 
-  val saUtrIncorrectFormat: Constraint[String] = Constraint("sa-utr.incorrect-format")(
-    saUtr => validateNot(
+  val saUtrIncorrectFormat: Constraint[String] = Constraint("sa-utr.incorrect-format")(saUtr =>
+    validateNot(
       constraint = saUtr.toUpperCase.matches(sautrRegex.regex),
-      errMsg = "sa-utr.incorrect.format.error"
+      errMsg     = "sa-utr.incorrect.format.error"
     )
   )
 

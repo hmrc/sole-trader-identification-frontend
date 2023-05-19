@@ -26,57 +26,59 @@ trait AuthenticatorStub extends WireMockMethods {
   def stubMatch(authenticatorDetails: IndividualDetails)(status: Int, body: JsObject): Unit = {
     val nino = authenticatorDetails.optNino match {
       case Some(nino) => nino
-      case _ => ""
+      case _          => ""
     }
-    when(method = POST,
-      uri = s"/authenticator/match",
+    when(
+      method = POST,
+      uri    = s"/authenticator/match",
       body = Json.obj(
-        "firstName" -> authenticatorDetails.firstName,
-        "lastName" -> authenticatorDetails.lastName,
+        "firstName"   -> authenticatorDetails.firstName,
+        "lastName"    -> authenticatorDetails.lastName,
         "dateOfBirth" -> authenticatorDetails.dateOfBirth.format(ofPattern("uuuu-MM-dd")),
-        "nino" -> nino
+        "nino"        -> nino
       )
     ).thenReturn(
       status = status,
-      body = body
+      body   = body
     )
   }
 
   def stubMatchStub(authenticatorDetails: IndividualDetails)(status: Int, body: JsObject): Unit = {
     val nino = authenticatorDetails.optNino match {
       case Some(nino) => nino
-      case _ => ""
+      case _          => ""
     }
 
-    when(method = POST,
-      uri = s"/identify-your-sole-trader-business/test-only/authenticator/match",
+    when(
+      method = POST,
+      uri    = s"/identify-your-sole-trader-business/test-only/authenticator/match",
       body = Json.obj(
-        "firstName" -> authenticatorDetails.firstName,
-        "lastName" -> authenticatorDetails.lastName,
+        "firstName"   -> authenticatorDetails.firstName,
+        "lastName"    -> authenticatorDetails.lastName,
         "dateOfBirth" -> authenticatorDetails.dateOfBirth.format(ofPattern("uuuu-MM-dd")),
-        "nino" -> nino
+        "nino"        -> nino
       )
     ).thenReturn(
       status = status,
-      body = body
+      body   = body
     )
   }
 
   def successfulMatchJson(authenticatorDetails: IndividualDetails): JsObject = {
     val nino = authenticatorDetails.optNino match {
       case Some(nino) => nino
-      case _ => ""
+      case _          => ""
     }
 
     Json.obj(
-      "firstName" -> authenticatorDetails.firstName,
-      "lastName" -> authenticatorDetails.lastName,
+      "firstName"   -> authenticatorDetails.firstName,
+      "lastName"    -> authenticatorDetails.lastName,
       "dateOfBirth" -> authenticatorDetails.dateOfBirth.format(ofPattern("uuuu-MM-dd")),
-      "nino" -> nino
+      "nino"        -> nino
     ) ++ {
       authenticatorDetails.optSautr match {
         case Some(sautr) => Json.obj("saUtr" -> sautr)
-        case None => Json.obj()
+        case None        => Json.obj()
       }
 
     }

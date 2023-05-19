@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,26 +28,23 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FeatureSwitchFrontendController @Inject()(featureSwitchService: FeatureSwitchRetrievalService,
-                                                featureSwitchView: feature_switch,
-                                                mcc: MessagesControllerComponents
-                                               )(implicit ec: ExecutionContext,
-                                                 appConfig: AppConfig) extends FrontendController(mcc) with FeatureSwitching with I18nSupport {
+class FeatureSwitchFrontendController @Inject() (featureSwitchService: FeatureSwitchRetrievalService,
+                                                 featureSwitchView: feature_switch,
+                                                 mcc: MessagesControllerComponents
+                                                )(implicit ec: ExecutionContext, appConfig: AppConfig)
+    extends FrontendController(mcc)
+    with FeatureSwitching
+    with I18nSupport {
 
-
-  def show: Action[AnyContent] = Action.async {
-    implicit req =>
-      featureSwitchService.retrieveFeatureSwitches().map {
-        featureSwitches =>
-          Ok(featureSwitchView(featureSwitches, routes.FeatureSwitchFrontendController.submit))
-      }
+  def show: Action[AnyContent] = Action.async { implicit req =>
+    featureSwitchService.retrieveFeatureSwitches().map { featureSwitches =>
+      Ok(featureSwitchView(featureSwitches, routes.FeatureSwitchFrontendController.submit))
+    }
   }
 
-  def submit: Action[Map[String, Seq[String]]] = Action.async(parse.formUrlEncoded) {
-    implicit req =>
-      featureSwitchService.updateFeatureSwitches(req.body.keys).map {
-        featureSwitches =>
-          Ok(featureSwitchView(featureSwitches, routes.FeatureSwitchFrontendController.submit))
-      }
+  def submit: Action[Map[String, Seq[String]]] = Action.async(parse.formUrlEncoded) { implicit req =>
+    featureSwitchService.updateFeatureSwitches(req.body.keys).map { featureSwitches =>
+      Ok(featureSwitchView(featureSwitches, routes.FeatureSwitchFrontendController.submit))
+    }
   }
 }

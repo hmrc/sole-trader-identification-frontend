@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,31 +30,31 @@ class CaptureFullNameForm {
 
   val nameRegex: String = "^(?=.{1,99}$)([A-Z]([-'. ]{0,1}[A-Za-z ]+)*[A-Za-z]?)$"
 
-  private val firstNameNotEntered: Constraint[String] = Constraint("first_name.not_entered")(
-    firstName => validate(
+  private val firstNameNotEntered: Constraint[String] = Constraint("first_name.not_entered")(firstName =>
+    validate(
       constraint = firstName.isEmpty,
-      errMsg = "error.no_entry_first_name"
+      errMsg     = "error.no_entry_first_name"
     )
   )
 
-  private val firstNameInvalid: Constraint[String] = Constraint("first_name.invalid")(
-    firstName => validateNot(
+  private val firstNameInvalid: Constraint[String] = Constraint("first_name.invalid")(firstName =>
+    validateNot(
       constraint = validName(firstName.capitalize),
-      errMsg = "error.invalid_first_name"
+      errMsg     = "error.invalid_first_name"
     )
   )
 
-  private val lastNameNotEntered: Constraint[String] = Constraint("last_name.not_entered")(
-    lastName => validate(
+  private val lastNameNotEntered: Constraint[String] = Constraint("last_name.not_entered")(lastName =>
+    validate(
       constraint = lastName.isEmpty,
-      errMsg = "error.no_entry_last_name"
+      errMsg     = "error.no_entry_last_name"
     )
   )
 
-  private val lastNameInvalid: Constraint[String] = Constraint("last_name.invalid")(
-    lastName => validateNot(
+  private val lastNameInvalid: Constraint[String] = Constraint("last_name.invalid")(lastName =>
+    validateNot(
       constraint = validName(lastName.capitalize),
-      errMsg = "error.invalid_last_name"
+      errMsg     = "error.invalid_last_name"
     )
   )
 
@@ -62,7 +62,7 @@ class CaptureFullNameForm {
     Form(
       mapping(
         "first-name" -> optText.toTrimmedText.verifying(firstNameNotEntered andThen firstNameInvalid),
-        "last-name" -> optText.toTrimmedText.verifying(lastNameNotEntered andThen lastNameInvalid)
+        "last-name"  -> optText.toTrimmedText.verifying(lastNameNotEntered andThen lastNameInvalid)
       )(FullName.apply)(FullName.unapply)
     )
   }

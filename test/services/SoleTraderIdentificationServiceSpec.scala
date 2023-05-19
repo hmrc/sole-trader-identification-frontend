@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class SoleTraderIdentificationServiceSpec extends AnyWordSpec with Matchers with
       "the call to the database times out" in {
         mockRetrieveSoleTraderInformation[String](
           journeyId = testJourneyId,
-          dataKey = "sautr"
+          dataKey   = "sautr"
         )(Future.failed(new GatewayTimeoutException("GET of '/testUrl' timed out with message 'testError'")))
 
         intercept[GatewayTimeoutException](

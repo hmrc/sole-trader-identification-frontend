@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,16 +42,12 @@ trait MockAuditConnector extends MockitoSugar with BeforeAndAfterEach {
     verify(mockAuditConnector, times(1)).sendExplicitAudit(
       ArgumentMatchers.eq("IndividualIdentification"),
       auditEventCaptor.capture()
-    )(ArgumentMatchers.any[HeaderCarrier],
-      ArgumentMatchers.any[ExecutionContext]
-    )
+    )(ArgumentMatchers.any[HeaderCarrier], ArgumentMatchers.any[ExecutionContext])
 
   def verifySendExplicitAuditSoleTraders(): Unit =
     verify(mockAuditConnector, times(1)).sendExplicitAudit(
       ArgumentMatchers.eq("SoleTraderRegistration"),
       auditEventCaptor.capture()
-    )(ArgumentMatchers.any[HeaderCarrier],
-      ArgumentMatchers.any[ExecutionContext]
-    )
+    )(ArgumentMatchers.any[HeaderCarrier], ArgumentMatchers.any[ExecutionContext])
 
 }

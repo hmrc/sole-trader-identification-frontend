@@ -27,299 +27,232 @@ import java.time.LocalDate
 trait SoleTraderIdentificationStub extends WireMockMethods {
 
   def stubStoreFullName(journeyId: String, fullName: FullName)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/fullName",
+    when(
+      method = PUT,
+      uri    = s"/sole-trader-identification/journey/$journeyId/fullName",
       body = Json.obj(
         "firstName" -> fullName.firstName,
-        "lastName" -> fullName.lastName
+        "lastName"  -> fullName.lastName
       )
     ).thenReturn(
       status = status
     )
 
   def stubStoreNino(journeyId: String, nino: String)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/nino",
-      body = JsString(nino)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/nino", body = JsString(nino)).thenReturn(
       status = status
     )
 
   def stubStoreAddress(journeyId: String, address: Address)(status: Int): StubMapping =
     when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/address",
-      body = Json.toJson(
-        address
-      )
-    ).thenReturn(
+         uri    = s"/sole-trader-identification/journey/$journeyId/address",
+         body = Json.toJson(
+           address
+         )
+        ).thenReturn(
       status = status
     )
 
   def stubStoreTrn(journeyId: String, trn: String)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/trn",
-      body = JsString(trn)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/trn", body = JsString(trn)).thenReturn(
       status = status
     )
 
   def stubStoreSautr(journeyId: String, sautr: String)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/sautr", body = JsString(sautr)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/sautr", body = JsString(sautr)).thenReturn(
       status = status
     )
 
   def stubStoreSaPostcode(journeyId: String, saPostcode: String)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/saPostcode",
-      body = JsString(saPostcode)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/saPostcode", body = JsString(saPostcode)).thenReturn(
       status = status
     )
 
   def stubStoreDob(journeyId: String, dateOfBirth: LocalDate)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/dateOfBirth", body = Json.toJson(dateOfBirth)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/dateOfBirth", body = Json.toJson(dateOfBirth)).thenReturn(
       status = status
     )
 
   def stubStoreIdentifiersMatch(journeyId: String, identifiersMatch: SoleTraderDetailsMatchResult)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch", body = JsString(identifiersMatch.toString)
-    ).thenReturn(
-      status = status
-    )
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch", body = JsString(identifiersMatch.toString))
+      .thenReturn(
+        status = status
+      )
 
   def stubStoreNinoInsights(journeyId: String, insights: JsObject)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/reputation", body = insights
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/reputation", body = insights).thenReturn(
       status = status
     )
 
   def stubStoreAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails", body = Json.toJson(authenticatorDetails)
-    ).thenReturn(
-      status = status
-    )
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails", body = Json.toJson(authenticatorDetails))
+      .thenReturn(
+        status = status
+      )
 
-  def stubStoreAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure)(status: Int): StubMapping =
+  def stubStoreAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure)(
+    status: Int
+  ): StubMapping =
     when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse", body = JsString(authenticatorFailureResponse.toString)
-    ).thenReturn(
+         uri    = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse",
+         body   = JsString(authenticatorFailureResponse.toString)
+        ).thenReturn(
       status = status
     )
 
   def stubStoreES20Details(journeyId: String, es20Details: KnownFactsResponse)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/es20Details", body = Json.toJson(es20Details)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/es20Details", body = Json.toJson(es20Details)).thenReturn(
       status = status
     )
 
   def stubStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(status: Int): Unit =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
-      body = JsString(overseasTaxIdentifier)
-    ).thenReturn(
-      status = status
-    )
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers", body = JsString(overseasTaxIdentifier))
+      .thenReturn(
+        status = status
+      )
 
   def stubStoreOverseasTaxIdentifiersCountry(journeyId: String, country: String)(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/country", body = JsString(country)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/country", body = JsString(country)).thenReturn(
       status = status
     )
 
   def verifyStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
+      uri     = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers",
       optBody = Some(JsString(overseasTaxIdentifier).toString())
     )
 
-
   def stubRetrieveSoleTraderDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveAuthenticatorDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveAuthenticatorFailureResponse(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveIndividualDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveFullName(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/fullName"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/fullName").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveDob(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/dateOfBirth"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/dateOfBirth").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveNino(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/nino"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/nino").thenReturn(
       status = status,
-      body = JsString(body)
+      body   = JsString(body)
     )
 
   def stubRetrieveSautr(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/sautr"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/sautr").thenReturn(
       status = status,
-      body = JsString(body)
+      body   = JsString(body)
     )
 
   def stubRetrieveSaPostcode(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/saPostcode"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/saPostcode").thenReturn(
       status = status,
-      body = JsString(body)
+      body   = JsString(body)
     )
 
-
   def stubRetrieveOverseasTaxIdentifier(journeyId: String)(status: Int, overseasTaxIdentifier: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers").thenReturn(
       status = status,
-      body = overseasTaxIdentifier
+      body   = overseasTaxIdentifier
     )
 
   def stubRetrieveOverseasTaxIdentifierCountry(journeyId: String)(status: Int, country: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/country"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/country").thenReturn(
       status = status,
-      body = country
+      body   = country
     )
 
   def stubRetrieveAddress(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/address"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/address").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveTrn(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/trn"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/trn").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveSautr(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/sautr"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/sautr").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveSaPostcode(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/saPostcode"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/saPostcode").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveNino(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/nino"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/nino").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveAddress(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/address"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/address").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveInsights(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/reputation"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/reputation").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveOverseasTaxIdentifier(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/overseasTaxIdentifiers").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveOverseasTaxIdentifiersCountry(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId/country"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId/country").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRemoveAllData(journeyId: String)(status: Int, body: String = ""): StubMapping =
-    when(method = DELETE,
-      uri = s"/sole-trader-identification/journey/$journeyId"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/sole-trader-identification/journey/$journeyId").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
-  def stubStoreBusinessVerificationStatus(journeyId: String,
-                                          businessVerificationStatus: BusinessVerificationStatus
-                                         )(status: Int): StubMapping =
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/businessVerification",
-      body = Json.toJson(businessVerificationStatus)
-    ).thenReturn(
-      status = status
-    )
+  def stubStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus)(status: Int): StubMapping =
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/businessVerification", body = Json.toJson(businessVerificationStatus))
+      .thenReturn(
+        status = status
+      )
 
   def verifyStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus): Unit = {
     val jsonBody = Json.toJson(businessVerificationStatus)
@@ -327,50 +260,37 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   }
 
   def stubRetrieveBusinessVerificationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/businessVerification"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/businessVerification").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatch: SoleTraderDetailsMatchResult): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch").thenReturn(
       status = status,
-      body = JsString(identifiersMatch.toString)
+      body   = JsString(identifiersMatch.toString)
     )
 
   def stubRetrieveInsights(journeyId: String)(status: Int, insights: JsObject = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/reputation"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/reputation").thenReturn(
       status = status,
-      body = insights
+      body   = insights
     )
 
   def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/registration"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/registration").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubRetrieveES20Result(journeyId: String)(status: Int, body: JsValue = Json.obj()): StubMapping =
-    when(method = GET,
-      uri = s"/sole-trader-identification/journey/$journeyId/es20Details"
-    ).thenReturn(
+    when(method = GET, uri = s"/sole-trader-identification/journey/$journeyId/es20Details").thenReturn(
       status = status,
-      body = body
+      body   = body
     )
 
   def stubStoreRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(status: Int): StubMapping = {
-    when(method = PUT,
-      uri = s"/sole-trader-identification/journey/$journeyId/registration",
-      body = Json.toJsObject(registrationStatus)
-    ).thenReturn(
+    when(method = PUT, uri = s"/sole-trader-identification/journey/$journeyId/registration", body = Json.toJsObject(registrationStatus)).thenReturn(
       status = status
     )
   }
@@ -383,39 +303,39 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
   def verifyStoreAuthenticatorDetails(journeyId: String, authenticatorDetails: IndividualDetails): Unit = {
     val jsonBody = Json.toJsObject(authenticatorDetails)
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails",
+      uri     = s"/sole-trader-identification/journey/$journeyId/authenticatorDetails",
       optBody = Some(jsonBody.toString())
     )
   }
 
   def verifyStoreAuthenticatorFailureResponse(journeyId: String, authenticatorFailureResponse: SoleTraderDetailsMatchFailure): Unit = {
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse",
+      uri     = s"/sole-trader-identification/journey/$journeyId/authenticatorFailureResponse",
       optBody = Some(JsString(authenticatorFailureResponse.toString).toString())
     )
   }
 
   def verifyStoreIdentifiersMatch(journeyId: String, expBody: JsValue): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/identifiersMatch",
+      uri     = s"/sole-trader-identification/journey/$journeyId/identifiersMatch",
       optBody = Some(Json.stringify(expBody))
     )
 
   def verifyStoreNinoInsights(journeyId: String, expBody: JsObject): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/reputation",
+      uri     = s"/sole-trader-identification/journey/$journeyId/reputation",
       optBody = Some(Json.stringify(expBody))
     )
 
   def verifyStoreTrn(journeyId: String, trn: String): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/trn",
+      uri     = s"/sole-trader-identification/journey/$journeyId/trn",
       optBody = Some(JsString(trn).toString())
     )
 
   def verifyStoreES20Details(journeyId: String, es20Details: KnownFactsResponse): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/es20Details",
+      uri     = s"/sole-trader-identification/journey/$journeyId/es20Details",
       optBody = Some(Json.toJsObject(es20Details).toString())
     )
 
@@ -427,17 +347,13 @@ trait SoleTraderIdentificationStub extends WireMockMethods {
 
   def verifyStoreCountry(journeyId: String, country: String): Unit =
     WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/country",
+      uri     = s"/sole-trader-identification/journey/$journeyId/country",
       optBody = Some(JsString(country).toString())
     )
 
   def verifyStoreAddress(journeyId: String, address: Address): Unit =
-    WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/address",
-      optBody = Some(Json.toJson(address).toString()))
+    WiremockHelper.verifyPut(uri = s"/sole-trader-identification/journey/$journeyId/address", optBody = Some(Json.toJson(address).toString()))
 
   def verifyStoreFullName(journeyId: String, fullName: FullName): Unit =
-    WiremockHelper.verifyPut(
-      uri = s"/sole-trader-identification/journey/$journeyId/fullName",
-      optBody = Some(Json.toJson(fullName).toString()))
+    WiremockHelper.verifyPut(uri = s"/sole-trader-identification/journey/$journeyId/fullName", optBody = Some(Json.toJson(fullName).toString()))
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,14 @@ object YesNoMapping {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] = {
       data.get(key) match {
         case Some(`option_yes`) => Right(true)
-        case Some(`option_no`) => Right(false)
-        case _ => Left(Seq(FormError(key, error)))
+        case Some(`option_no`)  => Right(false)
+        case _                  => Left(Seq(FormError(key, error)))
       }
     }
 
     override def unbind(key: String, value: Boolean): Map[String, String] = {
       val stringValue = value match {
-        case true => option_yes
+        case true  => option_yes
         case false => option_no
       }
 

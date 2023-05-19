@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@ import uk.gov.hmrc.auth.core.Enrolments
 object EnrolmentsHelper {
 
   def getSaEnrolment(enrolments: Enrolments): Option[String] =
-    enrolments.getEnrolment("IR-SA").flatMap {
-      IRSAEnrolments =>
-        IRSAEnrolments.getIdentifier("UTR").map {
-          _.value
-        }
+    enrolments.getEnrolment("IR-SA").flatMap { IRSAEnrolments =>
+      IRSAEnrolments.getIdentifier("UTR").map {
+        _.value
+      }
 
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,22 +38,20 @@ trait MockNinoIVService extends MockitoSugar with BeforeAndAfterEach {
     reset(mockNinoIVService)
   }
 
-  def mockCreateNinoIVJourney(journeyId: String,
-                              nino: String,
-                              journeyConfig: JourneyConfig
-                             )(response: Future[NinoIVJourneyCreationResponse]): OngoingStubbing[_] =
-    when(mockNinoIVService.createNinoIVJourney(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier])
+  def mockCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig)(
+    response: Future[NinoIVJourneyCreationResponse]
+  ): OngoingStubbing[_] =
+    when(
+      mockNinoIVService.createNinoIVJourney(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(nino),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  def verifyCreateNinoIVJourney(journeyId: String,
-                                nino: String,
-                                journeyConfig: JourneyConfig): Unit =
-    verify(mockNinoIVService).createNinoIVJourney(ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(journeyConfig))(ArgumentMatchers.any[HeaderCarrier])
+  def verifyCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig): Unit =
+    verify(mockNinoIVService).createNinoIVJourney(ArgumentMatchers.eq(journeyId), ArgumentMatchers.eq(nino), ArgumentMatchers.eq(journeyConfig))(
+      ArgumentMatchers.any[HeaderCarrier]
+    )
 
 }

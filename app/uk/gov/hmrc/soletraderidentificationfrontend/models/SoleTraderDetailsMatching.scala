@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,13 @@ object SoleTraderDetailsMatching {
   implicit val format: Format[SoleTraderDetailsMatchResult] = new Format[SoleTraderDetailsMatchResult] {
     override def writes(soleTraderMatchingResult: SoleTraderDetailsMatchResult): JsValue = {
       val knownFactsMatchingResultString = soleTraderMatchingResult match {
-        case SuccessfulMatch => SuccessfulMatchKey
+        case SuccessfulMatch             => SuccessfulMatchKey
         case NotEnoughInformationToMatch => NotEnoughInfoToMatchKey
-        case DetailsMismatch => DetailsMismatchKey
-        case NinoNotDeclaredButFound => NinoNotDeclaredButFoundKey
-        case NinoNotFound => NinoNotFoundKey
-        case DeceasedCitizensDetails => DeceasedCitizensDetailsKey
-        case KnownFactsNoContent => KnownFactsNoContentKey
+        case DetailsMismatch             => DetailsMismatchKey
+        case NinoNotDeclaredButFound     => NinoNotDeclaredButFoundKey
+        case NinoNotFound                => NinoNotFoundKey
+        case DeceasedCitizensDetails     => DeceasedCitizensDetailsKey
+        case KnownFactsNoContent         => KnownFactsNoContentKey
       }
 
       JsString(knownFactsMatchingResultString)
@@ -67,16 +67,17 @@ object SoleTraderDetailsMatching {
 
     override def reads(json: JsValue): JsResult[SoleTraderDetailsMatchResult] =
       json.validate[String] match {
-        case JsSuccess(identifiersMatchString, _) => identifiersMatchString match {
-          case SuccessfulMatchKey => JsSuccess(SuccessfulMatch)
-          case NotEnoughInfoToMatchKey => JsSuccess(NotEnoughInformationToMatch)
-          case DetailsMismatchKey => JsSuccess(DetailsMismatch)
-          case NinoNotDeclaredButFoundKey => JsSuccess(NinoNotDeclaredButFound)
-          case NinoNotFoundKey => JsSuccess(NinoNotFound)
-          case DeceasedCitizensDetailsKey => JsSuccess(DeceasedCitizensDetails)
-          case KnownFactsNoContentKey => JsSuccess(KnownFactsNoContent)
-          case notMapped => JsError(s"Error trying to match Sole Trader Matching Result. $notMapped is not mapped to any match result")
-        }
+        case JsSuccess(identifiersMatchString, _) =>
+          identifiersMatchString match {
+            case SuccessfulMatchKey         => JsSuccess(SuccessfulMatch)
+            case NotEnoughInfoToMatchKey    => JsSuccess(NotEnoughInformationToMatch)
+            case DetailsMismatchKey         => JsSuccess(DetailsMismatch)
+            case NinoNotDeclaredButFoundKey => JsSuccess(NinoNotDeclaredButFound)
+            case NinoNotFoundKey            => JsSuccess(NinoNotFound)
+            case DeceasedCitizensDetailsKey => JsSuccess(DeceasedCitizensDetails)
+            case KnownFactsNoContentKey     => JsSuccess(KnownFactsNoContent)
+            case notMapped => JsError(s"Error trying to match Sole Trader Matching Result. $notMapped is not mapped to any match result")
+          }
         case JsError(error) => JsError(s"Error reading Sole Trader Matching Result json. Details: $error")
       }
   }

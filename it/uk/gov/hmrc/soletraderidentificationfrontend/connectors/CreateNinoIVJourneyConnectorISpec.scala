@@ -73,7 +73,9 @@ class CreateNinoIVJourneyConnectorISpec extends ComponentSpecHelper with NinoIVS
       "return the redirectUri and therefore no BV status" when {
         "the journey creation has been successful" in {
           disable(NinoIVJourneyStub)
-          stubCreateNinoIdentityVerificationJourney(testNino, testJourneyId, testSoleTraderJourneyConfig)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateNinoIdentityVerificationJourney(testNino, testJourneyId, testSoleTraderJourneyConfig)(CREATED,
+                                                                                                          Json.obj("redirectUri" -> testContinueUrl)
+                                                                                                         )
 
           val result = await(createNinoIVJourneyConnector.createNinoIdentityVerificationJourney(testJourneyId, testNino, testSoleTraderJourneyConfig))
 

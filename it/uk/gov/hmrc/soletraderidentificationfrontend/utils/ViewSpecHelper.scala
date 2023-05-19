@@ -20,7 +20,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatest.matchers.{HavePropertyMatchResult, HavePropertyMatcher}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object ViewSpecHelper {
 
@@ -98,11 +98,12 @@ object ViewSpecHelper {
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =
-    (element: Elements) => HavePropertyMatchResult(
-      element.text() == text,
-      "text",
-      text,
-      element.text()
-    )
+    (element: Elements) =>
+      HavePropertyMatchResult(
+        element.text() == text,
+        "text",
+        text,
+        element.text()
+      )
 
 }

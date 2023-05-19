@@ -26,7 +26,7 @@ trait JourneyStub extends WireMockMethods {
     when(method = POST, uri = "/sole-trader-identification/journey")
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
 
 }

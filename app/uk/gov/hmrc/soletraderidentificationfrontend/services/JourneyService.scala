@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class JourneyService @Inject()(createJourneyConnector: CreateJourneyConnector,
-                               journeyConfigRepository: JourneyConfigRepository
-                              )(implicit ec: ExecutionContext) {
+class JourneyService @Inject() (createJourneyConnector: CreateJourneyConnector, journeyConfigRepository: JourneyConfigRepository)(implicit
+  ec: ExecutionContext
+) {
 
-  def createJourney(journeyConfig: JourneyConfig, authInternalId: String)
-                   (implicit headerCarrier: HeaderCarrier): Future[String] =
+  def createJourney(journeyConfig: JourneyConfig, authInternalId: String)(implicit headerCarrier: HeaderCarrier): Future[String] =
     for {
       journeyId <- createJourneyConnector.createJourney()
-      _ <- journeyConfigRepository.insertJourneyConfig(journeyId, authInternalId, journeyConfig)
+      _         <- journeyConfigRepository.insertJourneyConfig(journeyId, authInternalId, journeyConfig)
     } yield journeyId
 
   def getJourneyConfig(journeyId: String, authInternalId: String): Future[JourneyConfig] =

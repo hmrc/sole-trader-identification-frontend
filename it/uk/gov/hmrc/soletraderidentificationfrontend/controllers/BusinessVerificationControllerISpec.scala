@@ -29,25 +29,26 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs._
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 
-class BusinessVerificationControllerISpec extends ComponentSpecHelper
-  with FeatureSwitching
-  with AuthStub
-  with BusinessVerificationStub
-  with RegisterStub
-  with SoleTraderIdentificationStub
-  with CreateTrnStub
-  with BeforeAndAfterEach
-  with WiremockHelper {
+class BusinessVerificationControllerISpec
+    extends ComponentSpecHelper
+    with FeatureSwitching
+    with AuthStub
+    with BusinessVerificationStub
+    with RegisterStub
+    with SoleTraderIdentificationStub
+    with CreateTrnStub
+    with BeforeAndAfterEach
+    with WiremockHelper {
 
   def extraConfig = Map(
-    "auditing.enabled" -> "true",
+    "auditing.enabled"               -> "true",
     "auditing.consumer.baseUri.host" -> mockHost,
     "auditing.consumer.baseUri.port" -> mockPort
   )
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig)
-    .build
+    .build()
 
   override def beforeEach(): Unit = {
     await(journeyConfigRepository.drop)
@@ -58,11 +59,13 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
     s"the $BusinessVerificationStub feature switch is enabled" should {
       "redirect to the continue url" when {
         "the user has a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           enable(BusinessVerificationStub)
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
@@ -94,11 +97,13 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           verifyAudit()
         }
         "the user does not have a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
           enable(BusinessVerificationStub)
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
@@ -140,11 +145,13 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
         enable(BusinessVerificationStub)
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         stubAudit()
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result")
@@ -158,11 +165,13 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
     s"the $BusinessVerificationStub feature switch is disabled" should {
       "redirect to the continue url" when {
         "the user has a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
 
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveBusinessVerificationResult(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
@@ -195,11 +204,13 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           verifyAudit()
         }
         "the user does not have a nino" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testSoleTraderJourneyConfig
-          ))
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId      = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig  = testSoleTraderJourneyConfig
+            )
+          )
 
           stubAuth(OK, successfulAuthResponse())
           stubRetrieveBusinessVerificationResult(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
@@ -238,17 +249,18 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
         }
       }
 
-
       "throw an exception when the query string is missing" in {
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveBusinessVerificationResult(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
         stubAudit()
 
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
 
         lazy val result = get(s"$baseUrl/$testJourneyId/business-verification-result")
 

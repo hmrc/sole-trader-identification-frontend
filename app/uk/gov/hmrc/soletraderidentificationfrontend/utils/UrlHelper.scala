@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,22 @@ import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfigUrlStatus
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlNotAllowed, JourneyConfigUrlInvalid}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlInvalid, JourneyConfigUrlNotAllowed}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class UrlHelper @Inject()(appConfig: AppConfig) {
+class UrlHelper @Inject() (appConfig: AppConfig) {
 
   def isAValidUrl(urlToBeValidated: String): JourneyConfigUrlStatus =
     Try(RedirectUrl(urlToBeValidated)) match {
       case Failure(_: IllegalArgumentException) => JourneyConfigUrlNotAllowed
-      case Failure(_: Throwable) => JourneyConfigUrlInvalid
+      case Failure(_: Throwable)                => JourneyConfigUrlInvalid
       case Success(maybeAValidUrl) =>
         maybeAValidUrl.getEither(OnlyRelative | AbsoluteWithHostnameFromAllowlist(appConfig.allowedHosts)) match {
           case Right(_) => JourneyConfigUrlAllowed
-          case Left(_) => JourneyConfigUrlNotAllowed
+          case Left(_)  => JourneyConfigUrlNotAllowed
         }
     }
 

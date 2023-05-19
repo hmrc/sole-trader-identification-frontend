@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi,
-                             view: error_template,
-                             val config: Configuration,
-                             val env: Environment
-                            )(implicit val appConfig: AppConfig) extends FrontendErrorHandler with AuthRedirects with Logging {
+class ErrorHandler @Inject() (val messagesApi: MessagesApi, view: error_template, val config: Configuration, val env: Environment)(implicit
+  val appConfig: AppConfig
+) extends FrontendErrorHandler
+    with AuthRedirects
+    with Logging {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =
     if (play.mvc.Http.Status.BAD_REQUEST == statusCode)
@@ -43,17 +43,13 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi,
     else
       super.onClientError(request, statusCode, message)
 
-  override def standardErrorTemplate(pageTitle: String,
-                                     heading: String,
-                                     message: String
-                                    )(implicit request: Request[_]): Html =
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
     view(pageTitle, heading, message)
-
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     exception match {
       case _: AuthorisationException => Future.successful(resolveError(request, exception))
-      case _ => super.onServerError(request, exception)
+      case _                         => super.onServerError(request, exception)
     }
   }
 

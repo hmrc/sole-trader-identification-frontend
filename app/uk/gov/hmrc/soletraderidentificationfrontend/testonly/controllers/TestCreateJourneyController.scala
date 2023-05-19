@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,39 +29,41 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                            testCreateJourneyConnector: TestCreateJourneyConnector,
-                                            view: test_create_journey,
-                                            val authConnector: AuthConnector
-                                           )(implicit ec: ExecutionContext,
-                                             appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+class TestCreateJourneyController @Inject() (messagesControllerComponents: MessagesControllerComponents,
+                                             testCreateJourneyConnector: TestCreateJourneyConnector,
+                                             view: test_create_journey,
+                                             val authConnector: AuthConnector
+                                            )(implicit ec: ExecutionContext, appConfig: AppConfig)
+    extends FrontendController(messagesControllerComponents)
+    with AuthorisedFunctions {
 
   private val defaultPageConfig = Utils.defaultPageConfig(appConfig).copy(enableSautrCheck = false)
 
   private val defaultJourneyConfig = Utils.defaultJourneyConfig(appConfig, defaultPageConfig, regime = "VATC")
 
-  val show: Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.deprecatedForm().fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit))
-        )
-      }
+  val show: Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      Future.successful(
+        Ok(view(defaultPageConfig, TestCreateJourneyForm.deprecatedForm().fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit))
+      )
+    }
   }
 
-  val submit: Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        TestCreateJourneyForm.deprecatedForm().bindFromRequest().fold(
+  val submit: Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      TestCreateJourneyForm
+        .deprecatedForm()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateJourneyController.submit))
             ),
           journeyConfig =>
-            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map {
-              journeyUrl => SeeOther(journeyUrl)
+            testCreateJourneyConnector.createSoleTraderJourney(journeyConfig).map { journeyUrl =>
+              SeeOther(journeyUrl)
             }
         )
-      }
+    }
   }
 }

@@ -64,18 +64,15 @@ object TestConstants {
 
   val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
-  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
+  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject =
+    Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallBVKey)
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject =
     Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
   val testBusinessVerificationUnchallengedJson: JsObject = Json.obj(BusinessVerificationStatusKey -> "UNCHALLENGED")
 
-  val testSuccessfulRegistrationJson: JsObject = Json.obj(
-    "registrationStatus" -> "REGISTERED",
-    "registeredBusinessPartnerId" -> testSafeId)
+  val testSuccessfulRegistrationJson: JsObject = Json.obj("registrationStatus" -> "REGISTERED", "registeredBusinessPartnerId" -> testSafeId)
 
-  def testFailedRegistrationJson(failures: JsArray): JsObject = Json.obj(
-    "registrationStatus" -> "REGISTRATION_FAILED",
-    "failures" -> failures)
+  def testFailedRegistrationJson(failures: JsArray): JsObject = Json.obj("registrationStatus" -> "REGISTRATION_FAILED", "failures" -> failures)
 
   val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
 
@@ -102,26 +99,26 @@ object TestConstants {
 
   val testInsightsReturnBody: JsObject = Json.obj(
     "ninoInsightsCorrelationId" -> testCorrelationId,
-    "code" -> 0,
-    "reason" -> "0 code"
+    "code"                      -> 0,
+    "reason"                    -> "0 code"
   )
 
   val testIndividualPageConfig: PageConfig = PageConfig(
-    optServiceName = None,
-    deskProServiceId = testDeskProServiceId,
-    signOutUrl = testSignOutUrl,
-    enableSautrCheck = false,
-    accessibilityUrl = testAccessibilityUrl,
+    optServiceName       = None,
+    deskProServiceId     = testDeskProServiceId,
+    signOutUrl           = testSignOutUrl,
+    enableSautrCheck     = false,
+    accessibilityUrl     = testAccessibilityUrl,
     optFullNamePageLabel = None,
-    labels = None
+    labels               = None
   )
 
   val testSoleTraderPageConfig: PageConfig = testIndividualPageConfig.copy(enableSautrCheck = true)
 
   val testIndividualJourneyConfig: JourneyConfig = JourneyConfig(
-    continueUrl = testContinueUrl,
+    continueUrl               = testContinueUrl,
     businessVerificationCheck = false,
-    pageConfig = testIndividualPageConfig,
+    pageConfig                = testIndividualPageConfig,
     testRegime
   )
 
@@ -135,90 +132,90 @@ object TestConstants {
 
   val testSoleTraderDetails: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = Some(testSaPostcode),
-      optSautr = Some(testSautr),
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = Some(BusinessVerificationPass),
-      registrationStatus = Some(Registered(testSafeId)),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = Some(testSaPostcode),
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = Some(BusinessVerificationPass),
+      registrationStatus              = Some(Registered(testSafeId)),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsMismatch: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = Some(testSaPostcode),
-      optSautr = Some(testSautr),
-      identifiersMatch = DetailsMismatch,
-      businessVerification = Some(BusinessVerificationNotEnoughInformationToCallBV),
-      registrationStatus = Some(RegistrationNotCalled),
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = Some(testSaPostcode),
+      optSautr                        = Some(testSautr),
+      identifiersMatch                = DetailsMismatch,
+      businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
+      registrationStatus              = Some(RegistrationNotCalled),
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsNoBV: SoleTraderDetails = testSoleTraderDetails.copy(businessVerification = None)
 
   val testSoleTraderDetailsIndividualJourney: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      address = None,
-      optSaPostcode = None,
-      optSautr = None,
-      identifiersMatch = SuccessfulMatch,
-      businessVerification = None,
-      registrationStatus = None,
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = Some(testNino),
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = None,
+      identifiersMatch                = SuccessfulMatch,
+      businessVerification            = None,
+      registrationStatus              = None,
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = Some(testInsightsReturnBody)
+      optNinoInsights                 = Some(testInsightsReturnBody)
     )
 
   val testSoleTraderDetailsIndividualJourneyNoNino: SoleTraderDetails =
     SoleTraderDetails(
-      fullName = testFullName,
-      dateOfBirth = testDateOfBirth,
-      optNino = None,
-      address = None,
-      optSaPostcode = None,
-      optSautr = None,
-      identifiersMatch = DetailsMismatch,
-      businessVerification = None,
-      registrationStatus = None,
-      optTrn = None,
-      optOverseasTaxIdentifier = None,
+      fullName                        = testFullName,
+      dateOfBirth                     = testDateOfBirth,
+      optNino                         = None,
+      address                         = None,
+      optSaPostcode                   = None,
+      optSautr                        = None,
+      identifiersMatch                = DetailsMismatch,
+      businessVerification            = None,
+      registrationStatus              = None,
+      optTrn                          = None,
+      optOverseasTaxIdentifier        = None,
       optOverseasTaxIdentifierCountry = None,
-      optNinoInsights = None
+      optNinoInsights                 = None
     )
 
   val testIndividualDetails: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = Some(testNino),
-      optSautr = Some(testSautr)
+      optNino     = Some(testNino),
+      optSautr    = Some(testSautr)
     )
 
   val testIndividualDetailsLowerCaseNino: IndividualDetails =
     IndividualDetails(
-      firstName = testFirstName,
-      lastName = testLastName,
+      firstName   = testFirstName,
+      lastName    = testLastName,
       dateOfBirth = testDateOfBirth,
-      optNino = Some("aa111111a"),
-      optSautr = Some(testSautr)
+      optNino     = Some("aa111111a"),
+      optSautr    = Some(testSautr)
     )
 
   val testIndividualDetailsLowerCaseFirstName: IndividualDetails = testIndividualDetails.copy(firstName = "john")
@@ -228,102 +225,105 @@ object TestConstants {
   val testIndividualDetailsNoSautr: IndividualDetails = testIndividualDetails.copy(optSautr = None)
 
   val testSoleTraderDetailsJson: JsObject = {
-    Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "nino" -> testNino,
-      "saPostcode" -> testSaPostcode,
-      "sautr" -> testSautr,
-      "identifiersMatch" -> true,
+    Json.obj(
+      "fullName" -> Json.obj(
+        "firstName" -> testFirstName,
+        "lastName"  -> testLastName
+      ),
+      "dateOfBirth"          -> testDateOfBirth,
+      "nino"                 -> testNino,
+      "saPostcode"           -> testSaPostcode,
+      "sautr"                -> testSautr,
+      "identifiersMatch"     -> true,
       "businessVerification" -> testBusinessVerificationPassJson,
-      "registration" -> testSuccessfulRegistrationJson,
-      "reputation" -> testInsightsReturnBody
+      "registration"         -> testSuccessfulRegistrationJson,
+      "reputation"           -> testInsightsReturnBody
     )
   }
 
   def testSoleTraderDetailsJsonMisMatch(bvStatus: JsObject): JsObject = {
-    Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "nino" -> testNino,
-      "saPostcode" -> testSaPostcode,
-      "sautr" -> testSautr,
-      "identifiersMatch" -> "DetailsMismatch",
+    Json.obj(
+      "fullName" -> Json.obj(
+        "firstName" -> testFirstName,
+        "lastName"  -> testLastName
+      ),
+      "dateOfBirth"          -> testDateOfBirth,
+      "nino"                 -> testNino,
+      "saPostcode"           -> testSaPostcode,
+      "sautr"                -> testSautr,
+      "identifiersMatch"     -> "DetailsMismatch",
       "businessVerification" -> bvStatus,
-      "registration" -> testRegistrationNotCalledJson
+      "registration"         -> testRegistrationNotCalledJson
     )
   }
 
   def testSoleTraderDetailsJsonNoNinoKnownFactsNoContent(bvStatus: JsObject): JsObject = {
-    Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "address" -> testAddressJson,
-      "sautr" -> testSautr,
-      "saPostcode" -> testSaPostcode,
+    Json.obj(
+      "fullName" -> Json.obj(
+        "firstName" -> testFirstName,
+        "lastName"  -> testLastName
+      ),
+      "dateOfBirth"            -> testDateOfBirth,
+      "address"                -> testAddressJson,
+      "sautr"                  -> testSautr,
+      "saPostcode"             -> testSaPostcode,
       "overseasTaxIdentifiers" -> testOverseasTaxIdentifier,
-      "country" -> testOverseasTaxIdentifierCountry,
-      "identifiersMatch" -> KnownFactsNoContentKey,
-      "businessVerification" -> bvStatus,
-      "registration" -> testRegistrationNotCalledJson,
-      "trn" -> testTrn
+      "country"                -> testOverseasTaxIdentifierCountry,
+      "identifiersMatch"       -> KnownFactsNoContentKey,
+      "businessVerification"   -> bvStatus,
+      "registration"           -> testRegistrationNotCalledJson,
+      "trn"                    -> testTrn
     )
   }
 
   val testSoleTraderDetailsJsonIndividualNoNino: JsObject = {
     Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "identifiersMatch" -> false
-    )
+               "firstName" -> testFirstName,
+               "lastName"  -> testLastName
+             ),
+             "dateOfBirth"      -> testDateOfBirth,
+             "identifiersMatch" -> false
+            )
   }
 
   val testIndividualDetailsJson: JsObject = {
     Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "nino" -> testNino,
-      "sautr" -> testSautr
-    )
+               "firstName" -> testFirstName,
+               "lastName"  -> testLastName
+             ),
+             "dateOfBirth" -> testDateOfBirth,
+             "nino"        -> testNino,
+             "sautr"       -> testSautr
+            )
   }
 
   val testIndividualDetailsJsonNoSautr: JsObject = {
     Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "nino" -> testNino
-    )
+               "firstName" -> testFirstName,
+               "lastName"  -> testLastName
+             ),
+             "dateOfBirth" -> testDateOfBirth,
+             "nino"        -> testNino
+            )
   }
 
   val testIndividualDetailsJsonNoNino: JsObject = {
     Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth,
-      "sautr" -> testSautr
-    )
+               "firstName" -> testFirstName,
+               "lastName"  -> testLastName
+             ),
+             "dateOfBirth" -> testDateOfBirth,
+             "sautr"       -> testSautr
+            )
   }
 
   val testIndividualDetailsJsonNoNinoNoSautr: JsObject = {
     Json.obj("fullName" -> Json.obj(
-      "firstName" -> testFirstName,
-      "lastName" -> testLastName
-    ),
-      "dateOfBirth" -> testDateOfBirth
-    )
+               "firstName" -> testFirstName,
+               "lastName"  -> testLastName
+             ),
+             "dateOfBirth" -> testDateOfBirth
+            )
   }
 
   val testKnownFactsResponse: JsObject = Json.obj(
@@ -332,13 +332,13 @@ object TestConstants {
       Json.obj(
         "identifiers" -> Json.arr(
           Json.obj(
-            "key" -> "UTR",
+            "key"   -> "UTR",
             "value" -> testSautr
           )
         ),
         "verifiers" -> Json.arr(
           Json.obj(
-            "key" -> "Postcode",
+            "key"   -> "Postcode",
             "value" -> testSaPostcode
           )
         )
@@ -353,17 +353,17 @@ object TestConstants {
       Json.obj(
         "identifiers" -> Json.arr(
           Json.obj(
-            "key" -> "UTR",
+            "key"   -> "UTR",
             "value" -> testSautr
           )
         ),
         "verifiers" -> Json.arr(
           Json.obj(
-            "key" -> "NINO",
+            "key"   -> "NINO",
             "value" -> nino
           ),
           Json.obj(
-            "key" -> "Postcode",
+            "key"   -> "Postcode",
             "value" -> testSaPostcode
           )
         )
@@ -377,13 +377,13 @@ object TestConstants {
       Json.obj(
         "identifiers" -> Json.arr(
           Json.obj(
-            "key" -> "UTR",
+            "key"   -> "UTR",
             "value" -> testSautr
           )
         ),
         "verifiers" -> Json.arr(
           Json.obj(
-            "key" -> "Postcode",
+            "key"   -> "Postcode",
             "value" -> testSaPostcode
           )
         )
@@ -392,17 +392,17 @@ object TestConstants {
   )
 
   val testAddressJson: JsObject = Json.obj(
-    "line1" -> "line1",
-    "line2" -> "line2",
-    "line3" -> "line3",
-    "line4" -> "line4",
-    "line5" -> "line5",
-    "postcode" -> "AA1 1AA",
+    "line1"       -> "line1",
+    "line2"       -> "line2",
+    "line3"       -> "line3",
+    "line4"       -> "line4",
+    "line5"       -> "line5",
+    "postcode"    -> "AA1 1AA",
     "countryCode" -> "GB"
   )
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> "134124532",
-    "country" -> "AL"
+    "country"       -> "AL"
   )
 
   def testKnownFactsResponseIsAbroad(abroad: String = "Y"): JsObject = Json.obj(
@@ -411,13 +411,13 @@ object TestConstants {
       Json.obj(
         "identifiers" -> Json.arr(
           Json.obj(
-            "key" -> "UTR",
+            "key"   -> "UTR",
             "value" -> testSautr
           )
         ),
         "verifiers" -> Json.arr(
           Json.obj(
-            "key" -> "IsAbroad",
+            "key"   -> "IsAbroad",
             "value" -> abroad
           )
         )

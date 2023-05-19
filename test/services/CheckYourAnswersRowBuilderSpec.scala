@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,147 +43,195 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
   implicit val mockAppConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val testFirstNameRow = SummaryListRow(
-    key = Key(content = Text("First name")),
+    key   = Key(content = Text("First name")),
     value = Value(content = HtmlContent(testFirstName)),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureFullNameController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("First name")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureFullNameController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("First name")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testLastNameRow = SummaryListRow(
-    key = Key(content = Text("Last name")),
+    key   = Key(content = Text("Last name")),
     value = Value(content = HtmlContent(testLastName)),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureFullNameController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Last name")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureFullNameController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Last name")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testDateOfBirthRow = SummaryListRow(
-    key = Key(content = Text("Date of birth")),
+    key   = Key(content = Text("Date of birth")),
     value = Value(content = HtmlContent(testDateOfBirth.format(checkYourAnswersFormat))),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureDateOfBirthController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Date of birth")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureDateOfBirthController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Date of birth")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testNinoRow = SummaryListRow(
-    key = Key(content = Text("National Insurance number")),
+    key   = Key(content = Text("National Insurance number")),
     value = Value(content = HtmlContent(testNino.grouped(2).mkString(" "))),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureNinoController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("National Insurance number")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureNinoController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("National Insurance number")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testNoNinoRow = SummaryListRow(
-    key = Key(content = Text("National Insurance number")),
+    key   = Key(content = Text("National Insurance number")),
     value = Value(content = HtmlContent("There is no National Insurance number")),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureNinoController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("National Insurance number")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureNinoController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("National Insurance number")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testSautrRow = SummaryListRow(
-    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
+    key   = Key(content = Text("Unique Taxpayer Reference (UTR)")),
     value = Value(content = HtmlContent(testSautr)),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureSautrController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureSautrController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testNoSautrRow = SummaryListRow(
-    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
+    key   = Key(content = Text("Unique Taxpayer Reference (UTR)")),
     value = Value(content = HtmlContent("There is no UTR")),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureSautrController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureSautrController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testSaPostcodeRow = SummaryListRow(
-    key = Key(content = Text("Self Assessment postcode")),
+    key   = Key(content = Text("Self Assessment postcode")),
     value = Value(content = HtmlContent(testSaPostcode)),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureSaPostcodeController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Self Assessment postcode")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureSaPostcodeController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Self Assessment postcode")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testNoSaPostcodeRow = SummaryListRow(
-    key = Key(content = Text("Self Assessment postcode")),
+    key   = Key(content = Text("Self Assessment postcode")),
     value = Value(content = HtmlContent("The business does not have a Self Assessment postcode")),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureSaPostcodeController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Self Assessment postcode")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureSaPostcodeController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Self Assessment postcode")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testOverseasTaxIdentifierProvidedRow = SummaryListRow(
-    key = Key(content = Text("Overseas tax identifier")),
+    key   = Key(content = Text("Overseas tax identifier")),
     value = Value(content = HtmlContent(s"Yes, $testOverseasIdentifier")),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Overseas tax identifier")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Overseas tax identifier")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testOverseasTaxIdentifierNotProvidedRow = SummaryListRow(
-    key = Key(content = Text("Overseas tax identifier")),
+    key   = Key(content = Text("Overseas tax identifier")),
     value = Value(content = HtmlContent("No")),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Overseas tax identifier")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Overseas tax identifier")
+          )
+        )
       )
-    )))
+    )
   )
 
   val testOverseasTaxIdentifierCountryRow = SummaryListRow(
-    key = Key(content = Text("Country of overseas tax identifier")),
+    key   = Key(content = Text("Country of overseas tax identifier")),
     value = Value(content = HtmlContent(mockAppConfig.getCountryName(testOverseasIdentifierCountry))),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureOverseasTaxIdentifierCountryController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Country of overseas tax identifier")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureOverseasTaxIdentifierCountryController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Country of overseas tax identifier")
+          )
+        )
       )
-    )))
+    )
   )
 
   val formattedAddress: String = Seq(
@@ -197,22 +245,34 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
   ).flatten.mkString("<br>")
 
   val testAddressRow = SummaryListRow(
-    key = Key(content = Text("Home Address")),
+    key   = Key(content = Text("Home Address")),
     value = Value(content = HtmlContent(formattedAddress)),
-    actions = Some(Actions(items = Seq(
-      ActionItem(
-        href = routes.CaptureAddressController.show(testJourneyId).url,
-        content = Text("Change"),
-        visuallyHiddenText = Some("Home Address")
+    actions = Some(
+      Actions(items =
+        Seq(
+          ActionItem(
+            href               = routes.CaptureAddressController.show(testJourneyId).url,
+            content            = Text("Change"),
+            visuallyHiddenText = Some("Home Address")
+          )
+        )
       )
-    )))
+    )
   )
 
   "buildSummaryListRowSeq" should {
     "build a summary list sequence" when {
       "the user is on the individual journey" when {
         "there is a nino" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoSautr, optAddress = None, optSaPostcode = None, optOverseasTaxId = None, enableSautrCheck = false, optOverseasTaxIdCountry = None)
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoSautr,
+            optAddress              = None,
+            optSaPostcode           = None,
+            optOverseasTaxId        = None,
+            enableSautrCheck        = false,
+            optOverseasTaxIdCountry = None
+          )
 
           result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNinoRow)
         }
@@ -220,39 +280,134 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
 
       "the user is on the sole trader journey" when {
         "there is a nino and sautr but no address provided" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetails, optAddress = None, optSaPostcode = None, optOverseasTaxId = None, enableSautrCheck = true, optOverseasTaxIdCountry = None)
+          val result = TestService.buildSummaryListRows(testJourneyId,
+                                                        testIndividualDetails,
+                                                        optAddress              = None,
+                                                        optSaPostcode           = None,
+                                                        optOverseasTaxId        = None,
+                                                        enableSautrCheck        = true,
+                                                        optOverseasTaxIdCountry = None
+                                                       )
 
           result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNinoRow, testSautrRow)
         }
 
         "the nino has not been provided but sautr, sa postcode, address ,Overseas tax Identifiers ID and country have" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoNino, Some(testAddress), optSaPostcode = Some(testSaPostcode), optOverseasTaxId = Some(testOverseasIdentifier), enableSautrCheck = true, optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry))
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoNino,
+            Some(testAddress),
+            optSaPostcode           = Some(testSaPostcode),
+            optOverseasTaxId        = Some(testOverseasIdentifier),
+            enableSautrCheck        = true,
+            optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry)
+          )
 
-          result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNoNinoRow, testAddressRow, testSautrRow, testSaPostcodeRow, testOverseasTaxIdentifierProvidedRow, testOverseasTaxIdentifierCountryRow)
+          result mustBe Seq(
+            testFirstNameRow,
+            testLastNameRow,
+            testDateOfBirthRow,
+            testNoNinoRow,
+            testAddressRow,
+            testSautrRow,
+            testSaPostcodeRow,
+            testOverseasTaxIdentifierProvidedRow,
+            testOverseasTaxIdentifierCountryRow
+          )
         }
 
         "the nino and Overseas tax Identifiers details have not been provided but sautr, sa postcode and address have" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoNino, Some(testAddress), optSaPostcode = Some(testSaPostcode), optOverseasTaxId = None, enableSautrCheck = true, optOverseasTaxIdCountry = None)
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoNino,
+            Some(testAddress),
+            optSaPostcode           = Some(testSaPostcode),
+            optOverseasTaxId        = None,
+            enableSautrCheck        = true,
+            optOverseasTaxIdCountry = None
+          )
 
-          result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNoNinoRow, testAddressRow, testSautrRow, testSaPostcodeRow, testOverseasTaxIdentifierNotProvidedRow)
+          result mustBe Seq(
+            testFirstNameRow,
+            testLastNameRow,
+            testDateOfBirthRow,
+            testNoNinoRow,
+            testAddressRow,
+            testSautrRow,
+            testSaPostcodeRow,
+            testOverseasTaxIdentifierNotProvidedRow
+          )
         }
 
         "the nino has not been provided but sautr, sa postcode and address have" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoNino, Some(testAddress), optSaPostcode = Some(testSaPostcode), optOverseasTaxId = Some(testOverseasIdentifier), enableSautrCheck = true, optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry))
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoNino,
+            Some(testAddress),
+            optSaPostcode           = Some(testSaPostcode),
+            optOverseasTaxId        = Some(testOverseasIdentifier),
+            enableSautrCheck        = true,
+            optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry)
+          )
 
-          result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNoNinoRow, testAddressRow, testSautrRow, testSaPostcodeRow, testOverseasTaxIdentifierProvidedRow, testOverseasTaxIdentifierCountryRow)
+          result mustBe Seq(
+            testFirstNameRow,
+            testLastNameRow,
+            testDateOfBirthRow,
+            testNoNinoRow,
+            testAddressRow,
+            testSautrRow,
+            testSaPostcodeRow,
+            testOverseasTaxIdentifierProvidedRow,
+            testOverseasTaxIdentifierCountryRow
+          )
         }
 
         "the nino and sa postcode have not been provided but sautr, and address have" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoNino, Some(testAddress), optSaPostcode = None, optOverseasTaxId = Some(testOverseasIdentifier), enableSautrCheck = true, optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry))
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoNino,
+            Some(testAddress),
+            optSaPostcode           = None,
+            optOverseasTaxId        = Some(testOverseasIdentifier),
+            enableSautrCheck        = true,
+            optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry)
+          )
 
-          result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNoNinoRow, testAddressRow, testSautrRow, testNoSaPostcodeRow, testOverseasTaxIdentifierProvidedRow, testOverseasTaxIdentifierCountryRow)
+          result mustBe Seq(
+            testFirstNameRow,
+            testLastNameRow,
+            testDateOfBirthRow,
+            testNoNinoRow,
+            testAddressRow,
+            testSautrRow,
+            testNoSaPostcodeRow,
+            testOverseasTaxIdentifierProvidedRow,
+            testOverseasTaxIdentifierCountryRow
+          )
         }
 
         "the nino and sautr have not been provided but an address has" in {
-          val result = TestService.buildSummaryListRows(testJourneyId, testIndividualDetailsNoNinoNoSautr, Some(testAddress), optSaPostcode = None, optOverseasTaxId = Some(testOverseasIdentifier), enableSautrCheck = true, optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry))
+          val result = TestService.buildSummaryListRows(
+            testJourneyId,
+            testIndividualDetailsNoNinoNoSautr,
+            Some(testAddress),
+            optSaPostcode           = None,
+            optOverseasTaxId        = Some(testOverseasIdentifier),
+            enableSautrCheck        = true,
+            optOverseasTaxIdCountry = Some(testOverseasIdentifierCountry)
+          )
 
-          result mustBe Seq(testFirstNameRow, testLastNameRow, testDateOfBirthRow, testNoNinoRow, testAddressRow, testNoSautrRow, testOverseasTaxIdentifierProvidedRow, testOverseasTaxIdentifierCountryRow)
+          result mustBe Seq(
+            testFirstNameRow,
+            testLastNameRow,
+            testDateOfBirthRow,
+            testNoNinoRow,
+            testAddressRow,
+            testNoSautrRow,
+            testOverseasTaxIdentifierProvidedRow,
+            testOverseasTaxIdentifierCountryRow
+          )
         }
       }
     }

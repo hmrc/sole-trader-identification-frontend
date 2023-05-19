@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ trait InputFilter {
 
   def filter(input: String): String = {
     @tailrec
-    def applyFilters(filters: Seq[Pattern], sanitizedOuput: String): String = filters match {
-      case Nil => sanitizedOuput.filterNot(_ == '|')
+    def applyFilters(filters: Seq[Pattern], sanitizedOuput: String): String = filters.toList match {
+      case Nil            => sanitizedOuput.filterNot(_ == '|')
       case filter :: tail => applyFilters(tail, filter.matcher(sanitizedOuput).replaceAll(""))
     }
 

@@ -71,4 +71,3 @@ class RetrieveBusinessVerificationStatusConnectorISpec extends ComponentSpecHelp
     }
   }
 }
-

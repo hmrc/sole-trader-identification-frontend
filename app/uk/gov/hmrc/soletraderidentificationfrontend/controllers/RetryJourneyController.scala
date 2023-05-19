@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,19 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RetryJourneyController @Inject()(mcc: MessagesControllerComponents,
-                                       val authConnector: AuthConnector,
-                                       soleTraderIdentificationService: SoleTraderIdentificationService)
-                                      (implicit val appConfig: AppConfig,
-                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class RetryJourneyController @Inject() (mcc: MessagesControllerComponents,
+                                        val authConnector: AuthConnector,
+                                        soleTraderIdentificationService: SoleTraderIdentificationService
+                                       )(implicit val appConfig: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def tryAgain(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised(){
-        soleTraderIdentificationService.removeAllData(journeyId).map {
-          _ => Redirect(routes.CaptureFullNameController.show(journeyId))
-        }
+  def tryAgain(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      soleTraderIdentificationService.removeAllData(journeyId).map { _ =>
+        Redirect(routes.CaptureFullNameController.show(journeyId))
       }
+    }
   }
 
 }

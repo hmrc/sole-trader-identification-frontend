@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,16 +28,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateTrnConnector @Inject()(httpClient: HttpClient,
-                                   appConfig: AppConfig
-                                  )(implicit ec: ExecutionContext) {
+class CreateTrnConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address)(implicit hc: HeaderCarrier): Future[String] = {
 
     val jsonBody = Json.obj(
       "dateOfBirth" -> dateOfBirth,
-      "fullName" -> fullName,
-      "address" -> address
+      "fullName"    -> fullName,
+      "address"     -> address
     )
 
     httpClient.POST[JsObject, String](appConfig.createTrnUrl, jsonBody)(
@@ -62,5 +60,3 @@ object CreateTrnHttpParser {
     }
   }
 }
-
-

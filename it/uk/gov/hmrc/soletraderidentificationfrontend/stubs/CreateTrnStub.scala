@@ -28,14 +28,14 @@ trait CreateTrnStub extends WireMockMethods {
   def stubCreateTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address)(status: Int, body: JsObject = Json.obj()): StubMapping = {
     val jsonBody = Json.obj(
       "dateOfBirth" -> dateOfBirth,
-      "fullName" -> fullName,
-      "address" -> address
+      "fullName"    -> fullName,
+      "address"     -> address
     )
 
     when(method = POST, uri = "/sole-trader-identification/get-trn", body = jsonBody)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
 
   }

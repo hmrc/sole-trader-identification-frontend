@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ trait MockJourneyService extends MockitoSugar with BeforeAndAfterEach {
     reset(mockJourneyService)
   }
 
-  def mockGetJourneyConfig(journeyId: String,
-                           authInternalId: String)
-                          (response: Future[JourneyConfig]): OngoingStubbing[_] =
-    when(mockJourneyService.getJourneyConfig(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(authInternalId)
-    )).thenReturn(response)
+  def mockGetJourneyConfig(journeyId: String, authInternalId: String)(response: Future[JourneyConfig]): OngoingStubbing[_] =
+    when(
+      mockJourneyService.getJourneyConfig(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(authInternalId)
+      )
+    ).thenReturn(response)
 
 }

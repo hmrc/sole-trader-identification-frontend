@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,11 +41,11 @@ object BusinessVerificationStatus {
   implicit val format: Format[BusinessVerificationStatus] = new Format[BusinessVerificationStatus] {
     override def writes(businessVerificationStatus: BusinessVerificationStatus): JsObject = {
       val businessVerificationStatusString = businessVerificationStatus match {
-        case BusinessVerificationPass => BusinessVerificationPassKey
-        case BusinessVerificationFail => BusinessVerificationFailKey
+        case BusinessVerificationPass                            => BusinessVerificationPassKey
+        case BusinessVerificationFail                            => BusinessVerificationFailKey
         case BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationNotEnoughInfoToChallengeKey
-        case BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationNotEnoughInfoToCallBVKey
-        case SaEnrolled => BusinessVerificationSaEnrolledKey
+        case BusinessVerificationNotEnoughInformationToCallBV    => BusinessVerificationNotEnoughInfoToCallBVKey
+        case SaEnrolled                                          => BusinessVerificationSaEnrolledKey
       }
 
       Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
@@ -53,11 +53,11 @@ object BusinessVerificationStatus {
 
     override def reads(json: JsValue): JsResult[BusinessVerificationStatus] =
       (json \ BusinessVerificationStatusKey).validate[String].collect(JsonValidationError("Invalid business validation state")) {
-        case BusinessVerificationPassKey => BusinessVerificationPass
-        case BusinessVerificationFailKey => BusinessVerificationFail
+        case BusinessVerificationPassKey                     => BusinessVerificationPass
+        case BusinessVerificationFailKey                     => BusinessVerificationFail
         case BusinessVerificationNotEnoughInfoToChallengeKey => BusinessVerificationNotEnoughInformationToChallenge
-        case BusinessVerificationNotEnoughInfoToCallBVKey => BusinessVerificationNotEnoughInformationToCallBV
-        case BusinessVerificationSaEnrolledKey => SaEnrolled
+        case BusinessVerificationNotEnoughInfoToCallBVKey    => BusinessVerificationNotEnoughInformationToCallBV
+        case BusinessVerificationSaEnrolledKey               => SaEnrolled
       }
   }
 }

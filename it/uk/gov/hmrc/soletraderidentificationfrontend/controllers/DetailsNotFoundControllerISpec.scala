@@ -23,17 +23,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.AuthStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.DetailsNotFoundViewTests
 
-class DetailsNotFoundControllerISpec extends ComponentSpecHelper
-  with DetailsNotFoundViewTests
-  with AuthStub {
+class DetailsNotFoundControllerISpec extends ComponentSpecHelper with DetailsNotFoundViewTests with AuthStub {
 
   "GET /details-not-found" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testIndividualJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testIndividualJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/details-not-found")
     }

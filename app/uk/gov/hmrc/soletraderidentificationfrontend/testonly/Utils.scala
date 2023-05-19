@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, PageC
 object Utils {
 
   def defaultPageConfig(appConfig: AppConfig): PageConfig = PageConfig(
-    optServiceName = None,
-    deskProServiceId = "vrs",
-    signOutUrl = appConfig.vatRegFeedbackUrl,
-    enableSautrCheck = true,
-    accessibilityUrl = "/accessibility",
+    optServiceName       = None,
+    deskProServiceId     = "vrs",
+    signOutUrl           = appConfig.vatRegFeedbackUrl,
+    enableSautrCheck     = true,
+    accessibilityUrl     = "/accessibility",
     optFullNamePageLabel = None
   )
 
-  def defaultJourneyConfig(appConfig: AppConfig, pageConfig: PageConfig, regime: String):JourneyConfig = JourneyConfig(
-    continueUrl = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
+  def defaultJourneyConfig(appConfig: AppConfig, pageConfig: PageConfig, regime: String): JourneyConfig = JourneyConfig(
+    continueUrl               = s"${appConfig.selfUrl}/identify-your-sole-trader-business/test-only/retrieve-journey",
     businessVerificationCheck = true,
-    pageConfig = pageConfig,
-    regime = regime
+    pageConfig                = pageConfig,
+    regime                    = regime
   )
 
 }

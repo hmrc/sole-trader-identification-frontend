@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,24 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessVerificationService @Inject()(createBusinessVerificationJourneyConnector: CreateBusinessVerificationJourneyConnector,
-                                            retrieveBusinessVerificationResultConnector: RetrieveBusinessVerificationStatusConnector,
-                                            soleTraderIdentificationService: SoleTraderIdentificationService
-                                           )(implicit val executionContext: ExecutionContext) {
+class BusinessVerificationService @Inject() (createBusinessVerificationJourneyConnector: CreateBusinessVerificationJourneyConnector,
+                                             retrieveBusinessVerificationResultConnector: RetrieveBusinessVerificationStatusConnector,
+                                             soleTraderIdentificationService: SoleTraderIdentificationService
+                                            )(implicit val executionContext: ExecutionContext) {
 
-  def createBusinessVerificationJourney(journeyId: String,
-                                        sautr: String,
-                                        journeyConfig: JourneyConfig
-                                       )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] =
+  def createBusinessVerificationJourney(journeyId: String, sautr: String, journeyConfig: JourneyConfig)(implicit
+    hc: HeaderCarrier
+  ): Future[BusinessVerificationJourneyCreationResponse] =
     createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, journeyConfig).flatMap {
-      case success@Right(BusinessVerificationJourneyCreated(_)) =>
+      case success @ Right(BusinessVerificationJourneyCreated(_)) =>
         Future.successful(success)
       case Left(NotEnoughEvidence) =>
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map {
-          _ => Left(NotEnoughEvidence)
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map { _ =>
+          Left(NotEnoughEvidence)
         }
       case Left(UserLockedOut) =>
-        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map {
-          _ => Left(UserLockedOut)
+        soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map { _ =>
+          Left(UserLockedOut)
         }
       case _ =>
         throw new InternalServerException(s"createBusinessVerificationJourney service failed with invalid BV status")

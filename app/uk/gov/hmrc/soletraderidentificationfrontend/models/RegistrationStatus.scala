@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,12 @@ object RegistrationStatus {
   implicit val format: OFormat[RegistrationStatus] = new OFormat[RegistrationStatus] {
     override def writes(registrationStatus: RegistrationStatus): JsObject =
       registrationStatus match {
-        case Registered(businessPartnerId) => Json.obj(
-          registrationStatusKey -> RegisteredKey,
-          registeredBusinessPartnerIdKey -> businessPartnerId
-        )
-        case RegistrationFailed(failures) => Json.obj(
-          registrationStatusKey -> RegistrationFailedKey,
-          registrationFailuresKey -> failures)
+        case Registered(businessPartnerId) =>
+          Json.obj(
+            registrationStatusKey          -> RegisteredKey,
+            registeredBusinessPartnerIdKey -> businessPartnerId
+          )
+        case RegistrationFailed(failures) => Json.obj(registrationStatusKey -> RegistrationFailedKey, registrationFailuresKey -> failures)
         case RegistrationNotCalled =>
           Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
         case _ =>
@@ -58,12 +57,12 @@ object RegistrationStatus {
     override def reads(json: JsValue): JsResult[RegistrationStatus] =
       (json \ registrationStatusKey).validate[String] match {
         case JsSuccess(RegisteredKey, _) =>
-          (json \ registeredBusinessPartnerIdKey).validate[String].map {
-            businessPartnerId => Registered(businessPartnerId)
+          (json \ registeredBusinessPartnerIdKey).validate[String].map { businessPartnerId =>
+            Registered(businessPartnerId)
           }
         case JsSuccess(RegistrationFailedKey, _) =>
-          (json \ registrationFailuresKey).validate[List[Failure]].map {
-            failures => RegistrationFailed(failures)
+          (json \ registrationFailuresKey).validate[List[Failure]].map { failures =>
+            RegistrationFailed(failures)
           }
         case JsSuccess(RegistrationNotCalledKey, path) =>
           JsSuccess(RegistrationNotCalled, path)

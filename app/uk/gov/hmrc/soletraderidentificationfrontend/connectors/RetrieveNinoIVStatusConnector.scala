@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveNinoIVStatusConnector @Inject()(http: HttpClient,
-                                              appConfig: AppConfig
-                                             )(implicit ec: ExecutionContext) {
+class RetrieveNinoIVStatusConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveNinoIVStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
     http.GET[BusinessVerificationStatus](appConfig.getNinoIVResultUrl(journeyId))(
@@ -53,7 +51,8 @@ object RetrieveNinoIVStatusConnector {
             .collect(JsonValidationError("Invalid verification status returned from identity verification")) {
               case PassKey => BusinessVerificationPass
               case FailKey => BusinessVerificationFail
-            }.getOrElse(throw new InternalServerException("Invalid response returned from retrieve Nino Identity Verification result"))
+            }
+            .getOrElse(throw new InternalServerException("Invalid response returned from retrieve Nino Identity Verification result"))
         case _ =>
           throw new InternalServerException("Invalid response returned from retrieve Nino Identity Verification result")
       }
@@ -61,4 +60,3 @@ object RetrieveNinoIVStatusConnector {
   }
 
 }
-

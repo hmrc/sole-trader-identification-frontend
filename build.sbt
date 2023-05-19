@@ -1,10 +1,9 @@
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import scoverage.ScoverageKeys
 
 val appName = "sole-trader-identification-frontend"
 
-val silencerVersion = "1.7.0"
+val silencerVersion = "1.7.12"
 
 lazy val scoverageSettings = {
 
@@ -25,7 +24,7 @@ lazy val scoverageSettings = {
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := exclusionList.mkString(";"),
-    ScoverageKeys.coverageMinimum := 90,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true
   )
@@ -38,11 +37,11 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies()
   )
   .settings(scoverageSettings)
-  .settings(publishingSettings: _*)
   .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(PlayKeys.playDefaultPort := 9717)
+  .settings(scalafmtOnCompile := true)
   .settings(
     // ***************
     // Use the silencer plugin to suppress warnings
@@ -58,15 +57,15 @@ TwirlKeys.templateImports ++= Seq(
   "uk.gov.hmrc.govukfrontend.views.html.components._"
 )
 
-Test / Keys.fork:= true
+Test / Keys.fork := true
 Test / javaOptions += "-Dlogger.resource=logback-test.xml"
 Test / parallelExecution := true
 
 IntegrationTest / Keys.fork := true
-IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory) (base => Seq(base / "it")).value
+IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value
 IntegrationTest / javaOptions += "-Dlogger.resource=logback-test.xml"
 addTestReportOption(IntegrationTest, "int-test-reports")
 IntegrationTest / parallelExecution := false
 majorVersion := 1
 
-scalaVersion :=  "2.12.12"
+scalaVersion := "2.13.8"

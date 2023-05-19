@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,62 +32,66 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureFullNameController @Inject()(mcc: MessagesControllerComponents,
-                                          view: capture_full_name_page,
-                                          captureFullNameForm: CaptureFullNameForm,
-                                          soleTraderIdentificationService: SoleTraderIdentificationService,
-                                          val authConnector: AuthConnector,
-                                          journeyService: JourneyService,
-                                          messagesHelper: MessagesHelper
-                                         )(implicit val config: AppConfig,
-                                           ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureFullNameController @Inject() (mcc: MessagesControllerComponents,
+                                           view: capture_full_name_page,
+                                           captureFullNameForm: CaptureFullNameForm,
+                                           soleTraderIdentificationService: SoleTraderIdentificationService,
+                                           val authConnector: AuthConnector,
+                                           journeyService: JourneyService,
+                                           messagesHelper: MessagesHelper
+                                          )(implicit val config: AppConfig, ec: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId,authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
 
-              Ok(view(
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureFullNameController.submit(journeyId),
-                form = captureFullNameForm.apply(),
-                label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+          Ok(
+            view(
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureFullNameController.submit(journeyId),
+              form       = captureFullNameForm.apply(),
+              label      = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          captureFullNameForm.apply().bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        captureFullNameForm
+          .apply()
+          .bindFromRequest()
+          .fold(
             formWithErrors =>
-              journeyService.getJourneyConfig(journeyId,authInternalId).map {
-                journeyConfig =>
-                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                  BadRequest(view(
+              journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(
+                  view(
                     pageConfig = journeyConfig.pageConfig,
                     formAction = routes.CaptureFullNameController.submit(journeyId),
-                    form = formWithErrors,
-                    label = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
-                  ))
+                    form       = formWithErrors,
+                    label      = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
+                  )
+                )
               },
             fullName =>
-              soleTraderIdentificationService.storeFullName(journeyId, fullName).map {
-                _ => Redirect(routes.CaptureDateOfBirthController.show(journeyId))
+              soleTraderIdentificationService.storeFullName(journeyId, fullName).map { _ =>
+                Redirect(routes.CaptureDateOfBirthController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

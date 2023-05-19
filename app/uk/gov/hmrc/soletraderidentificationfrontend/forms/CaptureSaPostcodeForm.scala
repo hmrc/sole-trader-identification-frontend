@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,17 @@ import scala.util.matching.Regex
 object CaptureSaPostcodeForm {
   val postCodeRegex: Regex = """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$""".r
 
-  val postcodeNotEntered: Constraint[String] = Constraint("sa-postcode.not-entered")(
-    country => validate(
+  val postcodeNotEntered: Constraint[String] = Constraint("sa-postcode.not-entered")(country =>
+    validate(
       constraint = country.isEmpty,
-      errMsg = "error.no_entry_sa-postcode"
+      errMsg     = "error.no_entry_sa-postcode"
     )
   )
 
-  val postcodeInvalid: Constraint[String] = Constraint("sa-postcode.invalid-format")(
-    postcode => validateNot(
+  val postcodeInvalid: Constraint[String] = Constraint("sa-postcode.invalid-format")(postcode =>
+    validateNot(
       constraint = postcode.toUpperCase matches postCodeRegex.regex,
-      errMsg = "sa-postcode.invalid.format.error"
+      errMsg     = "sa-postcode.invalid.format.error"
     )
   )
 

@@ -19,7 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureSaPostcode => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureSaPostcode => messages, Header}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -31,7 +31,6 @@ trait CaptureSaPostcodeViewTests {
   def testCaptureSaPostcodeView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
-
 
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut

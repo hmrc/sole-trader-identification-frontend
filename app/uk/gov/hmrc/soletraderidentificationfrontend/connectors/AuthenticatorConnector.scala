@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,19 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuthenticatorConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit executionContext: ExecutionContext) {
+class AuthenticatorConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit executionContext: ExecutionContext) {
 
   def matchSoleTraderDetails(authenticatorDetails: IndividualDetails)(implicit hc: HeaderCarrier): Future[AuthenticatorResponse] = {
     val nino = authenticatorDetails.optNino match {
       case Some(nino) => nino.toUpperCase()
-      case _ => throw new InternalServerException("Missing required NINO for Authenticator API")
+      case _          => throw new InternalServerException("Missing required NINO for Authenticator API")
     }
 
     val jsonBody = Json.obj(
-      "firstName" -> authenticatorDetails.firstName.capitalize,
-      "lastName" -> authenticatorDetails.lastName.capitalize,
+      "firstName"   -> authenticatorDetails.firstName.capitalize,
+      "lastName"    -> authenticatorDetails.lastName.capitalize,
       "dateOfBirth" -> authenticatorDetails.dateOfBirth.format(ofPattern("uuuu-MM-dd")),
-      "nino" -> nino
+      "nino"        -> nino
     )
 
     httpClient.POST(appConfig.matchSoleTraderDetailsUrl, jsonBody)

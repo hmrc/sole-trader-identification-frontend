@@ -31,7 +31,7 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPati
     .configure(config)
     .configure("application.router" -> "testOnlyDoNotUseInAppConf.Routes")
     .configure("mongodb.timeToLiveSeconds" -> "10")
-    .build
+    .build()
 
   val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
 
@@ -65,12 +65,18 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper with AbstractPati
     }
 
     "successfully insert a journeyConfig with JourneyLabels" in {
-      val toBePersisted = testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(labels = Some(JourneyLabels(
-        Some("testWelshServiceName"),
-        Some("testEnglishServiceName"),
-        Some("testWelshFullName"),
-        Some("testEnglishFullName"),
-      ))))
+      val toBePersisted = testIndividualJourneyConfig.copy(pageConfig =
+        testIndividualPageConfig.copy(labels =
+          Some(
+            JourneyLabels(
+              Some("testWelshServiceName"),
+              Some("testEnglishServiceName"),
+              Some("testWelshFullName"),
+              Some("testEnglishFullName")
+            )
+          )
+        )
+      )
 
       await(repo.insertJourneyConfig(testJourneyId, testInternalId, toBePersisted))
     }

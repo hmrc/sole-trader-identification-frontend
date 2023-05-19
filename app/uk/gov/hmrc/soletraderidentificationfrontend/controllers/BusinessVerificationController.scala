@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,34 +27,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class BusinessVerificationController @Inject()(mcc: MessagesControllerComponents,
-                                               val authConnector: AuthConnector,
-                                               businessVerificationService: BusinessVerificationService,
-                                               journeyService: JourneyService,
-                                               registrationOrchestrationService: RegistrationOrchestrationService,
-                                               soleTraderIdentificationService: SoleTraderIdentificationService
-                                              )(implicit val executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class BusinessVerificationController @Inject() (mcc: MessagesControllerComponents,
+                                                val authConnector: AuthConnector,
+                                                businessVerificationService: BusinessVerificationService,
+                                                journeyService: JourneyService,
+                                                registrationOrchestrationService: RegistrationOrchestrationService,
+                                                soleTraderIdentificationService: SoleTraderIdentificationService
+                                               )(implicit val executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def retrieveBusinessVerificationResult(journeyId: String): Action[AnyContent] = Action.async {
-    implicit req =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          req.getQueryString("journeyId") match {
-            case Some(businessVerificationJourneyId) =>
-              for {
-                journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-                verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
-                _ <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
-                _ <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
-              } yield {
-                SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-              }
-            case None =>
-              throw new InternalServerException("Missing JourneyID from Business Verification callback")
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def retrieveBusinessVerificationResult(journeyId: String): Action[AnyContent] = Action.async { implicit req =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        req.getQueryString("journeyId") match {
+          case Some(businessVerificationJourneyId) =>
+            for {
+              journeyConfig      <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
+              _                  <- soleTraderIdentificationService.storeBusinessVerificationStatus(journeyId, verificationStatus)
+              _                  <- registrationOrchestrationService.registerAfterBusinessVerification(journeyId, journeyConfig)
+            } yield {
+              SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+            }
+          case None =>
+            throw new InternalServerException("Missing JourneyID from Business Verification callback")
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

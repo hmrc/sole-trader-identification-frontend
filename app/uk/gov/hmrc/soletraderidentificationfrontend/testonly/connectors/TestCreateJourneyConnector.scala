@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors
 
 import play.api.http.Status._
-import play.api.libs.json.{Json, JsObject, Writes}
+import play.api.libs.json.{JsObject, Json, Writes}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
@@ -31,9 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
-                                           appConfig: AppConfig
-                                          )(implicit ec: ExecutionContext) {
+class TestCreateJourneyConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createSoleTraderJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] =
     postTo(destination = apiRoutes.JourneyController.createSoleTraderJourney(), journeyConfig = journeyConfig)
@@ -44,7 +42,7 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
   private def postTo(destination: Call, journeyConfig: JourneyConfig)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[String] = {
     val destinationUrl = appConfig.selfBaseUrl + destination.url
     httpClient.POST(url = destinationUrl, body = journeyConfig).map {
-      case response@HttpResponse(CREATED, _, _) =>
+      case response @ HttpResponse(CREATED, _, _) =>
         (response.json \ "journeyStartUrl").as[String]
       case response =>
         throw new InternalServerException(s"Invalid response from $destinationUrl: Status: ${response.status} Body: ${response.body}")
@@ -54,21 +52,22 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
 }
 
 object TestCreateJourneyConnector {
-  implicit val journeyConfigWriter: Writes[JourneyConfig] = (journeyConfig: JourneyConfig) => Json.obj(
-    continueUrlKey -> journeyConfig.continueUrl,
-    businessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
-    optServiceNameKey -> journeyConfig.pageConfig.optServiceName,
-    deskProServiceIdKey -> journeyConfig.pageConfig.deskProServiceId,
-    signOutUrlKey -> journeyConfig.pageConfig.signOutUrl,
-    enableSautrCheckKey -> journeyConfig.pageConfig.enableSautrCheck,
-    accessibilityUrlKey -> journeyConfig.pageConfig.accessibilityUrl,
-    optFullNamePageLabelKey -> journeyConfig.pageConfig.optFullNamePageLabel,
-    regimeKey -> journeyConfig.regime
-  ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.labels)
+  implicit val journeyConfigWriter: Writes[JourneyConfig] = (journeyConfig: JourneyConfig) =>
+    Json.obj(
+      continueUrlKey               -> journeyConfig.continueUrl,
+      businessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
+      optServiceNameKey            -> journeyConfig.pageConfig.optServiceName,
+      deskProServiceIdKey          -> journeyConfig.pageConfig.deskProServiceId,
+      signOutUrlKey                -> journeyConfig.pageConfig.signOutUrl,
+      enableSautrCheckKey          -> journeyConfig.pageConfig.enableSautrCheck,
+      accessibilityUrlKey          -> journeyConfig.pageConfig.accessibilityUrl,
+      optFullNamePageLabelKey      -> journeyConfig.pageConfig.optFullNamePageLabel,
+      regimeKey                    -> journeyConfig.regime
+    ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.labels)
 
   private def labelsAsOptJsObject(optJourneyLabels: Option[JourneyLabels]): JsObject =
     optJourneyLabels match {
       case Some(journeyLabels) => Json.obj(labelsKey -> Json.toJsObject(journeyLabels))
-      case _ => Json.obj()
+      case _                   => Json.obj()
     }
 }

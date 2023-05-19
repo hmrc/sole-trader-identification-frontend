@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,21 +32,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.util.concurrent.TimeUnit
 
 @Singleton
-class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
-                                        appConfig: AppConfig)
-                                       (implicit ec: ExecutionContext) extends PlayMongoRepository[JsObject](
-  collectionName = "sole-trader-identification-frontend",
-  mongoComponent = mongoComponent,
-  domainFormat = implicitly[Format[JsObject]],
-  indexes = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds)),
-  extraCodecs = Seq(Codecs.playFormatCodec(journeyConfigMongoFormat))
-) {
+class JourneyConfigRepository @Inject() (mongoComponent: MongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[JsObject](
+      collectionName = "sole-trader-identification-frontend",
+      mongoComponent = mongoComponent,
+      domainFormat   = implicitly[Format[JsObject]],
+      indexes        = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds)),
+      extraCodecs    = Seq(Codecs.playFormatCodec(journeyConfigMongoFormat))
+    ) {
 
   def insertJourneyConfig(journeyId: String, authInternalId: String, journeyConfig: JourneyConfig): Future[InsertOneResult] = {
 
     val document: JsObject = Json.obj(
-      JourneyIdKey -> journeyId,
-      AuthInternalIdKey -> authInternalId,
+      JourneyIdKey         -> journeyId,
+      AuthInternalIdKey    -> authInternalId,
       CreationTimestampKey -> Json.obj("$date" -> Instant.now.toEpochMilli)
     ) ++ Json.toJsObject(journeyConfig)
 
@@ -55,12 +54,14 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
 
   def findJourneyConfig(journeyId: String, authInternalId: String): Future[Option[JourneyConfig]] = {
 
-    collection.find[JourneyConfig](
-      Filters.and(
-        Filters.equal(JourneyIdKey, journeyId),
-        Filters.equal(AuthInternalIdKey, authInternalId)
+    collection
+      .find[JourneyConfig](
+        Filters.and(
+          Filters.equal(JourneyIdKey, journeyId),
+          Filters.equal(AuthInternalIdKey, authInternalId)
+        )
       )
-    ).headOption
+      .headOption()
 
   }
 
@@ -68,19 +69,20 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
 
   def removeJourneyConfig(journeyId: String, authInternalId: String): Future[DeleteResult] = {
 
-    collection.deleteOne(
-      Filters.and(
-        Filters.equal(JourneyIdKey, journeyId),
-        Filters.equal(AuthInternalIdKey, authInternalId)
+    collection
+      .deleteOne(
+        Filters.and(
+          Filters.equal(JourneyIdKey, journeyId),
+          Filters.equal(AuthInternalIdKey, authInternalId)
+        )
       )
-    ).toFuture()
+      .toFuture()
 
   }
 
-  def drop: Future[Unit] = collection.drop().toFuture.map(_ => Unit)
+  def drop: Future[Unit] = collection.drop().toFuture().map(_ => ())
 
 }
-
 
 object JourneyConfigRepository {
   val JourneyIdKey = "_id"

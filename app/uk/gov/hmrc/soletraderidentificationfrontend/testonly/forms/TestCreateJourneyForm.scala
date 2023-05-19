@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,122 +39,154 @@ object TestCreateJourneyForm {
   val welshFullNamePageLabel = "welshFullNamePageLabel"
   val welshServiceName = "welshServiceName"
 
-  def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
-    companyNumber => validate(
+  def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(companyNumber =>
+    validate(
       constraint = companyNumber.isEmpty,
-      errMsg = "Continue URL not entered"
+      errMsg     = "Continue URL not entered"
     )
   )
 
-  def deskProServiceIdEmpty: Constraint[String] = Constraint("desk_pro_service_id.not_entered")(
-    serviceId => validate(
+  def deskProServiceIdEmpty: Constraint[String] = Constraint("desk_pro_service_id.not_entered")(serviceId =>
+    validate(
       constraint = serviceId.isEmpty,
-      errMsg = "DeskPro Service Identifier is not entered"
+      errMsg     = "DeskPro Service Identifier is not entered"
     )
   )
 
-  def signOutUrlEmpty: Constraint[String] = Constraint("sign_out_url.not_entered")(
-    signOutUrl => validate(
+  def signOutUrlEmpty: Constraint[String] = Constraint("sign_out_url.not_entered")(signOutUrl =>
+    validate(
       constraint = signOutUrl.isEmpty,
-      errMsg = "Sign Out Url is not entered"
+      errMsg     = "Sign Out Url is not entered"
     )
   )
 
-  def accessibilityUrlEmpty: Constraint[String] = Constraint("accessibility_url.not_entered")(
-    signOutUrl => validate(
+  def accessibilityUrlEmpty: Constraint[String] = Constraint("accessibility_url.not_entered")(signOutUrl =>
+    validate(
       constraint = signOutUrl.isEmpty,
-      errMsg = "Accessibility Url is not entered"
+      errMsg     = "Accessibility Url is not entered"
     )
   )
 
-  def regimeEmpty: Constraint[String] = Constraint("regime.not_entered")(
-    regime => validate(
+  def regimeEmpty: Constraint[String] = Constraint("regime.not_entered")(regime =>
+    validate(
       constraint = regime.isEmpty,
-      errMsg = "Regime is not entered"
+      errMsg     = "Regime is not entered"
     )
   )
 
   def form(enableSautrCheck: Boolean): Form[JourneyConfig] = {
-    Form(mapping(
-      continueUrl -> text.verifying(continueUrlEmpty),
-      businessVerificationCheck -> boolean,
-      serviceName -> optText,
-      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
-      signOutUrl -> text.verifying(signOutUrlEmpty),
-      accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty),
-      welshFullNamePageLabel -> optText,
-      welshServiceName -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
-      JourneyConfig.apply(
-        continueUrl,
-        businessVerificationCheck,
-        PageConfig(
-          deskProServiceId,
-          signOutUrl,
-          enableSautrCheck,
-          accessibilityUrl,
-          JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
-        ),
-        regime
+    Form(
+      mapping(
+        continueUrl               -> text.verifying(continueUrlEmpty),
+        businessVerificationCheck -> boolean,
+        serviceName               -> optText,
+        deskProServiceId          -> text.verifying(deskProServiceIdEmpty),
+        signOutUrl                -> text.verifying(signOutUrlEmpty),
+        accessibilityUrl          -> text.verifying(signOutUrlEmpty),
+        fullNamePageLabel         -> optText,
+        regime                    -> text.verifying(regimeEmpty),
+        welshFullNamePageLabel    -> optText,
+        welshServiceName          -> optText
+      )(
+        (continueUrl,
+         businessVerificationCheck,
+         serviceName,
+         deskProServiceId,
+         signOutUrl,
+         accessibilityUrl,
+         fullNamePageLabel,
+         regime,
+         welshFullNamePageLabel,
+         welshServiceName
+        ) =>
+          JourneyConfig.apply(
+            continueUrl,
+            businessVerificationCheck,
+            PageConfig(
+              deskProServiceId,
+              signOutUrl,
+              enableSautrCheck,
+              accessibilityUrl,
+              JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
+            ),
+            regime
+          )
+      )(journeyConfig =>
+        Some(
+          (
+            journeyConfig.continueUrl,
+            journeyConfig.businessVerificationCheck,
+            journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
+            journeyConfig.pageConfig.deskProServiceId,
+            journeyConfig.pageConfig.signOutUrl,
+            journeyConfig.pageConfig.accessibilityUrl,
+            journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
+            journeyConfig.regime,
+            journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
+            journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
+          )
+        )
       )
-    )(journeyConfig =>
-      Some((
-        journeyConfig.continueUrl,
-        journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
-        journeyConfig.pageConfig.deskProServiceId,
-        journeyConfig.pageConfig.signOutUrl,
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
-        journeyConfig.regime,
-        journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
-        journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
-      ))))
+    )
   }
 
-
   def deprecatedForm(): Form[JourneyConfig] = {
-    Form(mapping(
-      continueUrl -> text.verifying(continueUrlEmpty),
-      businessVerificationCheck -> boolean,
-      serviceName -> optText,
-      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
-      signOutUrl -> text.verifying(signOutUrlEmpty),
-      enableSautrCheck -> optText.toBoolean,
-      accessibilityUrl -> text.verifying(signOutUrlEmpty),
-      fullNamePageLabel -> optText,
-      regime -> text.verifying(regimeEmpty),
-      welshFullNamePageLabel -> optText,
-      welshServiceName -> optText
-    )((continueUrl, businessVerificationCheck, serviceName, deskProServiceId, signOutUrl, enableSautrCheck, accessibilityUrl, fullNamePageLabel, regime, welshFullNamePageLabel, welshServiceName) =>
-      JourneyConfig.apply(
-        continueUrl,
-        businessVerificationCheck,
-        PageConfig(
-          deskProServiceId,
-          signOutUrl,
-          enableSautrCheck,
-          accessibilityUrl,
-          JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
-        ),
-        regime
+    Form(
+      mapping(
+        continueUrl               -> text.verifying(continueUrlEmpty),
+        businessVerificationCheck -> boolean,
+        serviceName               -> optText,
+        deskProServiceId          -> text.verifying(deskProServiceIdEmpty),
+        signOutUrl                -> text.verifying(signOutUrlEmpty),
+        enableSautrCheck          -> optText.toBoolean,
+        accessibilityUrl          -> text.verifying(signOutUrlEmpty),
+        fullNamePageLabel         -> optText,
+        regime                    -> text.verifying(regimeEmpty),
+        welshFullNamePageLabel    -> optText,
+        welshServiceName          -> optText
+      )(
+        (continueUrl,
+         businessVerificationCheck,
+         serviceName,
+         deskProServiceId,
+         signOutUrl,
+         enableSautrCheck,
+         accessibilityUrl,
+         fullNamePageLabel,
+         regime,
+         welshFullNamePageLabel,
+         welshServiceName
+        ) =>
+          JourneyConfig.apply(
+            continueUrl,
+            businessVerificationCheck,
+            PageConfig(
+              deskProServiceId,
+              signOutUrl,
+              enableSautrCheck,
+              accessibilityUrl,
+              JourneyLabels(welshServiceName, serviceName, welshFullNamePageLabel, fullNamePageLabel)
+            ),
+            regime
+          )
+      )(journeyConfig =>
+        Some(
+          (
+            journeyConfig.continueUrl,
+            journeyConfig.businessVerificationCheck,
+            journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
+            journeyConfig.pageConfig.deskProServiceId,
+            journeyConfig.pageConfig.signOutUrl,
+            journeyConfig.pageConfig.enableSautrCheck,
+            journeyConfig.pageConfig.accessibilityUrl,
+            journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
+            journeyConfig.regime,
+            journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
+            journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
+          )
+        )
       )
-    )(journeyConfig =>
-      Some((
-        journeyConfig.continueUrl,
-        journeyConfig.businessVerificationCheck,
-        journeyConfig.pageConfig.labels.flatMap(_.optEnglishServiceName),
-        journeyConfig.pageConfig.deskProServiceId,
-        journeyConfig.pageConfig.signOutUrl,
-        journeyConfig.pageConfig.enableSautrCheck,
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.pageConfig.labels.flatMap(_.optEnglishFullNamePageLabel),
-        journeyConfig.regime,
-        journeyConfig.pageConfig.labels.flatMap(_.optWelshServiceName),
-        journeyConfig.pageConfig.labels.flatMap(_.optWelshFullNamePageLabel)
-      ))))
+    )
   }
 
 }

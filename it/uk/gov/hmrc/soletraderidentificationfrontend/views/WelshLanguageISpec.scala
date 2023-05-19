@@ -45,11 +45,11 @@ class WelshLanguageISpec extends ComponentSpecHelper {
     }
 
     "have a matching welsh key for each english key" in {
-      for(key <- englishMessageKeys) welshMessageKeys.contains(key) mustBe true
+      for (key <- englishMessageKeys) welshMessageKeys.contains(key) mustBe true
     }
 
     "have a matching english key for each welsh key with the exception of the months of the year in welsh" in {
-      for(key <- welshMessageKeys.filterNot(_.startsWith("date.month.name"))) englishMessageKeys.contains(key) mustBe true
+      for (key <- welshMessageKeys.filterNot(_.startsWith("date.month.name"))) englishMessageKeys.contains(key) mustBe true
     }
   }
 
@@ -62,8 +62,7 @@ class WelshLanguageISpec extends ComponentSpecHelper {
   }
 
   private def getMessageKeys(source: Source): Iterator[String] =
-    source
-      .getLines
+    source.getLines
       .map(_.trim)
       .filterNot(_.startsWith("#"))
       .filter(_.nonEmpty)

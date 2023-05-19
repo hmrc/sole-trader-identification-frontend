@@ -26,18 +26,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderI
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.CaptureAddressViewTests
 
-class CaptureAddressControllerISpec extends ComponentSpecHelper
-  with CaptureAddressViewTests
-  with SoleTraderIdentificationStub
-  with AuthStub {
+class CaptureAddressControllerISpec extends ComponentSpecHelper with CaptureAddressViewTests with SoleTraderIdentificationStub with AuthStub {
 
   "GET /address" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testSoleTraderJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testSoleTraderJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
 
@@ -59,9 +58,10 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Faddress" +
-            "&origin=sole-trader-identification-frontend"
+          redirectUri(
+            "/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-sole-trader-business%2F$testJourneyId%2Faddress" +
+              "&origin=sole-trader-identification-frontend"
           )
         )
       }
@@ -71,11 +71,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
   "POST /address" when {
     "the form is correctly formatted" should {
       "redirect to the Capture Sautr page and store the data in the backend" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
 
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
@@ -89,7 +91,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
 
         result must have(
@@ -101,11 +103,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
 
     "the form has leading/trailing whitespaces in address lines" should {
       "remove whitespaces, redirect to the Capture Sautr page and store the data in the backend" in {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
 
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
@@ -119,7 +123,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> s"  $testAddress4   ",
           "address5" -> s"  $testAddress5   ",
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
 
         result must have(
@@ -127,25 +131,29 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           redirectUri(routes.CaptureSautrController.show(testJourneyId).url)
         )
 
-        verifyStoreAddress(testJourneyId, Address(
-          testAddress1,
-          testAddress2,
-          Some(testAddress3),
-          Some(testAddress4),
-          Some(testAddress5),
-          Some(testPostcode),
-          testCountry
-        ))
+        verifyStoreAddress(testJourneyId,
+                           Address(
+                             testAddress1,
+                             testAddress2,
+                             Some(testAddress3),
+                             Some(testAddress4),
+                             Some(testAddress5),
+                             Some(testPostcode),
+                             testCountry
+                           )
+                          )
       }
     }
 
     "the form is missing the first line of the address" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -158,7 +166,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       "return a bad request" in {
@@ -168,11 +176,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "the form is missing the second line of the address" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -185,7 +195,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       "return a bad request" in {
@@ -195,11 +205,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "there is an invalid character in the address form" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -212,7 +224,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       "return a bad request" in {
@@ -222,11 +234,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "the form has a line that is too long" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -239,7 +253,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       "return a bad request" in {
@@ -249,11 +263,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "the form has invalid characters in the postcode" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -266,7 +282,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> "%4£@",
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       "return a bad request" in {
@@ -276,11 +292,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "the form has no country selected" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -293,7 +311,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> testPostcode,
-          "country" -> ""
+          "country"  -> ""
         )
       }
       "return a bad request" in {
@@ -303,11 +321,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
     }
     "the form has GB selected but no postcode entered" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -320,7 +340,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> "",
-          "country" -> "GB"
+          "country"  -> "GB"
         )
       }
       "return a bad request" in {
@@ -331,11 +351,13 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
 
     "there is a form error and customer full name exists" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubStoreAddress(testJourneyId, testAddress)(status = OK)
@@ -348,18 +370,20 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> "to simulate an error",
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
       testTitleAndHeadingInTheErrorView(result)
     }
     "there is a form error and customer full name does NOT exist" should {
       lazy val result = {
-        await(journeyConfigRepository.insertJourneyConfig(
-          journeyId = testJourneyId,
-          authInternalId = testInternalId,
-          journeyConfig = testSoleTraderJourneyConfig
-        ))
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testSoleTraderJourneyConfig
+          )
+        )
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(NOT_FOUND)
@@ -372,7 +396,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper
           "address4" -> testAddress4,
           "address5" -> testAddress5,
           "postcode" -> "to simulate an error",
-          "country" -> testCountry
+          "country"  -> testCountry
         )
       }
 

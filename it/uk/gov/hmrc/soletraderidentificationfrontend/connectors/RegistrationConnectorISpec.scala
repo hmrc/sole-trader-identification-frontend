@@ -63,10 +63,12 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        val registrationFailure = Json.arr(Json.obj(
-          "code" -> "PARTY_TYPE_MISMATCH",
-          "reason" -> "The remote endpoint has indicated there is Party Type mismatch"
-        ))
+        val registrationFailure = Json.arr(
+          Json.obj(
+            "code"   -> "PARTY_TYPE_MISMATCH",
+            "reason" -> "The remote endpoint has indicated there is Party Type mismatch"
+          )
+        )
 
         stubRegister(testNino, Some(testSautr), testRegime)(OK, testBackendFailedRegistrationJson(registrationFailure))
 
@@ -76,14 +78,16 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
       }
       "multiple failures have been returned" in {
-        val registrationFailure = Json.arr(Json.obj(
-          "code" -> "INVALID_REGIME",
-          "reason" -> "Request has not passed validation.  Invalid regime"
-        ),
+        val registrationFailure = Json.arr(
           Json.obj(
-            "code" -> "INVALID_PAYLOAD",
+            "code"   -> "INVALID_REGIME",
+            "reason" -> "Request has not passed validation.  Invalid regime"
+          ),
+          Json.obj(
+            "code"   -> "INVALID_PAYLOAD",
             "reason" -> "Request has not passed validation. Invalid payload."
-          ))
+          )
+        )
 
         stubRegister(testNino, Some(testSautr), testRegime)(OK, testBackendFailedRegistrationJson(registrationFailure))
 
@@ -107,10 +111,12 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        val registrationFailure = Json.arr(Json.obj(
-          "code" -> "PARTY_TYPE_MISMATCH",
-          "reason" -> "The remote endpoint has indicated there is Party Type mismatch"
-        ))
+        val registrationFailure = Json.arr(
+          Json.obj(
+            "code"   -> "PARTY_TYPE_MISMATCH",
+            "reason" -> "The remote endpoint has indicated there is Party Type mismatch"
+          )
+        )
 
         stubRegisterWithTrn(testTrn, testSautr, testRegime)(OK, testBackendFailedRegistrationJson(registrationFailure))
 

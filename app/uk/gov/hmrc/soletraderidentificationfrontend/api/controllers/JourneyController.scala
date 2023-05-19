@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyContr
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.{routes => controllerRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig, SoleTraderDetails}
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlNotAllowed, JourneyConfigUrlInvalid}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{JourneyConfigUrlAllowed, JourneyConfigUrlInvalid, JourneyConfigUrlNotAllowed}
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.UrlHelper
 
@@ -34,13 +34,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class JourneyController @Inject()(controllerComponents: ControllerComponents,
-                                  journeyService: JourneyService,
-                                  val authConnector: AuthConnector,
-                                  soleTraderIdentificationService: SoleTraderIdentificationService,
-                                  urlHelper: UrlHelper
-                                 )(implicit ec: ExecutionContext,
-                                   appConfig: AppConfig) extends BackendController(controllerComponents) with AuthorisedFunctions {
+class JourneyController @Inject() (controllerComponents: ControllerComponents,
+                                   journeyService: JourneyService,
+                                   val authConnector: AuthConnector,
+                                   soleTraderIdentificationService: SoleTraderIdentificationService,
+                                   urlHelper: UrlHelper
+                                  )(implicit ec: ExecutionContext, appConfig: AppConfig)
+    extends BackendController(controllerComponents)
+    with AuthorisedFunctions {
 
   val relativeUrlReads: String => Reads[String] = relativeUrlReadsHelper(urlHelper)
   val continueUrlReads: Reads[String] = relativeUrlReads(continueUrlKey)
@@ -53,57 +54,57 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
 
   def createJourney(): Action[JourneyConfig] = createJourney(sautrCheckPolicy = SautrCheckReadFromIncomingJson)
 
-  def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async {
-    implicit req =>
-      authorised() {
-        soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId).map {
-          case Some(journeyData) =>
-            Ok(SoleTraderDetails.jsonWriterForCallingServices(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
-          case None => NotFound
-        }
+  def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async { implicit req =>
+    authorised() {
+      soleTraderIdentificationService.retrieveSoleTraderDetails(journeyId).map {
+        case Some(journeyData) =>
+          Ok(SoleTraderDetails.jsonWriterForCallingServices(journeyData.copy(optNino = journeyData.optNino.map(_.toUpperCase))))
+        case None => NotFound
       }
+    }
   }
 
-  private def createJourney(sautrCheckPolicy: SautrCheckPolicy): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
-    json =>
-      for {
-        continueUrl <- relativeUrlReads(continueUrlKey).reads(json)
-        businessVerificationCheck <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
-        optServiceName <- (json \ optServiceNameKey).validateOpt[String]
-        deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
-        signOutUrl <- signOutUrlReads.reads(json)
-        sautrCheckFromIncomingJson <- (json \ enableSautrCheckKey).validateOpt[Boolean]
-        accessibilityUrl <- accessibilityUrlReads.reads(json)
-        optFullNamePageLabel <- (json \ optFullNamePageLabelKey).validateOpt[String]
-        regime <- (json \ regimeKey).validate[String]
-        labels <- (json \ labelsKey).validateOpt[JourneyLabels]
-      } yield JourneyConfig(
-        continueUrl,
-        businessVerificationCheck.getOrElse(true),
-        PageConfig(
-          optServiceName,
-          deskProServiceId,
-          signOutUrl,
-          enableSautrCheck(sautrCheckPolicy, sautrCheckFromIncomingJson),
-          accessibilityUrl,
-          optFullNamePageLabel,
-          labels
-        ),
-        regime
-      )
-  }) {
-    implicit req =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.createJourney(req.body, authInternalId).map(
-            journeyId =>
-              Created(Json.obj(
+  private def createJourney(sautrCheckPolicy: SautrCheckPolicy): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] { json =>
+    for {
+      continueUrl                <- relativeUrlReads(continueUrlKey).reads(json)
+      businessVerificationCheck  <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
+      optServiceName             <- (json \ optServiceNameKey).validateOpt[String]
+      deskProServiceId           <- (json \ deskProServiceIdKey).validate[String]
+      signOutUrl                 <- signOutUrlReads.reads(json)
+      sautrCheckFromIncomingJson <- (json \ enableSautrCheckKey).validateOpt[Boolean]
+      accessibilityUrl           <- accessibilityUrlReads.reads(json)
+      optFullNamePageLabel       <- (json \ optFullNamePageLabelKey).validateOpt[String]
+      regime                     <- (json \ regimeKey).validate[String]
+      labels                     <- (json \ labelsKey).validateOpt[JourneyLabels]
+    } yield JourneyConfig(
+      continueUrl,
+      businessVerificationCheck.getOrElse(true),
+      PageConfig(
+        optServiceName,
+        deskProServiceId,
+        signOutUrl,
+        enableSautrCheck(sautrCheckPolicy, sautrCheckFromIncomingJson),
+        accessibilityUrl,
+        optFullNamePageLabel,
+        labels
+      ),
+      regime
+    )
+  }) { implicit req =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService
+          .createJourney(req.body, authInternalId)
+          .map(journeyId =>
+            Created(
+              Json.obj(
                 "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureFullNameController.show(journeyId).url}"
-              ))
+              )
+            )
           )
-        case _ =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case _ =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }
@@ -120,19 +121,21 @@ object JourneyController {
   val regimeKey = "regime"
   val labelsKey = "labels"
 
-  private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = (JsPath \ jsPathKeyToBeRead).read[String]
-    .flatMap { someIncomingUrlToBeValidated =>
-      (_: JsValue) =>
-        urlHelper.isAValidUrl(urlToBeValidated = someIncomingUrlToBeValidated) match {
-            case JourneyConfigUrlAllowed => JsSuccess(someIncomingUrlToBeValidated)
-            case JourneyConfigUrlNotAllowed => JsError(s"$someIncomingUrlToBeValidated value for $jsPathKeyToBeRead json key is not relative or accepted urls")
-            case JourneyConfigUrlInvalid => JsError(s"An unexpected error occurred validating $someIncomingUrlToBeValidated for $jsPathKeyToBeRead json key")
-        }
+  private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = (JsPath \ jsPathKeyToBeRead)
+    .read[String]
+    .flatMap { someIncomingUrlToBeValidated => (_: JsValue) =>
+      urlHelper.isAValidUrl(urlToBeValidated = someIncomingUrlToBeValidated) match {
+        case JourneyConfigUrlAllowed => JsSuccess(someIncomingUrlToBeValidated)
+        case JourneyConfigUrlNotAllowed =>
+          JsError(s"$someIncomingUrlToBeValidated value for $jsPathKeyToBeRead json key is not relative or accepted urls")
+        case JourneyConfigUrlInvalid =>
+          JsError(s"An unexpected error occurred validating $someIncomingUrlToBeValidated for $jsPathKeyToBeRead json key")
+      }
     }
 
   private def enableSautrCheck(sautrCheckPolicy: SautrCheckPolicy, sautrCheckFromIncomingJson: Option[Boolean]): Boolean = sautrCheckPolicy match {
-    case SautrCheckDisabled => false
-    case SautrCheckEnabled => true
+    case SautrCheckDisabled             => false
+    case SautrCheckEnabled              => true
     case SautrCheckReadFromIncomingJson => sautrCheckFromIncomingJson.getOrElse(false)
   }
 

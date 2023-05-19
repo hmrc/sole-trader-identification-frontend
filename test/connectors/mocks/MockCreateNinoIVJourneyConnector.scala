@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,16 @@ trait MockCreateNinoIVJourneyConnector extends MockitoSugar with BeforeAndAfterE
     reset(mockCreateNinoIVJourneyConnector)
   }
 
-  def mockCreateNinoIVJourney(journeyId: String,
-                              nino: String,
-                              journeyConfig: JourneyConfig
-                             )(response: Future[NinoIVJourneyCreationResponse]): OngoingStubbing[_] = {
-    when(mockCreateNinoIVJourneyConnector.createNinoIdentityVerificationJourney(
-      ArgumentMatchers.eq(journeyId),
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(journeyConfig)
-    )(ArgumentMatchers.any[HeaderCarrier])).thenReturn(response)
+  def mockCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig)(
+    response: Future[NinoIVJourneyCreationResponse]
+  ): OngoingStubbing[_] = {
+    when(
+      mockCreateNinoIVJourneyConnector.createNinoIdentityVerificationJourney(
+        ArgumentMatchers.eq(journeyId),
+        ArgumentMatchers.eq(nino),
+        ArgumentMatchers.eq(journeyConfig)
+      )(ArgumentMatchers.any[HeaderCarrier])
+    ).thenReturn(response)
   }
 
   def verifyCreateNinoIVJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig): Unit = {
@@ -56,6 +57,5 @@ trait MockCreateNinoIVJourneyConnector extends MockitoSugar with BeforeAndAfterE
       ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
   }
-
 
 }

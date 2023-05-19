@@ -8,17 +8,17 @@ import uk.gov.hmrc.soletraderidentificationfrontend.stubs.AuthStub
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.DetailsDidNotMatchViewTests
 
-class DetailsDidNotMatchISpec extends ComponentSpecHelper
-  with DetailsDidNotMatchViewTests
-  with AuthStub {
+class DetailsDidNotMatchISpec extends ComponentSpecHelper with DetailsDidNotMatchViewTests with AuthStub {
 
   "GET /details-did-not-match" should {
     lazy val result = {
-      await(journeyConfigRepository.insertJourneyConfig(
-        journeyId = testJourneyId,
-        authInternalId = testInternalId,
-        journeyConfig = testSoleTraderJourneyConfig
-      ))
+      await(
+        journeyConfigRepository.insertJourneyConfig(
+          journeyId      = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig  = testSoleTraderJourneyConfig
+        )
+      )
       stubAuth(OK, successfulAuthResponse())
       get(s"/identify-your-sole-trader-business/$testJourneyId/details-did-not-match")
     }

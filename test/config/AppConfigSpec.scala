@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
       "a country name is requested, but the code is invalid" in {
 
-        intercept[InternalServerException]{
+        intercept[InternalServerException] {
           appConfig.getCountryName("XY")
         }
 
@@ -74,7 +74,7 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
       "a country list file name is incorrectly defined" in {
 
-        intercept[InternalServerException]{
+        intercept[InternalServerException] {
           appConfig.getCountryList("invalid")
         }
 

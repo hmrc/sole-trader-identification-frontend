@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,32 +30,30 @@ import uk.gov.hmrc.soletraderidentificationfrontend.views.html.could_not_confirm
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-/**
- * The could not confirm business error page is displayed when a sole trader asserts they do not have
- * a Universal Taxpayer Reference, but one is found in their known facts.
- */
+/** The could not confirm business error page is displayed when a sole trader asserts they do not have a Universal Taxpayer Reference, but one is
+  * found in their known facts.
+  */
 @Singleton
-class CouldNotConfirmBusinessErrorController @Inject()(mcc: MessagesControllerComponents,
-                                                       val authConnector: AuthConnector,
-                                                       journeyService: JourneyService,
-                                                       view: could_not_confirm_business_error_page,
-                                                       messagesHelper: MessagesHelper
-                                                      )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
-  extends FrontendController(mcc) with AuthorisedFunctions {
+class CouldNotConfirmBusinessErrorController @Inject() (mcc: MessagesControllerComponents,
+                                                        val authConnector: AuthConnector,
+                                                        journeyService: JourneyService,
+                                                        view: could_not_confirm_business_error_page,
+                                                        messagesHelper: MessagesHelper
+                                                       )(implicit appConfig: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(pageConfig = journeyConfig.pageConfig, redirectLocation = routes.RetryJourneyController.tryAgain(journeyId)))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(view(pageConfig = journeyConfig.pageConfig, redirectLocation = routes.RetryJourneyController.tryAgain(journeyId)))
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
 }

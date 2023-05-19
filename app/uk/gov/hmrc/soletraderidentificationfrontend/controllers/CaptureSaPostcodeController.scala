@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,69 +33,72 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
-                                            view: capture_sa_postcode_page,
-                                            soleTraderIdentificationService: SoleTraderIdentificationService,
-                                            val authConnector: AuthConnector,
-                                            journeyService: JourneyService,
-                                            messagesHelper: MessagesHelper
-                                           )(implicit val config: AppConfig,
-                                             executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
+class CaptureSaPostcodeController @Inject() (mcc: MessagesControllerComponents,
+                                             view: capture_sa_postcode_page,
+                                             soleTraderIdentificationService: SoleTraderIdentificationService,
+                                             val authConnector: AuthConnector,
+                                             journeyService: JourneyService,
+                                             messagesHelper: MessagesHelper
+                                            )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions
+    with FeatureSwitching {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-              implicit val messages: Messages = remoteMessagesApi.preferred(request)
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                form = CaptureSaPostcodeForm.form
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+          implicit val messages: Messages = remoteMessagesApi.preferred(request)
+          Ok(
+            view(
+              journeyId  = journeyId,
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureSaPostcodeController.submit(journeyId),
+              form       = CaptureSaPostcodeForm.form
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          CaptureSaPostcodeForm.form.bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        CaptureSaPostcodeForm.form
+          .bindFromRequest()
+          .fold(
             formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig =>
-                  val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
-                  implicit val messages: Messages = remoteMessagesApi.preferred(request)
-                  BadRequest(view(
-                    journeyId = journeyId,
+              journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+                val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
+                implicit val messages: Messages = remoteMessagesApi.preferred(request)
+                BadRequest(
+                  view(
+                    journeyId  = journeyId,
                     pageConfig = journeyConfig.pageConfig,
                     formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                    form = formWithErrors
-                  ))
+                    form       = formWithErrors
+                  )
+                )
               },
             postcode =>
-              soleTraderIdentificationService.storeSaPostcode(journeyId, postcode).map {
-                _ => Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
+              soleTraderIdentificationService.storeSaPostcode(journeyId, postcode).map { _ =>
+                Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def noSaPostcode(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        soleTraderIdentificationService.removeSaPostcode(journeyId).map {
-          _ => Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
-        }
+  def noSaPostcode(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      soleTraderIdentificationService.removeSaPostcode(journeyId).map { _ =>
+        Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
       }
+    }
   }
 
 }

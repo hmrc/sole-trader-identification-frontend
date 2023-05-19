@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,12 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockRegister(nino: String, sautr: Option[String], regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
-    when(mockRegistrationConnector.registerWithNino(
-      ArgumentMatchers.eq(nino),
-      ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(regime)
-    )(ArgumentMatchers.any[HeaderCarrier])
+    when(
+      mockRegistrationConnector.registerWithNino(
+        ArgumentMatchers.eq(nino),
+        ArgumentMatchers.eq(sautr),
+        ArgumentMatchers.eq(regime)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
   }
 
@@ -55,11 +56,12 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
   }
 
   def mockRegisterWithTrn(trn: String, sautr: String, regime: String)(response: Future[RegistrationStatus]): OngoingStubbing[_] = {
-    when(mockRegistrationConnector.registerWithTrn(
-      ArgumentMatchers.eq(trn),
-      ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(regime)
-    )(ArgumentMatchers.any[HeaderCarrier])
+    when(
+      mockRegistrationConnector.registerWithTrn(
+        ArgumentMatchers.eq(trn),
+        ArgumentMatchers.eq(sautr),
+        ArgumentMatchers.eq(regime)
+      )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
   }
 
@@ -70,6 +72,5 @@ trait MockRegistrationConnector extends MockitoSugar with BeforeAndAfterEach {
       ArgumentMatchers.eq(regime)
     )(ArgumentMatchers.any[HeaderCarrier])
   }
-
 
 }

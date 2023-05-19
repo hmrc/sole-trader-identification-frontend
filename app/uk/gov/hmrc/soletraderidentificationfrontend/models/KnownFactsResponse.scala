@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,17 @@ object KnownFactsResponse {
     (JsPath \ PostcodeKey).readNullable[String] and
       (JsPath \ IsAbroadKey).readNullable[Boolean] and
       (JsPath \ NinoKey).readNullable[String]
-    ) (KnownFactsResponse.apply _)
+  )(KnownFactsResponse.apply _)
 
   implicit val writes: OWrites[KnownFactsResponse] = (
     (JsPath \ PostcodeKey).writeNullable[String] and
       (JsPath \ IsAbroadKey).writeNullable[Boolean] and
       (JsPath \ NinoKey).writeNullable[String]
-    ) (unlift(KnownFactsResponse.unapply))
+  )(unlift(KnownFactsResponse.unapply))
 
   val format: OFormat[KnownFactsResponse] = OFormat(reads, writes)
 
 }
-
 
 sealed trait KnownFactsResponseError
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,66 +32,71 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureOverseasTaxIdentifierController @Inject()(mcc: MessagesControllerComponents,
-                                                       journeyService: JourneyService,
-                                                       view: capture_overseas_tax_identifier_page,
-                                                       soleTraderIdentificationService: SoleTraderIdentificationService,
-                                                       messagesHelper: MessagesHelper,
-                                                       val authConnector: AuthConnector
-                                                      )(implicit val config: AppConfig,
-                                                        executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerComponents,
+                                                        journeyService: JourneyService,
+                                                        view: capture_overseas_tax_identifier_page,
+                                                        soleTraderIdentificationService: SoleTraderIdentificationService,
+                                                        messagesHelper: MessagesHelper,
+                                                        val authConnector: AuthConnector
+                                                       )(implicit val config: AppConfig, executionContext: ExecutionContext)
+    extends FrontendController(mcc)
+    with AuthorisedFunctions {
 
-  def show(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureOverseasTaxIdentifierController.submit(journeyId),
-                form = CaptureOverseasTaxIdentifierForm.form
-              ))
-          }
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+  def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+          implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+          Ok(
+            view(
+              journeyId  = journeyId,
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CaptureOverseasTaxIdentifierController.submit(journeyId),
+              form       = CaptureOverseasTaxIdentifierForm.form
+            )
+          )
+        }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 
-  def submit(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          CaptureOverseasTaxIdentifierForm.form.bindFromRequest().fold(
+  def submit(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised().retrieve(internalId) {
+      case Some(authInternalId) =>
+        CaptureOverseasTaxIdentifierForm.form
+          .bindFromRequest()
+          .fold(
             formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig =>
-                  implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
-                  BadRequest(view(
-                    journeyId = journeyId,
+              journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+                implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+                BadRequest(
+                  view(
+                    journeyId  = journeyId,
                     pageConfig = journeyConfig.pageConfig,
                     formAction = routes.CaptureOverseasTaxIdentifierController.submit(journeyId),
-                    form = formWithErrors
-                  ))
+                    form       = formWithErrors
+                  )
+                )
               },
             {
-              case Some(overseasTaxIdentifier) => for {
-                _ <- soleTraderIdentificationService.storeOverseasTaxIdentifier(journeyId, overseasTaxIdentifier)
-              } yield {
-                Redirect(routes.CaptureOverseasTaxIdentifierCountryController.show(journeyId))
-              }
-              case None => for {
-                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifier(journeyId)
-                _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)
-              } yield {
-                Redirect(routes.CheckYourAnswersController.show(journeyId))
-              }
+              case Some(overseasTaxIdentifier) =>
+                for {
+                  _ <- soleTraderIdentificationService.storeOverseasTaxIdentifier(journeyId, overseasTaxIdentifier)
+                } yield {
+                  Redirect(routes.CaptureOverseasTaxIdentifierCountryController.show(journeyId))
+                }
+              case None =>
+                for {
+                  _ <- soleTraderIdentificationService.removeOverseasTaxIdentifier(journeyId)
+                  _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)
+                } yield {
+                  Redirect(routes.CheckYourAnswersController.show(journeyId))
+                }
             }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
-      }
+      case None =>
+        throw new InternalServerException("Internal ID could not be retrieved from Auth")
+    }
   }
 }

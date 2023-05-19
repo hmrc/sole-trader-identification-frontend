@@ -25,74 +25,63 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.WireMockMethods
 
 trait BusinessVerificationStub extends WireMockMethods {
 
-  def stubCreateBusinessVerificationJourney(sautr: String,
-                                            journeyId: String,
-                                            journeyConfig: JourneyConfig
-                                           )(status: Int,
-                                             body: JsObject = Json.obj()): StubMapping =
-    internalStubCreateBusinessVerificationJourney(
-      sautr = sautr,
-      journeyId = journeyId,
-      journeyConfig = journeyConfig,
-      uriToPostTo = "/business-verification/journey")(status, body)
+  def stubCreateBusinessVerificationJourney(sautr: String, journeyId: String, journeyConfig: JourneyConfig)(status: Int,
+                                                                                                            body: JsObject = Json.obj()
+                                                                                                           ): StubMapping =
+    internalStubCreateBusinessVerificationJourney(sautr         = sautr,
+                                                  journeyId     = journeyId,
+                                                  journeyConfig = journeyConfig,
+                                                  uriToPostTo   = "/business-verification/journey"
+                                                 )(status, body)
 
-  def stubRetrieveBusinessVerificationResult(journeyId: String)
-                                            (status: Int,
-                                             body: JsObject = Json.obj()): StubMapping =
+  def stubRetrieveBusinessVerificationResult(journeyId: String)(status: Int, body: JsObject = Json.obj()): StubMapping =
     when(method = GET, uri = s"/business-verification/journey/$journeyId/status")
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
 
-  def stubCreateBusinessVerificationJourneyFromStub(sautr: String,
-                                                    journeyId: String,
-                                                    journeyConfig: JourneyConfig
-                                                   )(status: Int,
-                                                     body: JsObject = Json.obj()): StubMapping =
-    internalStubCreateBusinessVerificationJourney(
-      sautr = sautr,
-      journeyId = journeyId,
-      journeyConfig = journeyConfig,
-      uriToPostTo = "/identify-your-sole-trader-business/test-only/business-verification/journey")(status, body)
+  def stubCreateBusinessVerificationJourneyFromStub(sautr: String, journeyId: String, journeyConfig: JourneyConfig)(status: Int,
+                                                                                                                    body: JsObject = Json.obj()
+                                                                                                                   ): StubMapping =
+    internalStubCreateBusinessVerificationJourney(sautr         = sautr,
+                                                  journeyId     = journeyId,
+                                                  journeyConfig = journeyConfig,
+                                                  uriToPostTo   = "/identify-your-sole-trader-business/test-only/business-verification/journey"
+                                                 )(status, body)
 
-  def stubRetrieveBusinessVerificationResultFromStub(journeyId: String)
-                                                    (status: Int,
-                                                     body: JsObject = Json.obj()): StubMapping =
+  def stubRetrieveBusinessVerificationResultFromStub(journeyId: String)(status: Int, body: JsObject = Json.obj()): StubMapping =
     when(method = GET, uri = s"/identify-your-sole-trader-business/test-only/business-verification/journey/$journeyId/status")
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
 
-  private def internalStubCreateBusinessVerificationJourney(sautr: String,
-                                                            journeyId: String,
-                                                            journeyConfig: JourneyConfig,
-                                                            uriToPostTo: String
-                                                           )(status: Int,
-                                                             body: JsObject): StubMapping = {
+  private def internalStubCreateBusinessVerificationJourney(sautr: String, journeyId: String, journeyConfig: JourneyConfig, uriToPostTo: String)(
+    status: Int,
+    body: JsObject
+  ): StubMapping = {
 
     val pageTitle: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
 
-    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> journeyConfig.regime.toLowerCase,
+    val postBody = Json.obj(
+      "journeyType" -> "BUSINESS_VERIFICATION",
+      "origin"      -> journeyConfig.regime.toLowerCase,
       "identifiers" -> Json.arr(
         Json.obj(
           "saUtr" -> sautr
         )
       ),
-      "continueUrl" -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "continueUrl"               -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
       "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-      "pageTitle" -> pageTitle,
-      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
+      "pageTitle"                 -> pageTitle,
+      "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId
     )
     when(method = POST, uri = uriToPostTo, postBody)
       .thenReturn(
         status = status,
-        body = body
+        body   = body
       )
   }
 
-
 }
-

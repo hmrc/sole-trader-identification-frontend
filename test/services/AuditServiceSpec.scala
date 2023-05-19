@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,9 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         result mustBe a[Unit]
 
         verifySendExplicitAuditIndividuals()
-        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "false") ++ Json.obj("ninoReputation" -> testInsightsReturnBody)
+        auditEventCaptor.getValue mustBe testIndividualFailureAuditEventJson(isMatch = "false") ++ Json.obj(
+          "ninoReputation" -> testInsightsReturnBody
+        )
       }
 
       "the entity is an individual and there is no NINO (non nino in the event)" in {
@@ -136,7 +138,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
 
-
           val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfigWithCallingService))
 
           result mustBe a[Unit]
@@ -162,7 +163,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
           mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
           mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetails)))
           mockRetrieveES20Response(testJourneyId)(Future.successful(None))
-
 
           val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 
@@ -211,18 +211,18 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         }
         "there is a IR-SA enrolment with matching sautr" in {
           val testEnrolledAuditEventJson: JsObject = Json.obj(
-            "callingService" -> testDefaultServiceName,
-            "businessType" -> "Sole Trader",
-            "firstName" -> testFirstName,
-            "lastName" -> testLastName,
-            "nino" -> testNino,
-            "dateOfBirth" -> testDateOfBirth,
+            "callingService"        -> testDefaultServiceName,
+            "businessType"          -> "Sole Trader",
+            "firstName"             -> testFirstName,
+            "lastName"              -> testLastName,
+            "nino"                  -> testNino,
+            "dateOfBirth"           -> testDateOfBirth,
             "authenticatorResponse" -> Json.toJson(testIndividualDetails),
-            "userSAUTR" -> testSautr,
-            "isMatch" -> "true",
-            "VerificationStatus" -> "Enrolled",
-            "RegisterApiStatus" -> testRegistrationSuccess,
-            "ninoReputation" -> testInsightsReturnBody
+            "userSAUTR"             -> testSautr,
+            "isMatch"               -> "true",
+            "VerificationStatus"    -> "Enrolled",
+            "RegisterApiStatus"     -> testRegistrationSuccess,
+            "ninoReputation"        -> testInsightsReturnBody
           )
 
           mockRetrieveSoleTraderDetails(testJourneyId)(Future.successful(Some(testSoleTraderDetails.copy(businessVerification = Some(SaEnrolled)))))
@@ -269,7 +269,6 @@ class AuditServiceSpec extends AnyWordSpec with Matchers with MockAuditConnector
         mockRetrieveIdentifiersMatch(testJourneyId)(Future.successful(Some(SuccessfulMatch)))
         mockRetrieveAuthenticatorDetails(testJourneyId)(Future.successful(Some(testIndividualDetailsNoNino)))
         mockRetrieveES20Response(testJourneyId)(Future.successful(Some(testKnownFactsResponseOverseas)))
-
 
         val result: Unit = await(TestService.auditJourney(testJourneyId, testSoleTraderJourneyConfig))
 

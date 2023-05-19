@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
 
   "createJourney" should {
     "return a journeyID and store the provided journey config" in {
-      mockCreateJourney(response = Future.successful(testJourneyId))
+      mockCreateJourney(response                                                           = Future.successful(testJourneyId))
       mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response = Future.successful(mock[InsertOneResult]))
 
       val result = await(TestService.createJourney(testJourneyConfig(), testInternalId))
@@ -61,11 +61,9 @@ class JourneyServiceSpec extends AnyWordSpec with Matchers with MockJourneyConne
 
       "the journey config is not stored" in {
         mockCreateJourney(response = Future.successful(testJourneyId))
-        mockInsertJourneyConfig(
-          testJourneyId,
-          testInternalId,
-          testJourneyConfig())(response =
-          Future.failed(new MongoSocketReadException("Exception receiving message", new ServerAddress())))
+        mockInsertJourneyConfig(testJourneyId, testInternalId, testJourneyConfig())(response =
+          Future.failed(new MongoSocketReadException("Exception receiving message", new ServerAddress()))
+        )
 
         intercept[MongoSocketReadException](
           await(TestService.createJourney(testJourneyConfig(), testInternalId))
