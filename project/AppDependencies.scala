@@ -10,7 +10,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % bootstrapPlayVersion,
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28"  % bootstrapPlayVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % mongoVersion,
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.8.0-play-28", // later version breaks nonce-CSP as of 2023.05 up to version 7.7.0
+    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-28"      % "8.5.0",
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.2"
   )
 
