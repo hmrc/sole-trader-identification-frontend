@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@
 
 
 @scripts = {
-    <script src='@controllers.routes.Assets.versioned("javascript/backLink.js")'></script>
+    <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("javascript/backLink.js")'></script>
 }
 
 @hmrcLayout(
@@ -70,7 +70,6 @@
     signOutUrl = Some(pageConfig.signOutUrl),
     additionalHeadBlock = Some(head),
     accessibilityStatementUrl = Some(pageConfig.accessibilityUrl),
-    nonce = CSPNonce.get,
     phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId))),
     serviceName = Some(if (messages.isDefinedAt("optServiceName")) messages("optServiceName") else messages("service.name.default")),
     backLinkUrl = Some("#"),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,11 +41,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
 
-  private val assetsUrl = servicesConfig.getString("assets.url")
-
   private lazy val backendUrl: String = servicesConfig.baseUrl("sole-trader-identification")
 
-  val assetsPrefix: String = assetsUrl + servicesConfig.getString("assets.version")
   val analyticsToken: String = servicesConfig.getString("google-analytics.token")
   val analyticsHost: String = servicesConfig.getString("google-analytics.host")
 
