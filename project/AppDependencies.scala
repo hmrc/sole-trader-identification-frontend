@@ -3,7 +3,7 @@ import sbt.*
 
 object AppDependencies {
 
-  private val bootstrapPlayVersion = "7.14.0" // later version breaks the play's binding in this project as of 2023.05 up to version 7.15.0
+  private val bootstrapPlayVersion = "7.22.0"
   private val mongoVersion = "0.74.0"
 
   val compile: Seq[ModuleID] = Seq(
