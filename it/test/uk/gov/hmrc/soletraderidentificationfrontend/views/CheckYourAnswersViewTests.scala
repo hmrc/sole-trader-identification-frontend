@@ -27,7 +27,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.checkYourAnswersFormat
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait CheckYourAnswersViewTests {
   this: ComponentSpecHelper =>

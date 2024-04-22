@@ -5,8 +5,8 @@ This is a Scala/Play frontend to allow Sole Traders to provide their information
 ### How to run the service
 
 1. Make sure any dependent services are running using the following service-manager
-   command `sm --start SOLE_TRADER_IDENTIFICATION_ALL -r`
-2. Stop the frontend in service manager using `sm --stop SOLE_TRADER_IDENTIFICATION_FRONTEND`
+   command `sm2 --start SOLE_TRADER_IDENTIFICATION_ALL`
+2. Stop the frontend in service manager using `sm2 --stop SOLE_TRADER_IDENTIFICATION_FRONTEND`
 3. Run the frontend locally using
    `sbt 'run 9717 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'`
 
