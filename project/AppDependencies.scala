@@ -24,9 +24,9 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-30" % mongoVersion         % Test,
     "uk.gov.hmrc"            %% "bootstrap-test-play-30"  % bootstrapPlayVersion % Test,
   )
-  
+
   val it: Seq[ModuleID] = Seq(
-    "com.github.tomakehurst" % "wiremock" % "3.0.1" % Test
+    "org.wiremock" % "wiremock" % "3.5.3" % Test
   )
 
   def apply(): Seq[ModuleID] = compile ++ test
