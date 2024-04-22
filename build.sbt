@@ -27,7 +27,7 @@ lazy val scoverageSettings = {
 }
 
 ThisBuild / majorVersion := 1
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.12"
 
 Test / Keys.fork := true
 Test / javaOptions += "-Dlogger.resource=logback-test.xml"
