@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class ErrorHandler @Inject() (val messagesApi: MessagesApi, view: error_template, val config: Configuration, val env: Environment)(implicit
   val appConfig: AppConfig
 ) extends FrontendErrorHandler
-    with Logging {
+    with Logging
+    with AuthRedirects {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =
     if (play.mvc.Http.Status.BAD_REQUEST == statusCode)
@@ -49,46 +50,6 @@ class ErrorHandler @Inject() (val messagesApi: MessagesApi, view: error_template
       case _: AuthorisationException => Future.successful(resolveError(request, exception))
       case _                         => super.onServerError(request, exception)
     }
-  }
-
-  private def toGGLogin(continueUrl: String): Result = {
-    // TODO (WD) solve this
-    lazy val envPrefix =
-      if (env.mode.equals(Mode.Test)) "Test"
-      else
-        config
-          .getOptional[String]("run.mode")
-          .getOrElse("Dev")
-
-    val hostDefaults: Map[String, String] = Map(
-      "Dev.external-url.bas-gateway-frontend.host"           -> "http://localhost:9553",
-      "Dev.external-url.citizen-auth-frontend.host"          -> "http://localhost:9029",
-      "Dev.external-url.identity-verification-frontend.host" -> "http://localhost:9938",
-      "Dev.external-url.stride-auth-frontend.host"           -> "http://localhost:9041"
-    )
-
-    lazy val defaultOrigin: String = {
-      config
-        .getOptional[String]("sosOrigin")
-        .orElse(config.getOptional[String]("appName"))
-        .getOrElse("undefined")
-    }
-
-    def origin: String = defaultOrigin
-
-    def host(service: String): String = {
-      val key = s"$envPrefix.external-url.$service.host"
-      config.getOptional[String](key).orElse(hostDefaults.get(key)).getOrElse("")
-    }
-
-    def ggLoginUrl: String = host("bas-gateway-frontend") + "/bas-gateway/sign-in"
-    Redirect(
-      ggLoginUrl,
-      Map(
-        "continue_url" -> Seq(continueUrl),
-        "origin"       -> Seq(origin)
-      )
-    )
   }
 
   override def resolveError(rh: RequestHeader, ex: Throwable): Result = {
