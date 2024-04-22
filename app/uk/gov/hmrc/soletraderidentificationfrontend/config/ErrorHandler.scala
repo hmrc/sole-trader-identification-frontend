@@ -17,9 +17,9 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.config
 
 import play.api.i18n.MessagesApi
-import play.api.mvc.Results.{BadRequest, NotFound, Redirect}
+import play.api.mvc.Results.{BadRequest, NotFound}
 import play.api.mvc.{Request, RequestHeader, Result}
-import play.api.{Configuration, Environment, Logging, Mode}
+import play.api.{Configuration, Environment, Logging}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http.NotFoundException

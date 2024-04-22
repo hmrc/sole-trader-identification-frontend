@@ -27,8 +27,10 @@ trait AuthRedirects {
 
   private lazy val envPrefix =
     if (env.mode.equals(Mode.Test)) "Test"
-    else config.getOptional[String]("run.mode")
-      .getOrElse("Dev")
+    else
+      config
+        .getOptional[String]("run.mode")
+        .getOrElse("Dev")
 
   private val hostDefaults: Map[String, String] = Map(
     "Dev.external-url.bas-gateway-frontend.host"           -> "http://localhost:9553",
@@ -54,10 +56,10 @@ trait AuthRedirects {
   def origin: String = defaultOrigin
 
   def toGGLogin(continueUrl: String): Result =
-    Redirect(
-      ggLoginUrl,
-      Map(
-        "continue_url" -> Seq(continueUrl),
-        "origin"   -> Seq(origin)
-      ))
+    Redirect(ggLoginUrl,
+             Map(
+               "continue_url" -> Seq(continueUrl),
+               "origin"       -> Seq(origin)
+             )
+            )
 }
