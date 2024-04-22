@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package uk.gov.hmrc.soletraderidentificationfrontend.views
 
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -62,7 +63,8 @@ class WelshLanguageISpec extends ComponentSpecHelper {
   }
 
   private def getMessageKeys(source: Source): Iterator[String] =
-    source.getLines
+    source
+      .getLines()
       .map(_.trim)
       .filterNot(_.startsWith("#"))
       .filter(_.nonEmpty)
