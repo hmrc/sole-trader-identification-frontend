@@ -39,6 +39,7 @@ TwirlKeys.templateImports ++= Seq(
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(scoverageSettings)
   .settings(
     scalafmtOnCompile := true,
