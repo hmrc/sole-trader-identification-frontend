@@ -148,7 +148,7 @@ check-your-answers.tax_identifier_country                   = Y wlad a gyhoeddod
 ## Details Not Found Page
 details-not-found-page.title                                = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
 details-not-found-page.heading                              = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
-details-not-found-page.line_1                               = Nid oeddem yn gallu paru’r manylion a nodoch gyda’r cofnodion sydd gan CThEM.
+details-not-found-page.line_1                               = Nid oeddem yn gallu paru’r manylion a nodoch gyda’r cofnodion sydd gan CThEF.
 details-not-found-page.line_2                               = Os gwnaethoch ddefnyddio’r manylion anghywir, gallwch
 details-not-found-page.link_2                               = roi cynnig arall arni gan ddefnyddio manylion gwahanol.
 details-not-found-page.line_3                               = Os gwnaethoch ddefnyddio’r manylion cywir, ni allwch barhau i gofrestru i ddefnyddio’r gwasanaeth ar-lein hwn.
@@ -161,13 +161,13 @@ details-not-found-page.line_4.4                             = waeth beth fo’r 
 ## Details Did Not Match
 details-did-not-match-page.title                            = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
 details-did-not-match-page.heading                          = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
-details-did-not-match-page.line_1                           = Nid oeddem yn gallu paru’r manylion a nodoch gyda’r cofnodion sydd gan CThEM.
+details-did-not-match-page.line_1                           = Nid oeddem yn gallu paru’r manylion a nodoch gyda’r cofnodion sydd gan CThEF.
 details-did-not-match-page.line_2                           = Ni allwch barhau i gofrestru i ddefnyddio’r gwasanaeth ar-lein hwn.
 details-did-not-match-page.sign_out                         = Allgofnodi
 
 ## Cannot Confirm Business Error Page
-cannot-confirm-business.title                               = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEM
-cannot-confirm-business.heading                             = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEM
+cannot-confirm-business.title                               = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
+cannot-confirm-business.heading                             = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
 cannot-confirm-business.line_1                              = Os yw’r manylion hyn yn gywir, gallwch gofrestru o hyd. Os gwnaethoch nodi’r manylion anghywir, ewch yn ôl i wneud newidiadau.
 cannot-confirm-business.radio                               = A hoffech barhau i gofrestru gyda’r manylion a roesoch?
 
