@@ -41,7 +41,9 @@ object WiremockHelper extends Eventually with IntegrationPatience {
       case Some(body) => uriMapping.withRequestBody(equalTo(body))
       case None       => uriMapping
     }
-    verify(postRequest)
+    eventually {
+      verify(postRequest)
+    }
   }
 
   def verifyGet(uri: String): Unit = {
