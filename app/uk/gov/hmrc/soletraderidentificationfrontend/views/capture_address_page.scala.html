@@ -33,7 +33,7 @@
         select: GovukSelect
 )
 
-@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call,  form: Form[Address], countries: Seq[Country])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call,  form: Form[Address], countries: Seq[Country])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("enter-address.title", form)) {
 
@@ -100,8 +100,7 @@
                     selected = code == form("country").value.getOrElse(""),
                     attributes = Map("id" -> s"country-$code")
                 )
-            },
-            formGroupClasses = "form-field-group"
+            }
             ))
 
         <script src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>

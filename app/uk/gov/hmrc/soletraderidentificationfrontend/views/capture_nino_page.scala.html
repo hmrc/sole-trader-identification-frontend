@@ -33,7 +33,7 @@
         inputText: inputText,
         errorSummary: errorSummary)
 
-@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String], noNinoJourneyEnabled: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String], noNinoJourneyEnabled: Boolean)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("enter-nino.title", form)) {
 

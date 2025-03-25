@@ -17,18 +17,19 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
-import play.api.libs.json.{JsObject, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateNinoIVJourneyConnector.{NinoIVHttpReads, NinoIVJourneyCreationResponse}
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateNinoIVJourneyConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class CreateNinoIVJourneyConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createNinoIdentityVerificationJourney(journeyId: String, nino: String, journeyConfig: JourneyConfig)(implicit
     hc: HeaderCarrier
@@ -64,12 +65,11 @@ class CreateNinoIVJourneyConnector @Inject() (http: HttpClient, appConfig: AppCo
         )
       )
 
-    http.POST[JsObject, NinoIVJourneyCreationResponse](appConfig.createNinoIVJourneyUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      NinoIVHttpReads,
-      hc,
-      ec
-    )
+    httpClient
+      .post(url = url"${appConfig.createNinoIVJourneyUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[NinoIVJourneyCreationResponse](NinoIVHttpReads, ec)
+
   }
 
 }

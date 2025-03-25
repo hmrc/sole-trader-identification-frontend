@@ -17,18 +17,19 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
-import play.api.libs.json.{JsObject, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateBusinessVerificationJourneyConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class CreateBusinessVerificationJourneyConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createBusinessVerificationJourney(journeyId: String, sautr: String, journeyConfig: JourneyConfig)(implicit
     hc: HeaderCarrier
@@ -56,12 +57,11 @@ class CreateBusinessVerificationJourneyConnector @Inject() (http: HttpClient, ap
         "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId
       )
 
-    http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      BusinessVerificationHttpReads,
-      hc,
-      ec
-    )
+    httpClient
+      .post(url = url"${appConfig.createBusinessVerificationJourneyUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[BusinessVerificationJourneyCreationResponse](BusinessVerificationHttpReads, ec)
+
   }
 
 }

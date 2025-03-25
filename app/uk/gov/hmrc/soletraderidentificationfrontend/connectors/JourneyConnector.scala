@@ -20,16 +20,15 @@ import play.api.http.Status.CREATED
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateJourneyHttpParser.CreateJourneyHttpReads
-
+import uk.gov.hmrc.http.client.HttpClientV2
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateJourneyConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class CreateJourneyConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createJourney()(implicit hc: HeaderCarrier): Future[String] =
-    httpClient.POSTEmpty[String](appConfig.createJourneyUrl)(CreateJourneyHttpReads, hc, ec)
-
+    httpClient.post(url = url"${appConfig.createJourneyUrl}")(hc).execute[String](CreateJourneyHttpReads, ec)
 }
 
 object CreateJourneyHttpParser {

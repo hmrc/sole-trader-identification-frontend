@@ -17,18 +17,19 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.CREATED
-import play.api.libs.json.{JsObject, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateTrnHttpParser.CreateTrnHttpReads
 import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, FullName}
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateTrnConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class CreateTrnConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createTrn(dateOfBirth: LocalDate, fullName: FullName, address: Address)(implicit hc: HeaderCarrier): Future[String] = {
 
@@ -38,12 +39,11 @@ class CreateTrnConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig
       "address"     -> address
     )
 
-    httpClient.POST[JsObject, String](appConfig.createTrnUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      CreateTrnHttpReads,
-      hc,
-      ec
-    )
+    httpClient
+      .post(url = url"${appConfig.createTrnUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[String](CreateTrnHttpReads, ec)
+
   }
 }
 

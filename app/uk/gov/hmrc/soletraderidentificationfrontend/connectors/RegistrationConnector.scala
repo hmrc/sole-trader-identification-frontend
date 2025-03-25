@@ -17,17 +17,18 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.OK
-import play.api.libs.json.{JsObject, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.RegistrationHttpParser.RegistrationHttpReads
 import uk.gov.hmrc.soletraderidentificationfrontend.models.RegistrationStatus
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RegistrationConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class RegistrationConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def registerWithNino(nino: String, optSautr: Option[String], regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
 
@@ -45,12 +46,11 @@ class RegistrationConnector @Inject() (httpClient: HttpClient, appConfig: AppCon
       "soleTrader" -> detailsJson
     )
 
-    httpClient.POST[JsObject, RegistrationStatus](appConfig.registerUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      RegistrationHttpReads,
-      hc,
-      ec
-    )
+    httpClient
+      .post(url = url"${appConfig.registerUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[RegistrationStatus](RegistrationHttpReads, ec)
+
   }
 
   def registerWithTrn(temporaryReferenceNumber: String, sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
@@ -61,12 +61,11 @@ class RegistrationConnector @Inject() (httpClient: HttpClient, appConfig: AppCon
       "regime" -> regime
     )
 
-    httpClient.POST[JsObject, RegistrationStatus](appConfig.registerWithTrnUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      RegistrationHttpReads,
-      hc,
-      ec
-    )
+    httpClient
+      .post(url = url"${appConfig.registerWithTrnUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[RegistrationStatus](RegistrationHttpReads, ec)
+
   }
 
 }

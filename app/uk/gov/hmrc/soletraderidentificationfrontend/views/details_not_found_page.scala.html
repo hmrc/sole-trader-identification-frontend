@@ -27,7 +27,7 @@
       link: link,
       formWithCSRF: FormWithCSRF)
 
-@(pageConfig: PageConfig, redirectLocation: Call, journeyId: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, redirectLocation: Call, journeyId: String)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("details-not-found-page.title")) {
 
