@@ -32,7 +32,7 @@
         errorSummary: errorSummary
 )
 
-@(pageConfig: PageConfig, formAction: Call, form: Form[_], label: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, formAction: Call, form: Form[_], label: String)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title(label, form)) {
 

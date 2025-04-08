@@ -20,7 +20,8 @@ import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json, Writes}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.soletraderidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
@@ -31,7 +32,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class TestCreateJourneyConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def createSoleTraderJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] =
     postTo(destination = apiRoutes.JourneyController.createSoleTraderJourney(), journeyConfig = journeyConfig)
@@ -41,12 +42,16 @@ class TestCreateJourneyConnector @Inject() (httpClient: HttpClient, appConfig: A
 
   private def postTo(destination: Call, journeyConfig: JourneyConfig)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[String] = {
     val destinationUrl = appConfig.selfBaseUrl + destination.url
-    httpClient.POST(url = destinationUrl, body = journeyConfig).map {
+
+    httpClient.post(url"$destinationUrl").withBody(Json.toJson(journeyConfig)).execute[HttpResponse].map {
       case response @ HttpResponse(CREATED, _, _) =>
         (response.json \ "journeyStartUrl").as[String]
       case response =>
-        throw new InternalServerException(s"Invalid response from $destinationUrl: Status: ${response.status} Body: ${response.body}")
+        throw new InternalServerException(
+          s"Invalid response from Destination : ${destination.url}  Status : ${response.status} Body : ${response.body}"
+        )
     }
+
   }
 
 }

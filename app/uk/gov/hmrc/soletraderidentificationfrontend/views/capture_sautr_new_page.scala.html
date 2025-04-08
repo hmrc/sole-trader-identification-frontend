@@ -38,7 +38,7 @@
     errorSummary: errorSummary
 )
 
-@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[Option[String]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[Option[String]])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("new-sa-utr.title", form)) {
 

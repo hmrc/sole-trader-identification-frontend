@@ -17,18 +17,19 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderVerificationResultHttpParser.SoleTraderVerificationResultReads
 import uk.gov.hmrc.soletraderidentificationfrontend.models.IndividualDetails
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.AuthenticatorResponse
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.time.format.DateTimeFormatter.ofPattern
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuthenticatorConnector @Inject() (httpClient: HttpClient, appConfig: AppConfig)(implicit executionContext: ExecutionContext) {
+class AuthenticatorConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit executionContext: ExecutionContext) {
 
   def matchSoleTraderDetails(authenticatorDetails: IndividualDetails)(implicit hc: HeaderCarrier): Future[AuthenticatorResponse] = {
     val nino = authenticatorDetails.optNino match {
@@ -43,6 +44,6 @@ class AuthenticatorConnector @Inject() (httpClient: HttpClient, appConfig: AppCo
       "nino"        -> nino
     )
 
-    httpClient.POST(appConfig.matchSoleTraderDetailsUrl, jsonBody)
+    httpClient.post(url = url"${appConfig.matchSoleTraderDetailsUrl}")(hc).withBody(jsonBody).execute
   }
 }

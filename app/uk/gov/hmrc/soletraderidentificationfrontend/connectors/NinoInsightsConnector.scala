@@ -17,27 +17,28 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.OK
-import play.api.libs.json.{JsError, JsObject, JsSuccess, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.NinoInsightsHttpParser.NinoInsightsHttpReads
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NinoInsightsConnector @Inject() (http: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class NinoInsightsConnector @Inject() (httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveNinoInsights(nino: String)(implicit hc: HeaderCarrier): Future[JsObject] = {
     val jsonBody = Json.obj(
       "nino" -> nino
     )
-    http.POST[JsObject, JsObject](appConfig.insightsUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      NinoInsightsHttpReads,
-      hc,
-      ec
-    )
+
+    httpClient
+      .post(url = url"${appConfig.insightsUrl}")(hc)
+      .withBody(jsonBody)
+      .execute[JsObject](NinoInsightsHttpReads, ec)
+
   }
 
 }
