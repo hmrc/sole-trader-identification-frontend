@@ -153,8 +153,10 @@ object MessageLookup {
 
   object CaptureSaPostcode {
 
-    val title = "What is the postcode used to register the business for Self Assessment? - Test Service - GOV.UK"
-    val heading = "What is the postcode used to register the business for Self Assessment?"
+    val title = "The postcode used to register the business for Self Assessment - Test Service - GOV.UK"
+    val heading = "The postcode used to register the business for Self Assessment"
+    val p1 = "The postcode you enter must match our records. For example, this postcode was used to register the business for Self Assessment."
+    val label = "Enter the Self Assessment postcode"
     val hint = "For example, AB1 2YZ"
     val no_postcodeLink = "The business does not have a Self Assessment postcode"
 
