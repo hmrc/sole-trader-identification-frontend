@@ -57,19 +57,16 @@ trait CaptureSautrViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have the correct first line" in {
+    "render page content correctly" in {
       doc.getParagraphs.get(1).text mustBe messages.line_1
-    }
-
-    "have a correct details element" in {
-      doc.getDetailsSummary mustBe messages.line_2
-      doc.getParagraphs.get(2).text mustBe messages.details_line_1
-      doc.getParagraphs.get(3).text mustBe messages.details_line_2
-      doc.getParagraphs.get(4).text mustBe messages.details_line_3
+      doc.getParagraphs.get(2).text must include(messages.line_2)
+      doc.getLink("no-sautr").text mustBe messages.line_3
+      doc.getLabelElement.text mustBe messages.label
+      doc.getHints.get(0).text mustBe messages.hint
     }
 
     "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {

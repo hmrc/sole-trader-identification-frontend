@@ -21,54 +21,63 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(layout: govuk_template,
         govukInput: GovukInput,
         govukButton: GovukButton,
         formWithCSRF: FormWithCSRF,
+        h1: h1,
         p: p,
         details: details,
         inputText: inputText,
-        errorSummary: errorSummary
-)
+        link: link,
+        errorSummary: errorSummary,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
 
+)
 @(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("sa-utr.title", form)) {
 
     @errorSummary(form.errors)
 
+    @h1(messages("sa-utr.heading_1", firstName))
+
+    @p {@messages("sa-utr.line_1")}
+
+    @p(hmrcNewTabLinkHelper(NewTabLinkHelper(
+        text = messages("sa-utr.line_2"),
+        href = Some("https://www.gov.uk/find-utr-number")
+        ))
+    )
+
+    @p(
+        link(
+            link = routes.CaptureSautrController.noSautr(journeyId).url,
+            messageKey = messages("sa-utr.line_3"),
+            id = Some("no-sautr")
+        ),
+        classes = "govuk-inset-text"
+    )
+
     @formWithCSRF(action = formAction) {
         @inputText(
             form = form,
             id = "sa-utr",
             name = "sa-utr",
-            label = messages("sa-utr.heading", firstName),
-            isPageHeading = true,
-            hint = Some(Html(s"""<p class="govuk-body">${messages("sa-utr.line_1")}</p>""")),
-            classes = "govuk-input--width-20"
-        )
-
-        @details(
-            summary = messages("sa-utr.line_2"),
-            content = hiddenContent
+            label = messages("sa-utr.label"),
+            isPageHeading = false,
+            hasFieldTitle = true,
+            hint = Some(Html(messages("sa-utr.hint"))),
+            classes = "govuk-input--width-10"
         )
 
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
-
-}
-
-@hiddenContent = {
-    @p { @messages("sa-utr.details.line_1") }
-    <p>
-        <a class="govuk-link" id="lost-sautr" href="https://www.gov.uk/find-lost-utr-number">@messages("sa-utr.details.line_2")</a>
-    </p>
-    <p>
-        <a class="govuk-link" id="no-sautr" href="@routes.CaptureSautrController.noSautr(journeyId)">@messages("sa-utr.details.line_3")</a>
-    </p>
 }
