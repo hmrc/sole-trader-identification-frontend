@@ -57,6 +57,14 @@ trait CaptureSaPostcodeViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
+    "have the correct paragraph" in {
+      doc.getParagraphs.eq(1).text mustBe messages.p1
+    }
+
+    "have the correct label text" in {
+      doc.getLabelElement.text() mustBe messages.label
+    }
+
     "have the correct hint text" in {
       doc.getElementById("saPostcode-hint").text mustBe messages.hint
     }
@@ -65,8 +73,8 @@ trait CaptureSaPostcodeViewTests {
       doc.getElementById("no-sa-postcode").text() mustBe messages.no_postcodeLink
     }
 
-    "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {

@@ -105,8 +105,10 @@ new-sautr.label                                             = Cyfeirnod Unigryw 
 new-sautr.no-selection                                      = Dewiswch ‘Iawn’ os oes Cyfeirnod Unigryw y Trethdalwr
 
 ## SA Postcode Page
-sa-postcode.title                                           = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad?
-sa-postcode.heading                                         = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad?
+sa-postcode.title                                           = Y cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad
+sa-postcode.heading                                         = Y cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad
+sa-postcode.p1                                              = Mae’n rhaid i’r cod post rydych yn ei nodi gyd-fynd â’n cofnodion. Er enghraifft, defnyddiwyd y cod post hwn i gofrestru’r busnes ar gyfer Hunanasesiad.
+sa-postcode.label                                           = Nodwch y cod post Hunanasesiad
 sa-postcode.hint                                            = Er enghraifft, AB1 2YZ
 sa-postcode.no.postcodeLink                                 = Nid oes gan y busnes god post Hunanasesiad
 sa-postcode.invalid.format.error                            = Nodwch y cod post yn y fformat cywir

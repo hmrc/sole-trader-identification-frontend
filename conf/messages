@@ -91,8 +91,10 @@ new-sautr.label                                             = Unique Taxpayer Re
 new-sautr.no-selection                                      = Select yes if there is a Unique Taxpayer Reference
 
 ## SA Postcode Page
-sa-postcode.title                                            = What is the postcode used to register the business for Self Assessment?
-sa-postcode.heading                                          = What is the postcode used to register the business for Self Assessment?
+sa-postcode.title                                            = The postcode used to register the business for Self Assessment
+sa-postcode.heading                                          = The postcode used to register the business for Self Assessment
+sa-postcode.p1                                               = The postcode you enter must match our records. For example, this postcode was used to register the business for Self Assessment.
+sa-postcode.label                                            = Enter the Self Assessment postcode
 sa-postcode.hint                                             = For example, AB1 2YZ
 sa-postcode.no.postcodeLink                                  = The business does not have a Self Assessment postcode
 sa-postcode.invalid.format.error                             = Enter the postcode in the correct format
