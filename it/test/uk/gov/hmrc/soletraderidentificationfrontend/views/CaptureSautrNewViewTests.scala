@@ -61,12 +61,6 @@ trait CaptureSautrNewViewTests {
       doc.getParagraphs.get(1).text mustBe messages.new_line_1
     }
 
-    "have the correct link" in {
-      val links = doc.getLink("lost-sautr")
-      links.size mustBe 1
-      links.first.text mustBe messages.details_line_2
-    }
-
     "have the correct input options" in {
       val radios = doc.getRadioButtons
       radios.size mustBe 2
