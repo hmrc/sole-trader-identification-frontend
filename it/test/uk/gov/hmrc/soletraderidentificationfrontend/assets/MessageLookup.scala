@@ -129,13 +129,12 @@ object MessageLookup {
 
   object CaptureSautr {
     val title = "What is applicant’s Unique Taxpayer Reference? - Entity Validation Service - GOV.UK"
-    val heading = s"What is $testFirstName’s Unique Taxpayer Reference?"
-    val line_1 =
-      "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’."
-    val line_2 = "I do not have a Unique Taxpayer Reference"
-    val details_line_1 = "Your UTR helps us identify your business"
-    val details_line_2 = "I cannot find the UTR"
-    val details_line_3 = "The business does not have a UTR"
+    val heading = s"$testFirstName’s Self Assessment Unique Taxpayer Reference (UTR)"
+    val label = "What is your Self Assessment UTR?"
+    val line_1 = "You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."
+    val line_2 = "Get more help to find your UTR (opens in new tab)"
+    val line_3 = "The business does not have a UTR"
+    val hint = "Your UTR must be 10 digits long."
 
     val new_title = "Does the applicant have a Unique Taxpayer Reference? - Entity Validation Service - GOV.UK"
     val new_heading = s"Does $testFirstName have a Unique Taxpayer Reference?"

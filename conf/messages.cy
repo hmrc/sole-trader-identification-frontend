@@ -88,12 +88,12 @@ enter-address.country                                       = Gwlad
 
 ## SA UTR Page
 sa-utr.title                                                = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer yr ymgeisydd?
-sa-utr.heading                                              = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
-sa-utr.line_1                                               = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill ynghylch Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
-sa-utr.line_2                                               = Nid oes gennyf Gyfeirnod Unigryw y Trethdalwr
-sa-utr.details.line_1                                       = Mae’ch UTR yn ein helpu i ddod o hyd i’ch busnes
-sa-utr.details.line_2                                       = Ni allaf ddod o hyd i’r UTR
-sa-utr.details.line_3                                       = Nid oes gan y busnes UTR
+sa-utr.heading_1                                            = Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad {0}
+sa-utr.label                                                = Beth yw’ch UTR ar gyfer Hunanasesiad?
+sa-utr.line_1                                               = Bydd i’w weld yn eich Cyfrif Treth Personol, yn ap CThEF, neu ar Ffurflenni Treth a dogfennau eraill oddi wrth CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+sa-utr.line_2                                               = Rhagor o help i ddod o hyd i’ch UTR
+sa-utr.line_3                                               = Nid oes gan y busnes UTR
+sa-utr.hint                                                 = Mae eich UTR yn rhif 10 digid o hyd.
 sa-utr.incorrect.format.error                               = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y fformat cywir
 sa-utr.not.entered.error                                    = Nodwch Gyfeirnod Unigryw y Trethdalwr
 

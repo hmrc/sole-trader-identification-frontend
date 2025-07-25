@@ -74,12 +74,12 @@ enter-address.country                                       = Country
 
 ## SA-UTR Page
 sa-utr.title                                                = What is applicant’s Unique Taxpayer Reference?
-sa-utr.heading                                              = What is {0}’s Unique Taxpayer Reference?
-sa-utr.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
-sa-utr.line_2                                               = I do not have a Unique Taxpayer Reference
-sa-utr.details.line_1                                       = Your UTR helps us identify your business
-sa-utr.details.line_2                                       = I cannot find the UTR
-sa-utr.details.line_3                                       = The business does not have a UTR
+sa-utr.heading_1                                            = {0}’s Self Assessment Unique Taxpayer Reference (UTR)
+sa-utr.label                                                = What is your Self Assessment UTR?
+sa-utr.line_1                                               = You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+sa-utr.line_2                                               = Get more help to find your UTR
+sa-utr.line_3                                               = The business does not have a UTR
+sa-utr.hint                                                 = Your UTR must be 10 digits long.
 sa-utr.incorrect.format.error                               = Enter the Unique Taxpayer Reference in the correct format
 sa-utr.not.entered.error                                    = Enter the Unique Taxpayer Reference
 
