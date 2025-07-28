@@ -161,8 +161,14 @@ cannot-confirm-business.radio                               = Do you want to con
 
 ## Could not confirm business error page
 could-not-confirm-business.title                            = We could not confirm your business
-could-not-confirm-business.heading                          = We could not confirm your business
-could-not-confirm-business.line_1                           = The information you provided does not match the details we have about your business.
+could-not-confirm-business.line_1                           = We could not match the details you entered with records held by HMRC.
+could-not-confirm-business.line_2                           = This means that some or all of the details you entered were incorrect. If you used the wrong details, you can
+could-not-confirm-business.link_2                           = try again using different details.
+could-not-confirm-business.line_3                           = If you have used the correct details, you can:
+could-not-confirm-business.line_4                           = and tell them there is an issue with your Self Assessment Unique Tax Reference.
+could-not-confirm-business.link_4                           = contact the Self Assessment team
+could-not-confirm-business.line_5                           = if your details do not match our records.
+could-not-confirm-business.link_5                           = contact our technical support
 
 ## Errors
 error.no_entry_first_name                                   = Enter your first name

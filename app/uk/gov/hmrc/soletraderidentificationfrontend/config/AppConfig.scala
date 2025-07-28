@@ -63,6 +63,10 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val deskProServiceId: String = "grs"
 
+  val technicalHelpUrl: String = s"$contactHost/contact/report-technical-problem?service=$deskProServiceId"
+
+  val saHelpUrl: String = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment"
+
   lazy val defaultServiceName: String = servicesConfig.getString("defaultServiceName")
 
   lazy val defaultWelshServiceName: String = servicesConfig.getString("defaultWelshServiceName")

@@ -1,5 +1,5 @@
 @*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,50 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.soletraderidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 
 @this(layout: govuk_template,
       h1: h1,
-      p: p)
+      p: p,
+      ul: ul,
+      hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+      li: li,
+      link: link)
 
 @(pageConfig: PageConfig, redirectLocation: Call)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("could-not-confirm-business.title")){
 
-    @h1(messages("could-not-confirm-business.heading"))
+    @h1(messages("could-not-confirm-business.title"))<br>
 
     @p{@messages("could-not-confirm-business.line_1")}
 
-    <a id="tryAgain" class="govuk-button" href="@{redirectLocation.url}" role="button" data-module="govuk-button">@messages("base.try_again")</a>
+    @p{
+       @messages("could-not-confirm-business.line_2")
+       @link(redirectLocation.url, messages("could-not-confirm-business.link_2"), Some("base.try_again"))
+    }
+
+    @p{@messages("could-not-confirm-business.line_3")
+
+        @ul() {
+            @li() {
+                @hmrcNewTabLinkHelper(NewTabLinkHelper(
+                    text = messages("could-not-confirm-business.link_4"),
+                    href = Some(appConfig.saHelpUrl)
+                ))
+                @messages("could-not-confirm-business.line_4")
+            }
+            @li() {
+                @hmrcNewTabLinkHelper(NewTabLinkHelper(
+                    text = messages("could-not-confirm-business.link_5"),
+                    href = Some(appConfig.technicalHelpUrl)
+                ))
+                @messages("could-not-confirm-business.line_5")
+            }
+        }
+    }
+
 }

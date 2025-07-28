@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CouldNotConfirmBusiness => messages, Header}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CouldNotConfirmBusiness => messages}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
@@ -64,14 +62,20 @@ trait CouldNotConfirmBusinessErrorViewTests {
       doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have a try again link configured to appear link as a button" in {
-      val links: Elements = doc.getLink("tryAgain")
-      links.size mustBe 1
-      links.first.attr("class") mustBe "govuk-button"
-      links.first.attr("href") mustBe routes.RetryJourneyController.tryAgain(testJourneyId).url
-      links.first.attr("role") mustBe "button"
-      links.first.attr("data-module") mustBe "govuk-button"
-      links.first.text mustBe Base.try_again
+    "have the correct second line" in {
+      doc.getParagraphs.get(2).text mustBe messages.line_2 + messages.link_2
+    }
+
+    "have the correct third line" in {
+      doc.getParagraphs.get(3).text mustBe messages.line_3
+    }
+
+    "have the correct first bullet point" in {
+      doc.getBulletPoints.get(2).text mustBe messages.link_4 + messages.line_4
+    }
+
+    "have the correct second bullet point" in {
+      doc.getBulletPoints.get(3).text mustBe messages.link_5 + messages.line_5
     }
 
     "have the correct technical help link and text" in {
