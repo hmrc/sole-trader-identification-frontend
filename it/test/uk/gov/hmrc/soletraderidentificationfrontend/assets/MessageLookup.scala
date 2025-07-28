@@ -239,7 +239,7 @@ object MessageLookup {
   object CannotConfirmBusiness {
     val title = "The details you provided do not match records held by HMRC - Test Service - GOV.UK"
     val heading = "The details you provided do not match records held by HMRC"
-    val line_1 = "If these details are correct, you can still register. If you entered the wrong details, go back and make changes."
+    val line_1 = "If your details are correct, you can register and continue your journey. If not, go back and make changes."
     val radio = "Do you want to continue registering with the details you provided?"
 
     object Error {
