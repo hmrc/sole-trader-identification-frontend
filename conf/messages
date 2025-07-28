@@ -54,10 +54,13 @@ date-of-birth.field_1_hint                                  = For example, 27 3 
 
 ## Nino Page
 enter-nino.title                                            = What is applicant’s National Insurance number?
-enter-nino.heading                                          = What is {0}’s National Insurance number?
-enter-nino.line_1                                           = It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.
-enter-nino.invalid.format.error                             = Enter the National Insurance number in the correct format
+enter-nino.heading                                          = {0}’s National Insurance number?
+enter-nino.line_1                                           = It’s on your National Insurance card, benefit letter, payslip or P60 - for example, ‘QQ 12 34 56 C’
+enter-nino.line_2                                           = If you have forgotten or lost it, you can get help to
+enter-nino.link                                             = find your National Insurance number (opens in new tab).
+enter-nino.label                                            = Enter the National Insurance number
 enter-nino.no.nino                                          = I do not have a National Insurance number
+enter-nino.invalid.format.error                             = Enter the National Insurance number in the correct format
 enter-nino.not.entered.error                                = Enter the National Insurance number
 
 ## Address Page

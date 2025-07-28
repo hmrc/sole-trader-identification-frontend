@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 
 
 @this(layout: govuk_template,
@@ -31,6 +32,10 @@
         govukButton: GovukButton,
         formWithCSRF: FormWithCSRF,
         inputText: inputText,
+        h1: h1,
+        p: p,
+        link: link,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
         errorSummary: errorSummary)
 
 @(firstName: String, journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String], noNinoJourneyEnabled: Boolean)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
@@ -39,27 +44,41 @@
 
     @errorSummary(form.errors)
 
+    @h1(messages("enter-nino.heading", firstName))
+
+    @p {@messages("enter-nino.line_1")}
+
+    @p(Html(messages("enter-nino.line_2") + " " +
+            s"""<a class="govuk-link" href="https://www.gov.uk/find-national-insurance-number">
+            ${messages("enter-nino.link")}</a>"""
+    ))
+
+    @if(noNinoJourneyEnabled) {
+        @p(
+            link(
+                link = routes.CaptureNinoController.noNino(journeyId).url,
+                messageKey = messages("enter-nino.no.nino"),
+                id = Some("no-nino")
+            ),
+            classes = "govuk-inset-text"
+        )
+    }
+
     @formWithCSRF(action = formAction) {
         @inputText(
             form = form,
             id = "nino",
             name = "nino",
-            label = messages("enter-nino.heading", firstName),
-            isPageHeading = true,
-            hint = Some(Html(s"""<p class="govuk-body">${messages("enter-nino.line_1")}</p>""")),
-            classes = "govuk-input--width-20"
+            label = messages("enter-nino.label"),
+            isPageHeading = false,
+            hasFieldTitle = true,
+            classes = "govuk-input--width-10"
         )
 
-        @if(noNinoJourneyEnabled) {
-            <p class="govuk-body">
-                <a class="govuk-link" id="no-nino" href="@routes.CaptureNinoController.noNino(journeyId)">@messages("enter-nino.no.nino")</a>
-            </p>
-        }
-
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 }
