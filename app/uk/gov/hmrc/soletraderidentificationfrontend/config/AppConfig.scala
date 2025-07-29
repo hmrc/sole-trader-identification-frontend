@@ -103,8 +103,11 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   def registerWithTrnUrl: String = s"$backendUrl/sole-trader-identification/register-trn"
 
-  def ninoTeamUrl: String =
-    "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/national-insurance-enquiries-for-employees-and-individuals"
+  def techSupportUrl: String =
+    "https://www.tax.service.gov.uk/contact/report-technical-problem?_gl=1*5oojv4*_ga*ZmFsc2U.*_ga_Y4LWMWY6WS*MTc0NDEwMjI2NS44NS4xLjE3NDQxMDg4NDEuMC4wLjA"
+
+  def selfAssessmentUrl: String =
+    "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment"
 
   def createTrnUrl: String = s"$backendUrl/sole-trader-identification/get-trn"
 
