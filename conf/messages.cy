@@ -175,8 +175,8 @@ cannot-confirm-business.radio                               = A hoffech barhau i
 
 ## Could not confirm business error page
 could-not-confirm-business.title                            = Doedd dim modd cadarnhau’ch busnes
-could-not-confirm-business.line_1                           = We could not match the details you entered with records held by HMRC.
-could-not-confirm-business.line_2                           = Mae hyn yn golygu bod yr holl fanylion a nodwyd gennych, neu rywfaint ohonynt, yn anghywir.Os ydych wedi defnyddio’r manylion anghywir, gallwch roi cynnig arall arni gan
+could-not-confirm-business.line_1                           = Nid oeddem yn gallu paru’r manylion a nodwyd gennych â’r cofnodion sydd gan CThEF.
+could-not-confirm-business.line_2                           = Mae hyn yn golygu bod yr holl fanylion a nodwyd gennych, neu rywfaint ohonynt, yn anghywir. Os ydych wedi defnyddio’r manylion anghywir, gallwch roi cynnig arall arni gan
 could-not-confirm-business.link_2                           = ddefnyddio manylion gwahanol.
 could-not-confirm-business.line_3                           = Os ydych yn credu eich bod wedi nodi’r manylion cywir, gallwch wneud y canlynol:
 could-not-confirm-business.line_4                           = a rhoi gwybod bod problem gyda’ch Cyfeirnod Unigryw y Trethdalwr ar gyfer Hunanasesiad.

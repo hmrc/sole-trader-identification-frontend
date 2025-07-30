@@ -34,7 +34,7 @@
 
 @layout(pageConfig, title = title("could-not-confirm-business.title")){
 
-    @h1(messages("could-not-confirm-business.title"))<br>
+    @h1(messages("could-not-confirm-business.title"))
 
     @p{@messages("could-not-confirm-business.line_1")}
 
@@ -45,15 +45,15 @@
 
     @p{@messages("could-not-confirm-business.line_3")
 
-        @ul() {
-            @li() {
+        @ul{
+            @li{
                 @hmrcNewTabLinkHelper(NewTabLinkHelper(
                     text = messages("could-not-confirm-business.link_4"),
                     href = Some(appConfig.saHelpUrl)
                 ))
                 @messages("could-not-confirm-business.line_4")
             }
-            @li() {
+            @li{
                 @hmrcNewTabLinkHelper(NewTabLinkHelper(
                     text = messages("could-not-confirm-business.link_5"),
                     href = Some(appConfig.technicalHelpUrl)
