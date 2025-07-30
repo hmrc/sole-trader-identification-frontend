@@ -22,7 +22,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
-
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(layout: govuk_template,
         govUkHeader: GovukHeader,
@@ -46,12 +46,14 @@
 
     @h1(messages("enter-nino.heading", firstName))
 
-    @p {@messages("enter-nino.line_1")}
+    @p(Html(messages("enter-nino.line_1")))
 
-    @p(Html(messages("enter-nino.line_2") + " " +
-            s"""<a class="govuk-link" href="https://www.gov.uk/find-national-insurance-number">
-            ${messages("enter-nino.link")}</a>"""
-    ))
+    @p(Html(messages("enter-nino.line_2") + " " + Html(hmrcNewTabLinkHelper(
+        NewTabLinkHelper(
+            href = Some("https://www.gov.uk/find-national-insurance-number"),
+            text = messages("enter-nino.link"
+        ))) + "."
+    )))
 
     @if(noNinoJourneyEnabled) {
         @p(
