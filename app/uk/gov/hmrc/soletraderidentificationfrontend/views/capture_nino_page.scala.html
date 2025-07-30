@@ -51,8 +51,8 @@
     @p(Html(messages("enter-nino.line_2") + " " + Html(hmrcNewTabLinkHelper(
         NewTabLinkHelper(
             href = Some("https://www.gov.uk/find-national-insurance-number"),
-            text = messages("enter-nino.link"
-        ))) + "."
+            text = messages("enter-nino.link")
+        )) + "."
     )))
 
     @if(noNinoJourneyEnabled) {
