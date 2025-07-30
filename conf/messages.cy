@@ -68,10 +68,13 @@ date-of-birth.field_1_hint                                  = Er enghraifft, 27 
 
 ## Nino Page
 enter-nino.title                                            = Beth yw rhif Yswiriant Gwladol yr ymgeisydd?
-enter-nino.heading                                          = Beth yw rhif Yswiriant Gwladol {0}?
-enter-nino.line_1                                           = Mae hwn ar y cerdyn Yswiriant Gwladol, llythyr ynghylch budd-daliadau, slip cyflog neu P60. Er enghraifft, ‘QQ 12 34 56 C’.
-enter-nino.invalid.format.error                             = Nodwch y rhif Yswiriant Gwladol yn y fformat cywir
+enter-nino.heading                                          = Rhif Yswiriant Gwladol {0}
+enter-nino.line_1                                           = Mae ar eich cerdyn Yswiriant Gwladol, llythyr budd-daliadau, slip cyflog neu P60 - er enghraifft, ‘QQ 12 34 56 C’
+enter-nino.line_2                                           = Os ydych wedi ei anghofio neu ei golli, gallwch gael help i
+enter-nino.link                                             = ddod o hyd i’ch rhif Yswiriant Gwladol
+enter-nino.label                                            = Nodwch y rhif Yswiriant Gwladol
 enter-nino.no.nino                                          = Does dim rhif Yswiriant Gwladol gen i
+enter-nino.invalid.format.error                             = Nodwch y rhif Yswiriant Gwladol yn y fformat cywir
 enter-nino.not.entered.error                                = Nodwch y rhif Yswiriant Gwladol
 
 ## Address Page

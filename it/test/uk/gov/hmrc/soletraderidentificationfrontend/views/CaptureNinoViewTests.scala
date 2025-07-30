@@ -57,12 +57,10 @@ trait CaptureNinoViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have the correct hint text" in {
-      doc.getElementsByClass("govuk-hint").text mustBe messages.line_1
-    }
-
-    "have correct labels in the form" in {
-      doc.getElementById("nino-hint").text mustBe messages.form_field_1
+    "render page content correctly" in {
+      doc.getParagraphs.get(1).text mustBe messages.line_1
+      doc.getParagraphs.get(2).text mustBe messages.line_2
+      doc.getLabelElement.text mustBe messages.label
     }
 
     "not have a link to skip nino question" in {
@@ -70,7 +68,7 @@ trait CaptureNinoViewTests {
     }
 
     "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
@@ -107,20 +105,18 @@ trait CaptureNinoViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have the correct hint text" in {
-      doc.getElementsByClass("govuk-hint").text mustBe messages.line_1
-    }
-
-    "have correct labels in the form" in {
-      doc.getElementById("nino-hint").text mustBe messages.form_field_1
+    "render page content correctly" in {
+      doc.getParagraphs.get(1).text mustBe messages.line_1
+      doc.getParagraphs.get(2).text mustBe messages.line_2
+      doc.getLabelElement.text mustBe messages.label
     }
 
     "have a correct link to skip nino question" in {
-      doc.getElementById("no-nino").text() mustBe messages.no_nino
+      doc.getLink("no-nino").text mustBe messages.no_nino
     }
 
     "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
