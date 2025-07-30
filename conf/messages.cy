@@ -67,7 +67,7 @@ date-of-birth.field_1                                       = Dyddiad geni
 date-of-birth.field_1_hint                                  = Er enghraifft, 27 3 2007
 
 ## Nino Page
-enter-nino.title                                            = What is applicant’s National Insurance number?
+enter-nino.title                                            = Beth yw rhif Yswiriant Gwladol yr ymgeisydd?
 enter-nino.heading                                          = Rhif Yswiriant Gwladol {0}
 enter-nino.line_1                                           = Mae ar eich cerdyn Yswiriant Gwladol, llythyr budd-daliadau, slip cyflog neu P60 - er enghraifft, ‘QQ 12 34 56 C’
 enter-nino.line_2                                           = Os ydych wedi ei anghofio neu ei golli, gallwch gael help i
