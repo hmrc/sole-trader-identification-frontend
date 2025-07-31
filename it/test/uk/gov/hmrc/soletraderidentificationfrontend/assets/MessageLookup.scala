@@ -89,10 +89,11 @@ object MessageLookup {
 
   object CaptureNino {
     val title = s"What is applicant’s National Insurance number? - Entity Validation Service - GOV.UK"
-    val heading = s"What is $testFirstName’s National Insurance number?"
-    val line_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
-    val form_field_1 = "It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’."
+    val heading = s"$testFirstName’s National Insurance number?"
+    val line_1 = "It’s on your National Insurance card, benefit letter, payslip or P60 - for example, ‘QQ 12 34 56 C’"
+    val line_2 = "If you have forgotten or lost it, you can get help to find your National Insurance number (opens in new tab)."
     val no_nino = "I do not have a National Insurance number"
+    val label = "Enter the National Insurance number"
 
     object Error {
       val nino_not_entered = "Enter the National Insurance number"
