@@ -173,7 +173,7 @@ details-did-not-match-page.sign_out                         = Allgofnodi
 ## Cannot Confirm Business Error Page
 cannot-confirm-business.title                               = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
 cannot-confirm-business.heading                             = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
-cannot-confirm-business.line_1                              = Os yw’r manylion hyn yn gywir, gallwch gofrestru o hyd. Os gwnaethoch nodi’r manylion anghywir, ewch yn ôl i wneud newidiadau.
+cannot-confirm-business.line_1                              = Os yw’ch manylion yn gywir, gallwch gofrestru a pharhau â’ch taith. Os nad ydynt yn gywir, ewch yn ôl a gwnewch newidiadau.
 cannot-confirm-business.radio                               = A hoffech barhau i gofrestru gyda’r manylion a roesoch?
 
 ## Could not confirm business error page
