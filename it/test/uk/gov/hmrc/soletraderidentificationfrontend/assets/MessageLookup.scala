@@ -222,10 +222,10 @@ object MessageLookup {
     val line_1 = "We could not match the details you entered with records held by HMRC."
     val line_2 = "This means that some or all of the details you entered were incorrect, you can"
     val link_2 = "try again using different details."
-    val line_3 = "If you have used the correct details, you can:"
-    val line_4 = "contact the Self Assessment team (opens in a new tab) and tell them there is an issue with your Self Assessment Unique Tax Reference."
+    val line_3 = "If you have used the correct details, you can"
+    val line_4 = "and tell them there is an issue with your Self Assessment Unique Tax Reference."
     val link_4 = "contact the Self Assessment team (opens in a new tab)"
-    val line_5 = "contact our technical support (opens in a new tab) if your details do not match our records."
+    val line_5 = "if your details do not match our records."
     val link_5 = "contact our technical support (opens in a new tab)"
   }
 

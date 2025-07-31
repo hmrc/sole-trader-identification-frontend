@@ -139,11 +139,11 @@ details-not-found-page.heading                              = The details you en
 details-not-found-page.line_1                               = We could not match the details you entered with records held by HMRC.
 details-not-found-page.line_2                               = This means that some or all of the details you entered were incorrect, you can
 details-not-found-page.link_2                               = try again using different details.
-details-not-found-page.line_3                               = If you have used the correct details, you can:
-details-not-found-page.line_4.1                             = and tell them there is an issue with your Self Assessment Unique Tax Reference.
-details-not-found-page.link_4                               = contact the Self Assessment team (opens in new tab)
-details-not-found-page.line_4.2                             = if your details do not match our records.
-details-not-found-page.link_5                               = contact our technical support (opens in new tab)
+details-not-found-page.line_3                               = If you have used the correct details, you can
+details-not-found-page.line_4                               = and tell them there is an issue with your Self Assessment Unique Tax Reference.
+details-not-found-page.link_4                               = contact the Self Assessment team (opens in a new tab)
+details-not-found-page.line_5                               = if your details do not match our records.
+details-not-found-page.link_5                               = contact our technical support (opens in a new tab)
 
 ## Details Did Not Match
 details-did-not-match-page.title                            = The details you entered did not match our records

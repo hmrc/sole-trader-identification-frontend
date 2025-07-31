@@ -37,23 +37,22 @@
     @p {@messages("details-not-found-page.line_1")}
 
     @p {@messages("details-not-found-page.line_2")
-        @link(redirectLocation.url, messages("details-not-found-page.link_2"), Some("TryAgain"))
-    }
+        @link(redirectLocation.url,messages("details-not-found-page.link_2"),Some("TryAgain"))
+        }
 
     @p {@messages("details-not-found-page.line_3")}
 
-        <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-            <li>
+        <ul class="govuk-list govuk-list--bullet">
+            <li class="govuk-list--item">
             <p class="govuk-body">
-                <a href="@appConfig.selfAssessmentUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@messages("details-not-found-page.link_4")</a> @messages("details-not-found-page.line_4.1") </p>
+                <a href="@appConfig.selfAssessmentUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" id="selfassessmenturl" >@messages("details-not-found-page.link_4")</a>@messages("details-not-found-page.line_4")</p>
             </li>
-            <li>
+            <li class="govuk-list--item">
             <p class="govuk-body">
-                <a href="@appConfig.techSupportUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@messages("details-not-found-page.link_5")</a> @messages("details-not-found-page.line_4.2") </p>
+                <a href="@appConfig.techSupportUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" id="techsupporturl">@messages("details-not-found-page.link_5")</a>@messages("details-not-found-page.line_5")</p>
             </li>
         </ul>
-
-}
+    }
 
 
 
