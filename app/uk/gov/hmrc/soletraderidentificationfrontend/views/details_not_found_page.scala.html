@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 
+
 @this(layout: govuk_template,
       h1: h1,
       p: p,
@@ -32,23 +33,29 @@
 @layout(pageConfig, title = title("details-not-found-page.title")) {
 
     @h1(messages("details-not-found-page.heading"))
-
+    <br>
     @p {@messages("details-not-found-page.line_1")}
 
     @p {@messages("details-not-found-page.line_2")
         @link(redirectLocation.url, messages("details-not-found-page.link_2"), Some("TryAgain"))
-    }
+        }
 
     @p {@messages("details-not-found-page.line_3")}
 
-    @p {@messages("details-not-found-page.line_4.1")
-        <a class='govuk-link' href="@appConfig.ninoTeamUrl" id="ninoTeam" target="_blank">@messages("details-not-found-page.link_4")</a>
-        @messages("details-not-found-page.line_4.2")
-        <strong>@messages("details-not-found-page.line_4.3")</strong>
-        @messages("details-not-found-page.line_4.4")
+        <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+            <li class="govuk-list--item">
+                <a href="@appConfig.selfAssessmentUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" id="selfassessmenturl" > @messages("details-not-found-page.link_4")
+                </a>
+                @messages("details-not-found-page.line_4")
+            </li>
+            <li class="govuk-list--item">
+                <a href="@appConfig.techSupportUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" id="techsupporturl">
+                    @messages("details-not-found-page.link_5")
+                </a>
+                @messages("details-not-found-page.line_5")
+            </li>
+        </ul>
     }
-
-}
 
 
 

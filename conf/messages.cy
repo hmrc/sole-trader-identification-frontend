@@ -154,14 +154,14 @@ check-your-answers.tax_identifier_country                   = Y wlad a gyhoeddod
 details-not-found-page.title                                = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
 details-not-found-page.heading                              = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion
 details-not-found-page.line_1                               = Nid oeddem yn gallu paru’r manylion a nodoch gyda’r cofnodion sydd gan CThEF.
-details-not-found-page.line_2                               = Os gwnaethoch ddefnyddio’r manylion anghywir, gallwch
-details-not-found-page.link_2                               = roi cynnig arall arni gan ddefnyddio manylion gwahanol.
-details-not-found-page.line_3                               = Os gwnaethoch ddefnyddio’r manylion cywir, ni allwch barhau i gofrestru i ddefnyddio’r gwasanaeth ar-lein hwn.
-details-not-found-page.line_4.1                             = Mae angen
-details-not-found-page.link_4                               = i chi gysylltu â’r Tîm Yswiriant Gwladol (yn agor tab newydd)
-details-not-found-page.line_4.2                             = ac
-details-not-found-page.line_4.3                             = esbonio bod problem gyda’ch rhif Yswiriant Gwladol,
-details-not-found-page.line_4.4                             = waeth beth fo’r gyfundrefn dreth a ddefnyddiwch.
+details-not-found-page.line_2                               = Mae hyn yn golygu bod yr holl fanylion a nodwyd gennych, neu rywfaint ohonynt, yn anghywir.Os ydych wedi defnyddio’r manylion anghywir, gallwch roi cynnig arall arni gan
+details-not-found-page.link_2                               = ddefnyddio manylion gwahanol.
+details-not-found-page.line_3                               = Os ydych yn credu eich bod wedi nodi’r manylion cywir, gallwch wneud y canlynol:
+details-not-found-page.line_4                               = a rhoi gwybod bod problem gyda’ch Cyfeirnod Unigryw y Trethdalwr ar gyfer Hunanasesiad.
+details-not-found-page.link_4                               = cysylltu â’r tîm Hunanasesu (yn agor tab newydd)
+details-not-found-page.line_5                               = os nad yw’ch manylion yn cyd-fynd â’n cofnodion.
+details-not-found-page.link_5                               = cysylltu â’n tîm cymorth technegol (yn agor tab newydd)
+
 
 ## Details Did Not Match
 details-did-not-match-page.title                            = Nid yw’r manylion a nodwyd gennych yn cyd-fynd â’n cofnodion

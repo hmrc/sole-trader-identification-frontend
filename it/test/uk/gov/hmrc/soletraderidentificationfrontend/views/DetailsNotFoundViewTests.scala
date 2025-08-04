@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, DetailsNotFound => messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, DetailsNotFound => messages}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
@@ -61,7 +61,7 @@ trait DetailsNotFoundViewTests {
       doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have the correct second line" in {
+    "have the correct second line " in {
       doc.getParagraphs.get(2).text mustBe messages.line_2
     }
 
@@ -76,12 +76,13 @@ trait DetailsNotFoundViewTests {
       doc.getParagraphs.get(3).text mustBe messages.line_3
     }
 
-    "have the correct fourth line" in {
-      doc.getParagraphs.get(four).text mustBe messages.line_4
+    "have the correct first bullet point link and text" in {
+      doc.getBulletPoints.get(2).text mustBe messages.link_4 + messages.line_4
     }
 
-    "have the correct link text for contacting Nino Team" in {
-      doc.getLink(id = "ninoTeam").text mustBe messages.link_4
+    "have the correct second bullet point link and text" in {
+      doc.getBulletPoints.get(3).text mustBe messages.link_5 + messages.line_5
     }
+
   }
 }
