@@ -16,6 +16,9 @@
 
 @this()
 
-@(msg: String)
+@(content: Html, className: String = "govuk-list--item")
 
-<h1 class="govuk-heading-xl">@msg</h1>
+<li class="govuk-list--item">
+ @content
+</li>
+

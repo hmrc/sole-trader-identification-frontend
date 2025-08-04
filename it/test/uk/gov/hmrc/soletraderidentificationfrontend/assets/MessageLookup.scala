@@ -252,7 +252,14 @@ object MessageLookup {
   object CouldNotConfirmBusiness {
     val title = "We could not confirm your business - Entity Validation Service - GOV.UK"
     val heading = "We could not confirm your business"
-    val line_1 = "The information you provided does not match the details we have about your business."
+    val line_1 = "We could not match the details you entered with records held by HMRC."
+    val line_2 = "This means that some or all of the details you entered were incorrect. If you used the wrong details, you can "
+    val link_2 = "try again using different details."
+    val line_3 = "If you have used the correct details, you can:"
+    val line_4 = "and tell them there is an issue with your Self Assessment Unique Tax Reference."
+    val link_4 = "contact the Self Assessment team (opens in new tab) "
+    val line_5 = "if your details do not match our records."
+    val link_5 = "contact our technical support (opens in new tab) "
   }
 
   object CheckYourAnswers {
