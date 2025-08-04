@@ -31,7 +31,7 @@ object MessageLookup {
     val back = "Back"
     val try_again = "Try again"
 
-    val technicalDifficultiesTitle = "Sorry, there is a problem with the service - 500"
+    val technicalDifficultiesTitle = "Sorry, there is a problem with the service"
     val technicalDifficultiesHeading = "Sorry, there is a problem with the service"
 
     object Error {

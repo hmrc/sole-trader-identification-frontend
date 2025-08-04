@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
+@import views.html.helper.CSPNonce
 
 @this(layout: govuk_template,
         h1: h1,
@@ -103,8 +104,8 @@
             }
             ))
 
-        <script src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>
-        <script>
+        <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>
+        <script @{CSPNonce.attr}>
             accessibleAutocomplete.enhanceSelectElement({
                 selectElement: document.getElementById("country"),
                 name: 'countryAutocomplete',

@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.soletraderidentificationfrontend.models.Country
+@import views.html.helper.CSPNonce
 
 @this(layout: govuk_template,
         govukButton: GovukButton,
@@ -40,7 +41,7 @@
         @select(components.Select(
             id = "country",
             name = "country",
-            label = Label(content = HtmlContent(messages("tax-identifiers-country.heading")), classes = "govuk-label govuk-label--xl"),
+            label = Label(isPageHeading = true, content = HtmlContent(messages("tax-identifiers-country.heading")), classes = "govuk-label--xl"),
             errorMessage = form("country").error.map(fe => ErrorMessage(content = HtmlContent(messages("error.tax_identifier_country")))),
             items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
                 case Country(code, name) => SelectItem(
@@ -52,8 +53,8 @@
             }
         ))
 
-        <script src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>
-        <script>
+        <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")'></script>
+        <script @{CSPNonce.attr}>
                 accessibleAutocomplete.enhanceSelectElement({
                     selectElement: document.getElementById("country"),
                     name: 'countryAutocomplete',
