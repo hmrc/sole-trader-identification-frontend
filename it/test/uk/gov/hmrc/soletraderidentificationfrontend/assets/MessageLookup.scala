@@ -220,13 +220,13 @@ object MessageLookup {
     val title = "The details you entered did not match our records - Entity Validation Service - GOV.UK"
     val heading = "The details you entered did not match our records"
     val line_1 = "We could not match the details you entered with records held by HMRC."
-    val line_2 = "This means that some or all of the details you entered were incorrect, you can"
+    val line_2 = "This means that some or all of the details you entered were incorrect, you can try again using different details."
     val link_2 = "try again using different details."
     val line_3 = "If you have used the correct details, you can"
     val line_4 = "and tell them there is an issue with your Self Assessment Unique Tax Reference."
-    val link_4 = "contact the Self Assessment team (opens in a new tab)"
+    val link_4 = "contact the Self Assessment team (opens in a new tab) "
     val line_5 = "if your details do not match our records."
-    val link_5 = "contact our technical support (opens in a new tab)"
+    val link_5 = "contact our technical support (opens in a new tab) "
   }
 
   object DetailsDidNotMatch {

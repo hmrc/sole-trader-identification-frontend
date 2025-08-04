@@ -58,22 +58,29 @@ trait DetailsNotFoundViewTests {
     }
 
     "have the correct first line" in {
-      doc.getParagraphs.get(3).text mustBe messages.line_1
+      doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have the correct second line" in {
-      doc.getParagraphs.get(4).text mustBe messages.line_2 + " " + messages.link_2
+    "have the correct second line " in {
+      doc.getParagraphs.get(2).text mustBe messages.line_2
+    }
+
+    "have the correct link to try again" in {
+      val links: Elements = doc.getLink(id = "TryAgain")
+      links.size mustBe 1
+      links.first.text mustBe messages.link_2
+      links.first.attr("href") mustBe routes.RetryJourneyController.tryAgain(testJourneyId).url
     }
 
     "have the correct third line" in {
-      doc.getParagraphs.get(5).text mustBe messages.line_3
+      doc.getParagraphs.get(3).text mustBe messages.line_3
     }
 
-    "have the correct first bullet point" in {
+    "have the correct first bullet point link and text" in {
       doc.getBulletPoints.get(2).text mustBe messages.link_4 + messages.line_4
     }
 
-    "have the correct second bullet point" in {
+    "have the correct second bullet point link and text" in {
       doc.getBulletPoints.get(3).text mustBe messages.link_5 + messages.line_5
     }
 
