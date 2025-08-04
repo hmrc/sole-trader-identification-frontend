@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
@@ -46,15 +45,21 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
+    @h1(messages("tax-identifier.title"))
+
+    @p(Html(messages("tax-identifier.p1")))
+
+    @p(Html(messages("tax-identifier.inset")), classes = "govuk-inset-text")
+
     @formWithCSRF(action = formAction) {
+
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
-                legend = Some(HmrcPageHeadingLegend(
-                    content = Text(messages("tax-identifier.title")),
+                legend = Some(Legend(
+                    content = Text(messages("tax-identifier.legend")),
+                    classes = "govuk-fieldset__legend--s",
+                    isPageHeading = false
                 ))
-            )),
-            hint = Some(Hint(
-                content = Text(messages("tax-identifier.hint"))
             )),
             name = "tax-identifier-radio",
             items = Seq(
@@ -87,7 +92,7 @@
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 

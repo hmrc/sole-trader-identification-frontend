@@ -80,6 +80,8 @@ object ViewSpecHelper {
 
     def getBanner: Elements = element.getElementsByClass("govuk-phase-banner__text")
 
+    def getAllParagraphText: List[String] = element.getParagraphs.asScala.toList map(_.text())
+
     lazy val getSignOutLink: String = element.select(".hmrc-sign-out-nav__link").attr("href")
 
     lazy val getSignOutText: String = element.select(".hmrc-sign-out-nav__link").text
@@ -95,6 +97,8 @@ object ViewSpecHelper {
     lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
 
     lazy val getHints: Elements = element.getElementsByClass("govuk-hint")
+
+    lazy val getInsetText: Elements = element.getElementsByClass("govuk-inset-text")
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =

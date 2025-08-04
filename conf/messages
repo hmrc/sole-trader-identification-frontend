@@ -104,8 +104,10 @@ sa-postcode.invalid.format.error                             = Enter the postcod
 error.no_entry_sa-postcode                                   = Enter the postcode used to register the business for Self Assessment
 
 ## Overseas Tax Identifier Page
-tax-identifier.title                                         = Does the business have an overseas tax identifier?
-tax-identifier.hint                                          = This may help us identify the business. It could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify the business details.
+tax-identifier.title                                         = Your overseas tax identifier
+tax-identifier.p1                                            = You can provide any identifier that can be used to verify the business, like a VAT registration number or a Employee Identification Number (EIN).
+tax-identifier.inset                                         = It can help us to identify the business, you do not need to provide an overseas tax identifier if you don’t have one.
+tax-identifier.legend                                        = Does the business have an overseas tax identifier?
 tax-identifier.field_1                                       = Overseas tax identifier
 error.no_tax_identifiers_selection                           = Select yes if the business has an overseas tax identifier
 error.no_tax_identifiers                                     = Enter the overseas tax identifier

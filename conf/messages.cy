@@ -118,8 +118,10 @@ sa-postcode.invalid.format.error                            = Nodwch y cod post 
 error.no_entry_sa-postcode                                  = Nodwch y cod post a ddefnyddiwyd i gofrestru’r busnes ar gyfer Hunanasesiad
 
 ## Overseas Tax Identifier Page
-tax-identifier.title                                        = Oes gan y busnes ddynodydd treth tramor?
-tax-identifier.hint                                         = Gallai hyn ein helpu i wybod pa fusnes sydd dan sylw. Gallai hyn fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio i gadarnhau manylion y busnes.
+tax-identifier.title                                        = Eich dynodydd treth tramor
+tax-identifier.p1                                           = Gallwch ddarparu unrhyw ddynodydd y gellir ei ddefnyddio i ddilysu’r busnes, er enghraifft rhif cofrestru TAW neu Rif Adnabod y Cyflogai (EIN).
+tax-identifier.inset                                        = Gall ein helpu i adnabod eich busnes, nid oes rhaid i chi ddarparu dynodydd treth tramor os nad oes gennych un.
+tax-identifier.legend                                       = A oes gan y busnes ddynodydd treth tramor?
 tax-identifier.field_1                                      = Dynodydd treth tramor
 error.no_tax_identifiers_selection                          = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
 error.no_tax_identifiers                                    = Nodwch y dynodydd treth tramor
