@@ -40,7 +40,7 @@
         @select(components.Select(
             id = "country",
             name = "country",
-            label = Label(content = HtmlContent(messages("tax-identifiers-country.heading")), classes = "govuk-label govuk-label--xl"),
+            label = Label(isPageHeading = true, content = HtmlContent(messages("tax-identifiers-country.heading")), classes = "govuk-label--xl"),
             errorMessage = form("country").error.map(fe => ErrorMessage(content = HtmlContent(messages("error.tax_identifier_country")))),
             items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
                 case Country(code, name) => SelectItem(
