@@ -19,7 +19,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatest.matchers.{HavePropertyMatchResult, HavePropertyMatcher}
-
 import scala.jdk.CollectionConverters._
 
 object ViewSpecHelper {
@@ -79,8 +78,6 @@ object ViewSpecHelper {
     def getSummaryListChangeText: String = element.select("dd.govuk-summary-list__actions > a").text
 
     def getBanner: Elements = element.getElementsByClass("govuk-phase-banner__text")
-
-    def getAllParagraphText: List[String] = element.getParagraphs.asScala.toList map(_.text())
 
     lazy val getSignOutLink: String = element.select(".hmrc-sign-out-nav__link").attr("href")
 

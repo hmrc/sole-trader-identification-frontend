@@ -105,7 +105,7 @@ error.no_entry_sa-postcode                                   = Enter the postcod
 
 ## Overseas Tax Identifier Page
 tax-identifier.title                                         = Your overseas tax identifier
-tax-identifier.p1                                            = You can provide any identifier that can be used to verify the business, like a VAT registration number or a Employee Identification Number (EIN).
+tax-identifier.p1                                            = You can provide any identifier that can be used to verify the business, like a VAT registration number or an Employee Identification Number (EIN).
 tax-identifier.inset                                         = It can help us to identify the business, you do not need to provide an overseas tax identifier if you don’t have one.
 tax-identifier.legend                                        = Does the business have an overseas tax identifier?
 tax-identifier.field_1                                       = Overseas tax identifier

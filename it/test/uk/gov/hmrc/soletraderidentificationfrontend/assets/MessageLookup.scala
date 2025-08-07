@@ -191,7 +191,7 @@ object MessageLookup {
 
     val title = "Your overseas tax identifier"
     val paragraph1 =
-      "You can provide any identifier that can be used to verify the business, like a VAT registration number or a Employee Identification Number (EIN)."
+      "You can provide any identifier that can be used to verify the business, like a VAT registration number or an Employee Identification Number (EIN)."
 
     val insetText = "It can help us to identify the business, you do not need to provide an overseas tax identifier if you don’t have one."
     val legendText = "Does the business have an overseas tax identifier?"

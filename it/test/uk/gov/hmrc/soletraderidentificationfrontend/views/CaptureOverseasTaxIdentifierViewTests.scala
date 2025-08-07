@@ -67,8 +67,7 @@ trait CaptureOverseasTaxIdentifierViewTests {
     }
 
     "have the correct paragraph text" in {
-      val paragraphText = doc.getAllParagraphText
-      paragraphText must contain (messages.paragraph1)
+      doc.getParagraphs.get(1).text() mustBe messages.paragraph1
     }
 
     "have the correct inset text" in {
