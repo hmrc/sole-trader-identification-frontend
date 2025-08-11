@@ -114,7 +114,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a continue and confirm button" in {
-        doc.getSubmitButton.text mustBe Base.confirmAndContinue
+        doc.getSubmitButton.text mustBe Base.continue
       }
     }
 
@@ -196,7 +196,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a continue and confirm button" in {
-        doc.getSubmitButton.text mustBe Base.confirmAndContinue
+        doc.getSubmitButton.text mustBe Base.continue
       }
     }
 
@@ -323,7 +323,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a continue and confirm button" in {
-        doc.getSubmitButton.text mustBe Base.confirmAndContinue
+        doc.getSubmitButton.text mustBe Base.continue
       }
     }
 
@@ -441,7 +441,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a continue and confirm button" in {
-        doc.getSubmitButton.text mustBe Base.confirmAndContinue
+        doc.getSubmitButton.text mustBe Base.continue
       }
     }
 
@@ -523,7 +523,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a continue and confirm button" in {
-        doc.getSubmitButton.text mustBe Base.confirmAndContinue
+        doc.getSubmitButton.text mustBe Base.continue
       }
     }
 

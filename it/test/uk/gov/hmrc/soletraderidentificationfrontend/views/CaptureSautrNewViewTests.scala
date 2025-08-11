@@ -71,7 +71,7 @@ trait CaptureSautrNewViewTests {
     }
 
     "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
