@@ -23,7 +23,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureOverseasTaxIdentifier => messages, Header}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureOverseasTaxIdentifier => messages}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 
 trait CaptureOverseasTaxIdentifierViewTests {
@@ -52,7 +52,6 @@ trait CaptureOverseasTaxIdentifierViewTests {
 
     "have the correct title" in {
       doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
-
     }
 
     "have a back link" in {
@@ -67,16 +66,26 @@ trait CaptureOverseasTaxIdentifierViewTests {
       doc.getH1Elements.text mustBe messages.title
     }
 
-    "have the correct hint text" in {
-      val hints: Elements = doc.getHints
+    "have the correct paragraph text" in {
+      doc.getParagraphs.get(1).text() mustBe messages.paragraph1
+    }
 
-      hints.size mustBe 1
+    "have the correct inset text" in {
+      val insetElement: Elements = doc.getInsetText
 
-      hints.first.text mustBe messages.hint
+      insetElement.size mustBe 1
+      insetElement.first.text mustBe messages.insetText
+    }
+
+    "have the correct legend text" in {
+      val legendElement: Elements = doc.getLegendElement
+
+      legendElement.size mustBe 1
+      legendElement.first.text mustBe messages.legendText
     }
 
     "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {

@@ -19,7 +19,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.utils
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatest.matchers.{HavePropertyMatchResult, HavePropertyMatcher}
-
 import scala.jdk.CollectionConverters._
 
 object ViewSpecHelper {
@@ -95,6 +94,8 @@ object ViewSpecHelper {
     lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
 
     lazy val getHints: Elements = element.getElementsByClass("govuk-hint")
+
+    lazy val getInsetText: Elements = element.getElementsByClass("govuk-inset-text")
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =
