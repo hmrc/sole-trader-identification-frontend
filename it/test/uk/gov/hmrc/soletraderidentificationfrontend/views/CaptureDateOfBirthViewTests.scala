@@ -87,7 +87,7 @@ trait CaptureDateOfBirthViewTests {
       doc.getElementsByClass("govuk-hint").text() mustBe messages.hint
     }
 
-    "have a save and confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

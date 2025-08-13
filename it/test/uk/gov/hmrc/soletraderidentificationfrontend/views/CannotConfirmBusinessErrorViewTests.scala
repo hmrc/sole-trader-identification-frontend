@@ -67,7 +67,7 @@ trait CannotConfirmBusinessErrorViewTests {
       doc.getLegendElement.first.text() mustBe messages.radio
     }
 
-    "have a confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

@@ -70,7 +70,7 @@ trait CaptureSautrNewViewTests {
       doc.getLabelElement.get(1).text mustBe messages.new_label
     }
 
-    "have a continue and confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

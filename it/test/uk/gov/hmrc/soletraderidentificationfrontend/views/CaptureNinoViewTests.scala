@@ -67,7 +67,7 @@ trait CaptureNinoViewTests {
       doc.getElementsContainingText(messages.no_nino).toArray mustBe empty
     }
 
-    "have a save and continue button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 
@@ -115,7 +115,7 @@ trait CaptureNinoViewTests {
       doc.getLink("no-nino").text mustBe messages.no_nino
     }
 
-    "have a save and continue button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

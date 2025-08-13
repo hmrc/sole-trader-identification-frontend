@@ -113,7 +113,7 @@ trait CheckYourAnswersViewTests {
         sautrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.sautr}"
       }
 
-      "have a continue and confirm button" in {
+      "have a continue button" in {
         doc.getSubmitButton.text mustBe Base.continue
       }
     }
@@ -195,7 +195,7 @@ trait CheckYourAnswersViewTests {
         ninoRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.nino}"
       }
 
-      "have a continue and confirm button" in {
+      "have a continue button" in {
         doc.getSubmitButton.text mustBe Base.continue
       }
     }
@@ -322,7 +322,7 @@ trait CheckYourAnswersViewTests {
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifierCountry}"
       }
 
-      "have a continue and confirm button" in {
+      "have a continue button" in {
         doc.getSubmitButton.text mustBe Base.continue
       }
     }
@@ -440,7 +440,7 @@ trait CheckYourAnswersViewTests {
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
 
-      "have a continue and confirm button" in {
+      "have a continue button" in {
         doc.getSubmitButton.text mustBe Base.continue
       }
     }
@@ -522,7 +522,7 @@ trait CheckYourAnswersViewTests {
         ninoRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.nino}"
       }
 
-      "have a continue and confirm button" in {
+      "have a continue button" in {
         doc.getSubmitButton.text mustBe Base.continue
       }
     }

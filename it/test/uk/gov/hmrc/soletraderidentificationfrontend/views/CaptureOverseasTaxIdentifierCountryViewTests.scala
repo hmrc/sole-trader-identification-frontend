@@ -57,7 +57,7 @@ trait CaptureOverseasTaxIdentifierCountryViewTests {
       doc.getLabelElement.text mustBe messages.heading
     }
 
-    "have a save and continue button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

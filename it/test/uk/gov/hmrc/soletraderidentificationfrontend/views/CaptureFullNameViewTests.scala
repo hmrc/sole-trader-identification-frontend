@@ -93,7 +93,7 @@ trait CaptureFullNameViewTests {
       doc.getLabelElement.get(1).text() mustBe messages.form_field_2
     }
 
-    "have a save and confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

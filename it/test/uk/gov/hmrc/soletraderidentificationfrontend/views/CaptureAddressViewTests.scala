@@ -97,7 +97,7 @@ trait CaptureAddressViewTests {
       doc.getHintText mustBe messages.postcode_hint
     }
 
-    "have a save and confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 
