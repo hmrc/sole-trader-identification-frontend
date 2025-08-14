@@ -21,9 +21,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.testFir
 object MessageLookup {
 
   object Base {
-    val confirmAndContinue = "Confirm and continue"
     val change = "Change"
-    val saveAndContinue = "Save and continue"
     val continue = "Continue"
     val getHelp = "Is this page not working properly? (opens in new tab)"
     val yes = "Yes"

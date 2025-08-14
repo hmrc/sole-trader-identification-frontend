@@ -4,9 +4,7 @@ error.summary.title                                         = Mae problem wedi c
 error.title-prefix                                          = ‘Gwall: ’
 
 ## Base
-base.save_and_continue                                      = Cadw ac yn eich blaen
 base.change                                                 = Newid
-base.confirm_and_continue                                   = Cadarnhau ac yn eich blaen
 base.continue                                               = Parhau
 base.back                                                   = Yn ôl
 base.try_again                                              = Rhowch gynnig arall arni
