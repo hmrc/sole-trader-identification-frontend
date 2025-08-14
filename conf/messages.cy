@@ -134,6 +134,7 @@ error.tax_identifier_country                                = Nodwch enw’r wla
 ## Check Your Answers Page
 check-your-answers.title                                    = Gwirio’ch atebion
 check-your-answers.heading                                  = Gwirio’ch atebion
+check-your-answers.uk-details-summary-list.heading          = Manylion yn y DU
 check-your-answers.first_name                               = Enw cyntaf
 check-your-answers.last_name                                = Enw olaf
 check-your-answers.dob                                      = Dyddiad geni
@@ -144,8 +145,8 @@ check-your-answers.no_sautr                                 = Does dim Cyfeirnod
 check-your-answers.no_nino                                  = Does dim rhif Yswiriant Gwladol
 check-your-answers.sa_postcode                              = Cod post Hunanasesiad
 check-your-answers.no_sa_postcode                           = Nid oes gan y busnes god post Hunanasesiad
+check-your-answers.overseas-details-summary-list.heading    = Manylion tramor
 check-your-answers.tax_identifiers                          = Dynodydd treth tramor
-check-your-answers.no_tax-identifiers                       = Dydw i ddim am ddarparu dynodydd
 check-your-answers.tax_identifier                           = Dynodydd treth tramor
 check-your-answers.tax_identifier_yes                       = Iawn, {0}
 check-your-answers.tax_identifier_country                   = Y wlad a gyhoeddodd y dynodydd treth tramor

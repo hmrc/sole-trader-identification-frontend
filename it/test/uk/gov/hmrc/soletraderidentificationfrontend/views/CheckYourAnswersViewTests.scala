@@ -17,7 +17,9 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.views
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
+import org.scalatest.OptionValues
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CheckYourAnswers => messages, Header}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
@@ -29,7 +31,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.Element
 
 import scala.jdk.CollectionConverters._
 
-trait CheckYourAnswersViewTests {
+trait CheckYourAnswersViewTests extends OptionValues {
   this: ComponentSpecHelper =>
 
   def testCheckYourAnswersFullView(result: => WSResponse, journeyId: String): Unit = {
@@ -59,6 +61,19 @@ trait CheckYourAnswersViewTests {
 
     "have the correct heading" in {
       doc.getH1Elements.text mustBe messages.heading
+    }
+
+    "have the UK Details sub-header" in {
+
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+          val h2Elements: Elements = main.getH2Elements
+
+          h2Elements.size mustBe 1
+          h2Elements.first.text mustBe messages.ukDetails
+        case None => fail("Element with id main-content cannot be found")
+      }
+
     }
 
     "have a summary list which" should {
@@ -152,6 +167,19 @@ trait CheckYourAnswersViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
+    "have the UK Details sub-header" in {
+
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+          val h2Elements: Elements = main.getH2Elements
+
+          h2Elements.size mustBe 1
+          h2Elements.first.text mustBe messages.ukDetails
+        case None => fail("Element with id main-content cannot be found")
+      }
+
+    }
+
     "have a summary list which" should {
       lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
 
@@ -234,15 +262,33 @@ trait CheckYourAnswersViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have a summary list which" should {
-      lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
+    "have a UK details sub-header" in {
 
-      "have 9 rows" in {
-        summaryListRows.size mustBe 9
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+          val h2Elements: Elements = main.getH2Elements
+
+          h2Elements.size mustBe 2
+          h2Elements.first.text mustBe messages.ukDetails
+        case None => fail("Element with id main-content cannot be found")
       }
 
+    }
+
+    "have a UK Details summary list which" should {
+      lazy val summaryRowLists: List[Element] = doc.getSummaryRowLists.iterator.asScala.toList
+      lazy val ukDetailsSummaryListRows: Option[List[Element]] = summaryRowLists.headOption.map(_.getSummaryListRows.iterator().asScala.toList)
+
+        "be one of two summary row lists" in {
+          summaryRowLists.size mustBe 2
+        }
+
+        "have 7 rows" in {
+          ukDetailsSummaryListRows.value.size mustBe 7
+        }
+
       "have a first name row" in {
-        val firstNameRow = summaryListRows.head
+        val firstNameRow = ukDetailsSummaryListRows.value.head
 
         firstNameRow.getSummaryListQuestion mustBe messages.firstName
         firstNameRow.getSummaryListAnswer mustBe testFirstName
@@ -251,7 +297,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a last name row" in {
-        val lastNameRow = summaryListRows(1)
+        val lastNameRow = ukDetailsSummaryListRows.value(1)
 
         lastNameRow.getSummaryListQuestion mustBe messages.lastName
         lastNameRow.getSummaryListAnswer mustBe testLastName
@@ -260,7 +306,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a date of birth row" in {
-        val dateOfBirthRow = summaryListRows(2)
+        val dateOfBirthRow = ukDetailsSummaryListRows.value(2)
 
         dateOfBirthRow.getSummaryListQuestion mustBe messages.dob
         dateOfBirthRow.getSummaryListAnswer mustBe testDateOfBirth.format(checkYourAnswersFormat)
@@ -269,7 +315,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a nino row" in {
-        val ninoRow = summaryListRows(3)
+        val ninoRow = ukDetailsSummaryListRows.value(3)
 
         ninoRow.getSummaryListQuestion mustBe messages.nino
         ninoRow.getSummaryListAnswer mustBe messages.noNino
@@ -278,7 +324,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an address row" in {
-        val addressRow = summaryListRows(4)
+        val addressRow = ukDetailsSummaryListRows.value(4)
 
         addressRow.getSummaryListQuestion mustBe messages.address
         addressRow.getSummaryListAnswer mustBe s"$testAddress1 $testAddress2 $testAddress3 $testAddress4 $testAddress5 $testPostcode $testCountryName"
@@ -287,7 +333,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an sautr row" in {
-        val sautrRow = summaryListRows(5)
+        val sautrRow = ukDetailsSummaryListRows.value(5)
 
         sautrRow.getSummaryListQuestion mustBe messages.sautr
         sautrRow.getSummaryListAnswer mustBe testSautr
@@ -296,7 +342,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an sa postcode row" in {
-        val saPostcodeRow = summaryListRows(6)
+        val saPostcodeRow = ukDetailsSummaryListRows.value(6)
 
         saPostcodeRow.getSummaryListQuestion mustBe messages.saPostcode
         saPostcodeRow.getSummaryListAnswer mustBe testSaPostcode
@@ -304,8 +350,33 @@ trait CheckYourAnswersViewTests {
         saPostcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.saPostcode}"
       }
 
-      "have an Overseas tax identifers row" in {
-        val taxIdentifierRow = summaryListRows(7)
+    }
+
+    "have an overseas details sub-header" in {
+
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+
+          val h2Elements = main.getH2Elements
+
+          h2Elements.size mustBe 2
+          h2Elements.last.text mustBe messages.overseasDetails
+
+        case None => fail("Element with id main-content cannot be found")
+      }
+    }
+
+    "have an overseas details summary list which" should {
+      lazy val summaryRowLists: List[Element] = doc.getSummaryRowLists.iterator.asScala.toList
+      lazy val overseasDetailsSummaryListRows: Option[List[Element]] = summaryRowLists.lastOption.map(_.getSummaryListRows.iterator.asScala.toList)
+
+      "have 2 rows" in {
+
+        overseasDetailsSummaryListRows.value.size mustBe 2
+      }
+
+      "have an Overseas tax identifiers row" in {
+        val taxIdentifierRow = overseasDetailsSummaryListRows.value.head
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
         taxIdentifierRow.getSummaryListAnswer mustBe s"Yes, $testOverseasTaxIdentifier"
@@ -313,8 +384,8 @@ trait CheckYourAnswersViewTests {
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
 
-      "have an Overseas tax identifers Country row" in {
-        val taxIdentifierRow = summaryListRows.last
+      "have an Overseas tax identifiers Country row" in {
+        val taxIdentifierRow = overseasDetailsSummaryListRows.value.last
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifierCountry
         taxIdentifierRow.getSummaryListAnswer mustBe "Albania"
@@ -322,9 +393,10 @@ trait CheckYourAnswersViewTests {
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifierCountry}"
       }
 
-      "have a continue button" in {
-        doc.getSubmitButton.text mustBe Base.continue
-      }
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
@@ -361,15 +433,33 @@ trait CheckYourAnswersViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have a summary list which" should {
-      lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
+    "have a UK details sub-header" in {
 
-      "have 8 rows" in {
-        summaryListRows.size mustBe 8
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+          val h2Elements: Elements = main.getH2Elements
+
+          h2Elements.size mustBe 2
+          h2Elements.first.text mustBe messages.ukDetails
+        case None => fail("Element with id main-content cannot be found")
+      }
+
+    }
+
+    "have a UK details summary list which" should {
+      lazy val summaryRowLists: List[Element] = doc.getSummaryRowLists.iterator.asScala.toList
+      lazy val ukDetailsSummaryListRows: Option[List[Element]] = summaryRowLists.headOption.map(_.getSummaryListRows.iterator().asScala.toList)
+
+      "have two summary lists" in {
+        summaryRowLists.size mustBe 2
+      }
+
+      "have 7 rows" in {
+        ukDetailsSummaryListRows.value.size mustBe 7
       }
 
       "have a first name row" in {
-        val firstNameRow = summaryListRows.head
+        val firstNameRow = ukDetailsSummaryListRows.value.head
 
         firstNameRow.getSummaryListQuestion mustBe messages.firstName
         firstNameRow.getSummaryListAnswer mustBe testFirstName
@@ -378,7 +468,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a last name row" in {
-        val lastNameRow = summaryListRows(1)
+        val lastNameRow = ukDetailsSummaryListRows.value(1)
 
         lastNameRow.getSummaryListQuestion mustBe messages.lastName
         lastNameRow.getSummaryListAnswer mustBe testLastName
@@ -387,7 +477,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a date of birth row" in {
-        val dateOfBirthRow = summaryListRows(2)
+        val dateOfBirthRow = ukDetailsSummaryListRows.value(2)
 
         dateOfBirthRow.getSummaryListQuestion mustBe messages.dob
         dateOfBirthRow.getSummaryListAnswer mustBe testDateOfBirth.format(checkYourAnswersFormat)
@@ -396,7 +486,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a nino row" in {
-        val ninoRow = summaryListRows(3)
+        val ninoRow = ukDetailsSummaryListRows.value(3)
 
         ninoRow.getSummaryListQuestion mustBe messages.nino
         ninoRow.getSummaryListAnswer mustBe messages.noNino
@@ -405,7 +495,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an address row" in {
-        val addressRow = summaryListRows(4)
+        val addressRow = ukDetailsSummaryListRows.value(4)
 
         addressRow.getSummaryListQuestion mustBe messages.address
         addressRow.getSummaryListAnswer mustBe s"$testAddress1 $testAddress2 $testAddress3 $testAddress4 $testAddress5 $testPostcode $testCountryName"
@@ -414,7 +504,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an sautr row" in {
-        val sautrRow = summaryListRows(5)
+        val sautrRow = ukDetailsSummaryListRows.value(5)
 
         sautrRow.getSummaryListQuestion mustBe messages.sautr
         sautrRow.getSummaryListAnswer mustBe testSautr
@@ -423,7 +513,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have an sa postcode row" in {
-        val saPostcodeRow = summaryListRows(6)
+        val saPostcodeRow = ukDetailsSummaryListRows.value(6)
 
         saPostcodeRow.getSummaryListQuestion mustBe messages.saPostcode
         saPostcodeRow.getSummaryListAnswer mustBe testSaPostcode
@@ -431,8 +521,33 @@ trait CheckYourAnswersViewTests {
         saPostcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.saPostcode}"
       }
 
+    }
+
+    "have an overseas details sub-header" in {
+
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+
+          val h2Elements = main.getH2Elements
+
+          h2Elements.size mustBe 2
+          h2Elements.last.text mustBe messages.overseasDetails
+
+        case None => fail("Element with id main-content cannot be found")
+      }
+    }
+
+    "have an overseas details summary list which" should {
+      lazy val summaryRowLists: List[Element] = doc.getSummaryRowLists.iterator.asScala.toList
+      lazy val overseasDetailsSummaryListRows: Option[List[Element]] = summaryRowLists.lastOption.map(_.getSummaryListRows.iterator.asScala.toList)
+
+      "have 1 row" in {
+
+        overseasDetailsSummaryListRows.value.size mustBe 1
+      }
+
       "have an Overseas tax identifers row" in {
-        val taxIdentifierRow = summaryListRows.last
+        val taxIdentifierRow = overseasDetailsSummaryListRows.value.last
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
         taxIdentifierRow.getSummaryListAnswer mustBe Base.no
@@ -440,9 +555,10 @@ trait CheckYourAnswersViewTests {
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
 
-      "have a continue button" in {
-        doc.getSubmitButton.text mustBe Base.continue
-      }
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
@@ -479,15 +595,33 @@ trait CheckYourAnswersViewTests {
       doc.getH1Elements.text mustBe messages.heading
     }
 
-    "have a summary list which" should {
-      lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
+    "have a UK details sub-header" in {
+
+      doc.getNullableElementById("main-content") match {
+        case Some(main) =>
+          val h2Elements: Elements = main.getH2Elements
+
+          h2Elements.size mustBe 1
+          h2Elements.first.text mustBe messages.ukDetails
+        case None => fail("Element with id main-content cannot be found")
+      }
+
+    }
+
+    "have a UK details summary list which" should {
+      lazy val summaryRowLists: List[Element] = doc.getSummaryRowLists.iterator.asScala.toList
+      lazy val ukDetailsSummaryListRows: Option[List[Element]] = summaryRowLists.headOption.map(_.getSummaryListRows.iterator().asScala.toList)
+
+      "be the only summary list displayed" in {
+        summaryRowLists.size mustBe 1
+      }
 
       "have 4 rows" in {
-        summaryListRows.size mustBe 4
+        ukDetailsSummaryListRows.value.size mustBe 4
       }
 
       "have a first name row" in {
-        val firstNameRow = summaryListRows.head
+        val firstNameRow = ukDetailsSummaryListRows.value.head
 
         firstNameRow.getSummaryListQuestion mustBe messages.firstName
         firstNameRow.getSummaryListAnswer mustBe testFirstName
@@ -496,7 +630,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a last name row" in {
-        val lastNameRow = summaryListRows(1)
+        val lastNameRow = ukDetailsSummaryListRows.value(1)
 
         lastNameRow.getSummaryListQuestion mustBe messages.lastName
         lastNameRow.getSummaryListAnswer mustBe testLastName
@@ -505,7 +639,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a date of birth row" in {
-        val dateOfBirthRow = summaryListRows(2)
+        val dateOfBirthRow = ukDetailsSummaryListRows.value(2)
 
         dateOfBirthRow.getSummaryListQuestion mustBe messages.dob
         dateOfBirthRow.getSummaryListAnswer mustBe testDateOfBirth.format(checkYourAnswersFormat)
@@ -514,7 +648,7 @@ trait CheckYourAnswersViewTests {
       }
 
       "have a nino row" in {
-        val ninoRow = summaryListRows(3)
+        val ninoRow = ukDetailsSummaryListRows.value(3)
 
         ninoRow.getSummaryListQuestion mustBe messages.nino
         ninoRow.getSummaryListAnswer mustBe messages.noNino
@@ -522,9 +656,10 @@ trait CheckYourAnswersViewTests {
         ninoRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.nino}"
       }
 
-      "have a continue button" in {
-        doc.getSubmitButton.text mustBe Base.continue
-      }
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.text mustBe Base.continue
     }
 
     "have the correct technical help link and text" in {
