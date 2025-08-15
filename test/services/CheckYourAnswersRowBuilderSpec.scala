@@ -246,7 +246,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
   ).flatten.mkString("<br>")
 
   val testAddressRow = SummaryListRow(
-    key   = Key(content = Text("Home Address")),
+    key   = Key(content = Text("Home address")),
     value = Value(content = HtmlContent(formattedAddress)),
     actions = Some(
       Actions(items =
@@ -254,7 +254,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           ActionItem(
             href               = routes.CaptureAddressController.show(testJourneyId).url,
             content            = Text("Change"),
-            visuallyHiddenText = Some("Home Address")
+            visuallyHiddenText = Some("Home address")
           )
         )
       )

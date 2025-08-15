@@ -274,7 +274,7 @@ object MessageLookup {
     val dob = "Date of birth"
     val nino = "National Insurance number"
     val sautr = "Unique Taxpayer Reference (UTR)"
-    val address = "Home Address"
+    val address = "Home address"
     val noSautr = "There is no UTR"
     val noNino = "There is no National Insurance number"
     val saPostcode = "Self Assessment postcode"
