@@ -267,6 +267,8 @@ object MessageLookup {
   object CheckYourAnswers {
     val title = "Check your answers - Entity Validation Service - GOV.UK"
     val heading = "Check your answers"
+    val ukDetails = "UK details"
+    val overseasDetails ="Overseas details"
     val firstName = "First name"
     val lastName = "Last name"
     val dob = "Date of birth"

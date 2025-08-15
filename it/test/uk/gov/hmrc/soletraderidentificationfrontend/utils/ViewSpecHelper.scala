@@ -55,9 +55,13 @@ object ViewSpecHelper {
 
     lazy val getForm: Elements = element.select("form")
 
+    lazy val getSummaryRowLists: Elements = element.getElementsByClass("govuk-summary-list")
+
     lazy val getSummaryListRows: Elements = element.getElementsByClass("govuk-summary-list__row")
 
     lazy val getRadioButtons: Elements = element.getElementsByClass("govuk-radios__input")
+
+    def getNullableElementById(id: String): Option[Element] = Option(element.getElementById(id))
 
     def getSpan(id: String): Elements = element.select(s"""span[id=$id]""")
 

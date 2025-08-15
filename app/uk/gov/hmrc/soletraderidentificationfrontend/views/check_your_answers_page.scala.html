@@ -17,28 +17,40 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.soletraderidentificationfrontend.models.PageConfig
-@import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers.h1
+@import uk.gov.hmrc.soletraderidentificationfrontend.views.html.helpers.{h1, h2}
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 @import uk.gov.hmrc.soletraderidentificationfrontend.views.helpers.TitleHelper.title
 
 @this(layout: govuk_template,
         h1: h1,
+        h2: h2,
         govUkHeader: GovukHeader,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
         formWithCSRF: FormWithCSRF)
 
-@(pageConfig: PageConfig, formAction: Call, summaryRows: Seq[SummaryListRow])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, formAction: Call, ukDetailsSummaryRows: Seq[SummaryListRow], overseasDetailsSummaryRows: Seq[SummaryListRow])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("check-your-answers.title")) {
 
     @h1(messages("check-your-answers.heading"))
 
+    @h2(messages("check-your-answers.uk-details-summary-list.heading"))
+
     @govukSummaryList(SummaryList(
         classes = "govuk-!-margin-bottom-9",
-        rows = summaryRows
+        rows = ukDetailsSummaryRows
     ))
+
+    @if(!overseasDetailsSummaryRows.isEmpty){
+      @h2(messages("check-your-answers.overseas-details-summary-list.heading"))
+
+      @govukSummaryList(SummaryList(
+          classes = "govuk-!-margin-bottom-9",
+          rows = overseasDetailsSummaryRows
+      ))
+    }
 
     @formWithCSRF(action = formAction) {
         @govukButton(Button(

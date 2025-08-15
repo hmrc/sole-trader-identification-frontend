@@ -215,7 +215,10 @@ class SoleTraderMatchingServiceSpec
 
             verifyRetrieveKnownFacts(testSautr)
             verifyStoreIdentifiersMatch(testJourneyId, NinoNotDeclaredButFound)
-            reset(mockRetrieveKnownFactsConnector, mockSoleTraderIdentificationService)
+
+            // Reset mock classes separately to suppress compiler warning
+            reset(mockRetrieveKnownFactsConnector)
+            reset(mockSoleTraderIdentificationService)
           }
         }
       }

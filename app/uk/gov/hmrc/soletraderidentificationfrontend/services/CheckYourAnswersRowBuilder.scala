@@ -33,14 +33,12 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class CheckYourAnswersRowBuilder @Inject() () {
 
-  def buildSummaryListRows(journeyId: String,
-                           individualDetails: IndividualDetails,
-                           optAddress: Option[Address],
-                           optSaPostcode: Option[String],
-                           optOverseasTaxId: Option[String],
-                           optOverseasTaxIdCountry: Option[String],
-                           enableSautrCheck: Boolean
-                          )(implicit messages: Messages, config: AppConfig): Seq[SummaryListRow] = {
+  def buildUKDetailsSummaryListRows(journeyId: String,
+                                    individualDetails: IndividualDetails,
+                                    optAddress: Option[Address],
+                                    optSaPostcode: Option[String],
+                                    enableSautrCheck: Boolean
+                                   )(implicit messages: Messages, config: AppConfig): Seq[SummaryListRow] = {
 
     val firstNameRow = buildSummaryRow(
       messages("check-your-answers.first_name"),
@@ -99,20 +97,6 @@ class CheckYourAnswersRowBuilder @Inject() () {
       None
     }
 
-    val overseasTaxIdRow: Seq[Aliases.SummaryListRow] =
-      if (individualDetails.optNino.isEmpty && enableSautrCheck) {
-        (optOverseasTaxId, optOverseasTaxIdCountry) match {
-
-          case (Some(overseasTaxId), Some(overseasCountry)) =>
-            Seq(
-              createOverseasTaxIdProvidedRow(journeyId, overseasTaxId),
-              createOverseasTaxIdCountryRow(journeyId, overseasCountry)
-            )
-          case (None, None) => Seq(createOverseasTaxIdNotProvidedRow(journeyId))
-          case _            => throw new InternalServerException("Error: Invalid tax identifier and country")
-        }
-      } else Seq()
-
     val addressRow = optAddress.map { address =>
       val formattedAddress = Seq(
         Some(address.line1),
@@ -131,9 +115,28 @@ class CheckYourAnswersRowBuilder @Inject() () {
       )
     }
 
-    Seq(firstNameRow, lastNameRow, dateOfBirthRow, ninoRow) ++ addressRow ++ sautrRow ++ saPostcodeRow ++ overseasTaxIdRow
+    Seq(firstNameRow, lastNameRow, dateOfBirthRow, ninoRow) ++ addressRow ++ sautrRow ++ saPostcodeRow
 
   }
+
+  def buildOverseasDetailsSummaryListRows(journeyId: String,
+                                          individualDetails: IndividualDetails,
+                                          enableSautrCheck: Boolean,
+                                          optOverseasTaxId: Option[String],
+                                          optOverseasTaxIdCountry: Option[String]
+                                         )(implicit messages: Messages, config: AppConfig): Seq[Aliases.SummaryListRow] =
+    if (individualDetails.optNino.isEmpty && enableSautrCheck) {
+      (optOverseasTaxId, optOverseasTaxIdCountry) match {
+
+        case (Some(overseasTaxId), Some(overseasCountry)) =>
+          Seq(
+            createOverseasTaxIdProvidedRow(journeyId, overseasTaxId),
+            createOverseasTaxIdCountryRow(journeyId, overseasCountry)
+          )
+        case (None, None) => Seq(createOverseasTaxIdNotProvidedRow(journeyId))
+        case _            => throw new InternalServerException("Error: Invalid tax identifier and country")
+      }
+    } else Seq()
 
   private def buildSummaryRow(key: String, value: String, changeLink: Call)(implicit messages: Messages) = SummaryListRow(
     key   = Key(content = Text(key)),

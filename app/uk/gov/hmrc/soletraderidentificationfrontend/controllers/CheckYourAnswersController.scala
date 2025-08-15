@@ -61,22 +61,28 @@ class CheckYourAnswersController @Inject() (mcc: MessagesControllerComponents,
           optSaPostcode           <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
           optOverseasTaxId        <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
           optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
-          summaryRows = rowBuilder.buildSummaryListRows(journeyId,
-                                                        individualDetails,
-                                                        optAddress,
-                                                        optSaPostcode,
-                                                        optOverseasTaxId,
-                                                        optOverseasTaxIdCountry,
-                                                        journeyConfig.pageConfig.enableSautrCheck
-                                                       )
+
+          ukDetailsSummaryRows = rowBuilder.buildUKDetailsSummaryListRows(journeyId,
+                                                                          individualDetails,
+                                                                          optAddress,
+                                                                          optSaPostcode,
+                                                                          journeyConfig.pageConfig.enableSautrCheck
+                                                                         )
+          overseasDetailsSummaryRows = rowBuilder.buildOverseasDetailsSummaryListRows(journeyId,
+                                                                                      individualDetails,
+                                                                                      journeyConfig.pageConfig.enableSautrCheck,
+                                                                                      optOverseasTaxId,
+                                                                                      optOverseasTaxIdCountry
+                                                                                     )
         } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
           Ok(
             view(
-              pageConfig  = journeyConfig.pageConfig,
-              formAction  = routes.CheckYourAnswersController.submit(journeyId),
-              summaryRows = summaryRows
+              pageConfig                 = journeyConfig.pageConfig,
+              formAction                 = routes.CheckYourAnswersController.submit(journeyId),
+              ukDetailsSummaryRows       = ukDetailsSummaryRows,
+              overseasDetailsSummaryRows = overseasDetailsSummaryRows
             )
           )
         }
