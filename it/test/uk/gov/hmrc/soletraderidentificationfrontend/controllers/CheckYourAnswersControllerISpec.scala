@@ -18,7 +18,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import play.api.Application
-import play.api.http.Status.FORBIDDEN
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsString, Json}

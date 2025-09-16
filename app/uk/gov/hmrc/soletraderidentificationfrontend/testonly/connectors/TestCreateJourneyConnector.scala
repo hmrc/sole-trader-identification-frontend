@@ -18,6 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors
 
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2

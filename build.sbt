@@ -20,14 +20,14 @@ lazy val scoverageSettings = {
   )
   Seq(
     ScoverageKeys.coverageExcludedPackages := exclusionList.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 90,
+    ScoverageKeys.coverageMinimumStmtTotal := 80, // Reduce threshold owing to changes to Scala compiler
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true
   )
 }
 
 ThisBuild / majorVersion := 1
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.6"
 
 Test / Keys.fork := true
 Test / javaOptions += "-Dlogger.resource=logback-test.xml"
@@ -45,10 +45,14 @@ lazy val microservice = Project(appName, file("."))
     scalafmtOnCompile := true,
     libraryDependencies ++= AppDependencies(),
     PlayKeys.playDefaultPort := 9717,
-    // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
-    // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
+    // Configure Scala compiler to suppress warnings
+    scalacOptions ++= Seq(
+      "-Wconf:msg=Flag.*repeatedly:s",
+      "-Wconf:src=routes/.*&msg=unused import:silent",
+      "-Wconf:src=routes/.*&msg=unused private member:silent",
+      "-Wconf:msg=unused import&src=html/.*:s"
+      //scalacOptions += "-explain" Useful new compiler feature for Scala 3
+    )
   )
 
 lazy val it = project
@@ -56,3 +60,9 @@ lazy val it = project
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
   .settings(DefaultBuildSettings.itSettings())
   .settings(libraryDependencies ++= AppDependencies.it)
+  .settings(
+    scalacOptions ++= Seq(
+      "-Wconf:msg=Flag.*repeatedly:s"
+      //"-explain"
+    )
+  )

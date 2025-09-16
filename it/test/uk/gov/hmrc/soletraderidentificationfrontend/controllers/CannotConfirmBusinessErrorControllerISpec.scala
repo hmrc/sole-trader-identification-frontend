@@ -143,5 +143,26 @@ class CannotConfirmBusinessErrorControllerISpec
         )
       }
     }
+
+    "the user submits an invalid answer" should {
+      "return a status of bad request" in {
+        lazy val result = {
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig = testIndividualJourneyConfig
+            )
+          )
+
+          stubAuth(OK, successfulAuthResponse())
+
+          post(s"/identify-your-sole-trader-business/$testJourneyId/cannot-confirm-business")(
+            "yes_no" -> "")
+        }
+
+        result.status mustBe BAD_REQUEST
+      }
+    }
   }
 }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.NinoInsightsHttpParser.NinoInsightsHttpReads

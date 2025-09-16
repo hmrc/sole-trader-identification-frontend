@@ -18,7 +18,6 @@ package uk.gov.hmrc.soletraderidentificationfrontend.api.controllers
 
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.{TableFor1, Tables}
-import play.api.http.Status.CREATED
 import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
@@ -107,6 +106,30 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
                 result.status must be(CREATED)
 
                 journeyConfigRepository.drop
+
+              }
+            }
+          }
+        }
+      }
+    }
+
+    "respond with Internal server error" when {
+      "the user's authorisation data does not contain an internal id" in {
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
+          {
+
+            forAll(incomingUrlJsonKeyScenarios) { (incomingUrlJsonKey: String) =>
+
+              {
+
+                stubAuth(OK, successfulAuthResponse() - "internalId")
+
+                val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj(incomingUrlJsonKey -> "https://localhost:9000/some/url")
+
+                lazy val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
+
+                result.status must be(INTERNAL_SERVER_ERROR)
 
               }
             }

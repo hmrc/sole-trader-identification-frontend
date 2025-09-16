@@ -63,7 +63,7 @@ class CaptureFullNameForm {
       mapping(
         "first-name" -> optText.toTrimmedText.verifying(firstNameNotEntered andThen firstNameInvalid),
         "last-name"  -> optText.toTrimmedText.verifying(lastNameNotEntered andThen lastNameInvalid)
-      )(FullName.apply)(FullName.unapply)
+      )(FullName.apply)(fullName => Some(Tuple.fromProductTyped(fullName)))
     )
   }
 

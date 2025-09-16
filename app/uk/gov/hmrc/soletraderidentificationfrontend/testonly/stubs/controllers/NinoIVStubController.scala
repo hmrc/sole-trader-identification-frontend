@@ -17,17 +17,19 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.testonly.stubs.controllers
 
 import play.api.libs.json.{JsObject, JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, InjectedController}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, InjectedController}
 
 import java.util.UUID
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NinoIVStubController extends InjectedController {
+class NinoIVStubController @Inject() (controllerComponents: ControllerComponents) extends InjectedController {
 
   private val origin = "vat"
   private val businessVerificationJourneyId = UUID.randomUUID.toString
+
+  setControllerComponents(controllerComponents)
 
   def createNinoIVJourney: Action[JsValue] = Action.async(parse.json) { implicit request =>
     val jsonBody = for {

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
@@ -28,13 +29,14 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
 
 @Singleton
 class SoleTraderIdentificationConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveSoleTraderDetails[DataType](journeyId: String, dataKey: String)(implicit
     dataTypeReads: Reads[DataType],
-    manifest: Manifest[DataType],
+    classTag: ClassTag[DataType],
     hc: HeaderCarrier
   ): Future[Option[DataType]] =
     http.get(url = url"${appConfig.soleTraderIdentificationUrl(journeyId)}/$dataKey")(hc).execute[Option[DataType]]

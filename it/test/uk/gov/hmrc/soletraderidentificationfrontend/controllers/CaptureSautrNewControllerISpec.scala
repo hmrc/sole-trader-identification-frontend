@@ -182,6 +182,58 @@ class CaptureSautrNewControllerISpec extends ComponentSpecHelper with CaptureSau
       testCaptureSautrErrorMessages(result)
     }
 
+    "the user answers that they have a nino but do not have a SA UTR" should {
+      lazy val result = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          )
+        )
+
+        stubAuth(OK, successfulAuthResponse())
+        stubRemoveSautr(testJourneyId)(NO_CONTENT)
+        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
+        stubRetrieveNino(testJourneyId)(OK, testNino)
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "No")
+      }
+
+      "redirect the user to the check your answers page" in {
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+        )
+      }
+    }
+
+    "the user answers that they have neither a nino nor a SA UTR" should {
+      lazy val result = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          )
+        )
+
+        stubAuth(OK, successfulAuthResponse())
+        stubRemoveSautr(testJourneyId)(NO_CONTENT)
+        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
+        stubRetrieveNino(testJourneyId)(NOT_FOUND)
+
+        post(s"/identify-your-sole-trader-business/$testJourneyId/unique-taxpayer-reference-radio-buttons")("optSautr" -> "No")
+      }
+
+      "redirect the user to the overseas tax identifier page" in {
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
+        )
+      }
+    }
+
     "no radio option is submitted" should {
       lazy val result = {
         await(

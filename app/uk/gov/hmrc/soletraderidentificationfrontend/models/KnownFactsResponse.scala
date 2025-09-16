@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
 case class KnownFactsResponse(postcode: Option[String], isAbroad: Option[Boolean], nino: Option[String])
@@ -37,7 +37,7 @@ object KnownFactsResponse {
     (JsPath \ PostcodeKey).writeNullable[String] and
       (JsPath \ IsAbroadKey).writeNullable[Boolean] and
       (JsPath \ NinoKey).writeNullable[String]
-  )(unlift(KnownFactsResponse.unapply))
+  )(knownFactsResponse => Tuple.fromProductTyped(knownFactsResponse))
 
   val format: OFormat[KnownFactsResponse] = OFormat(reads, writes)
 
