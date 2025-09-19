@@ -108,7 +108,7 @@ object CaptureAddressForm {
         addressLine5Key -> optional(optText.toTrimmedText.verifying(addressInvalid andThen addressTooManyCharacters)),
         postcodeKey     -> of[Option[String]](postcodeFormatter()),
         countryKey      -> optText.toText.verifying(countryNotEntered)
-      )(Address.apply)(Address.unapply)
+      )(Address.apply)(address => Some(Tuple.fromProductTyped(address)))
     )
   }
 

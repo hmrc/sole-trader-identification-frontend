@@ -50,7 +50,7 @@ object RegistrationStatus {
         case RegistrationFailed(failures) => Json.obj(registrationStatusKey -> RegistrationFailedKey, registrationFailuresKey -> failures)
         case RegistrationNotCalled =>
           Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
-        case _ =>
+        case null =>
           throw new InternalServerException("Invalid registration status")
       }
 

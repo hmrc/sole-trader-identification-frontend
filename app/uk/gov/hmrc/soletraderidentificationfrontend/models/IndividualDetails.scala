@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models
 
-import play.api.libs.functional.syntax.{unlift, _}
+import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
 import java.time.LocalDate
@@ -45,7 +45,7 @@ object IndividualDetails {
       (JsPath \ DateOfBirthKey).write[LocalDate] and
       (JsPath \ NinoKey).writeNullable[String] and
       (JsPath \ SautrKey).writeNullable[String]
-  )(unlift(IndividualDetails.unapply))
+  )(individualDetails => Tuple.fromProductTyped(individualDetails))
 
   val format: OFormat[IndividualDetails] = OFormat(reads, writes)
 

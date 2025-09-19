@@ -18,8 +18,8 @@ package uk.gov.hmrc.soletraderidentificationfrontend.connectors
 
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
-import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.test.Helpers.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, await, defaultAwaitTimeout}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.soletraderidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
@@ -69,6 +69,27 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           result mustBe Left(UserLockedOut)
         }
       }
+      "raise an exception" when {
+        "the business verification service returns an internal server error" in {
+          enable(BusinessVerificationStub)
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(INTERNAL_SERVER_ERROR)
+
+          val result: Exception = intercept[InternalServerException](await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)))
+
+          result.getMessage mustBe s"Business Verification API failed with status: $INTERNAL_SERVER_ERROR"
+        }
+        "the response payload contains an invalid body" in {
+          enable(BusinessVerificationStub)
+          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testSoleTraderJourneyConfig)(
+            CREATED,
+            Json.obj("invalid" -> testContinueUrl)
+          )
+
+          val result: Exception = intercept[InternalServerException](await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)))
+
+          result.getMessage mustBe "Business Verification API returned malformed JSON"
+        }
+      }
     }
     s"the $BusinessVerificationStub feature switch is disabled" should {
       "return the redirectUri and therefore no BV status" when {
@@ -103,6 +124,27 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig))
 
           result mustBe Left(UserLockedOut)
+        }
+        "raise an exception" when {
+          "the business verification service returns an internal server error" in {
+            disable(BusinessVerificationStub)
+            stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(INTERNAL_SERVER_ERROR)
+
+            val result: Exception = intercept[InternalServerException](await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)))
+
+            result.getMessage mustBe s"Business Verification API failed with status: $INTERNAL_SERVER_ERROR"
+          }
+          "the response payload contains an invalid body" in {
+            disable(BusinessVerificationStub)
+            stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testSoleTraderJourneyConfig)(
+              CREATED,
+              Json.obj("invalid" -> testContinueUrl)
+            )
+
+            val result: Exception = intercept[InternalServerException](await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testSoleTraderJourneyConfig)))
+
+            result.getMessage mustBe "Business Verification API returned malformed JSON"
+          }
         }
       }
     }

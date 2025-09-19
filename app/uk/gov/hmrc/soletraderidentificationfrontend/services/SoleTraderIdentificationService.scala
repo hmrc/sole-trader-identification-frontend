@@ -24,7 +24,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.RemoveSoleTrader
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
-import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentificationService._
+import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentificationServiceConstants._
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
@@ -170,7 +170,7 @@ class SoleTraderIdentificationService @Inject() (connector: SoleTraderIdentifica
     connector.removeAllData(journeyId)
 }
 
-object SoleTraderIdentificationService {
+object SoleTraderIdentificationServiceConstants {
   val FullNameKey = "fullName"
   val NinoKey = "nino"
   val SautrKey = "sautr"

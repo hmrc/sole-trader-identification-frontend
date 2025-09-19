@@ -49,7 +49,7 @@ object JourneyLabels {
       (JsPath \ englishLabelsKey \ optServiceNameLabelKey).writeNullable[String] and
       (JsPath \ welshLabelsKey \ optFullNameLabelKey).writeNullable[String] and
       (JsPath \ englishLabelsKey \ optFullNameLabelKey).writeNullable[String]
-  )(unlift(JourneyLabels.unapply))
+  )(journeyLabels => Tuple.fromProductTyped(journeyLabels))
 
   val format: OFormat[JourneyLabels] = OFormat(reads, writes)
 

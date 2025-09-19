@@ -19,7 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.repositories
 import play.api.libs.json._
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.models.JourneyConfig
-import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepository._
+import uk.gov.hmrc.soletraderidentificationfrontend.repositories.JourneyConfigRepositoryHelper._
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import org.mongodb.scala.result.{DeleteResult, InsertOneResult}
@@ -84,7 +84,7 @@ class JourneyConfigRepository @Inject() (mongoComponent: MongoComponent, appConf
 
 }
 
-object JourneyConfigRepository {
+object JourneyConfigRepositoryHelper {
   val JourneyIdKey = "_id"
   val AuthInternalIdKey = "authInternalId"
   val CreationTimestampKey = "creationTimestamp"
