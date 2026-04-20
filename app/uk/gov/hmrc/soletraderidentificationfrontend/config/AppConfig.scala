@@ -43,9 +43,6 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   private lazy val backendUrl: String = servicesConfig.baseUrl("sole-trader-identification")
 
-  val analyticsToken: String = servicesConfig.getString("google-analytics.token")
-  val analyticsHost: String = servicesConfig.getString("google-analytics.host")
-
   def soleTraderIdentificationUrl(journeyId: String): String = s"$backendUrl/sole-trader-identification/journey/$journeyId"
 
   lazy val createJourneyUrl: String = s"$backendUrl/sole-trader-identification/journey"

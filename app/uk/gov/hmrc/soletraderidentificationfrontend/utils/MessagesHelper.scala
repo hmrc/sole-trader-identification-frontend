@@ -34,7 +34,7 @@ object MessagesHelper {
         JourneyLabels.toMap(optEnglishServiceName, optEnglishFullName)
       case Some(JourneyLabels(_, None, _, None)) | None =>
         JourneyLabels.toMap(journeyConfig.pageConfig.optServiceName, journeyConfig.pageConfig.optFullNamePageLabel)
-      case _ => Map.empty
+      case null => Map.empty
     }
 
     val extraWelshTranslations: Map[String, String] = journeyConfig.pageConfig.labels match {
