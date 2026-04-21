@@ -14,13 +14,5 @@
  * limitations under the License.
  *@
 
-@(alternativeText: Option[String] = None, gaEventString: Option[String] = None)(implicit messages: Messages)
-
-@gaEventString match {
- case Some(eventString) => {
-   <input id="continue-button" class="button" type="submit" value="@alternativeText.getOrElse(Messages("base.continue"))" data-journey-click="@eventString" data-journey-target>
- }
- case _ => {
-   <input id="continue-button" class="button" type="submit" value="@alternativeText.getOrElse(Messages("base.continue"))">
- }
-}
+@(alternativeText: Option[String] = None)(implicit messages: Messages)
+<input id="continue-button" class="button" type="submit" value='@alternativeText.getOrElse(messages("base.continue"))'>
