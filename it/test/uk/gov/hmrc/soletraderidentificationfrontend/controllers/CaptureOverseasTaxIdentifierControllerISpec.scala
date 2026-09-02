@@ -17,7 +17,7 @@
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
 import play.api.libs.ws.WSResponse
-import play.api.test.Helpers.{BAD_REQUEST, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{BAD_REQUEST, NOT_FOUND, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.soletraderidentificationfrontend.stubs.{AuthStub, SoleTraderIdentificationStub}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
@@ -42,6 +42,7 @@ class CaptureOverseasTaxIdentifierControllerISpec
           )
         )
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(NOT_FOUND)
         get(s"/identify-your-sole-trader-business/$testJourneyId/overseas-identifier")
       }
 

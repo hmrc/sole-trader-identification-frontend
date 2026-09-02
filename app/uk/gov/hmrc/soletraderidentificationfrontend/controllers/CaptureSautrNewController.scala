@@ -50,6 +50,7 @@ class CaptureSautrNewController @Inject() (mcc: MessagesControllerComponents,
           firstName <- soleTraderIdentificationService
                          .retrieveFullName(journeyId)
                          .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          storedSautr <- soleTraderIdentificationService.retrieveSautr(journeyId)
         } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
@@ -59,7 +60,7 @@ class CaptureSautrNewController @Inject() (mcc: MessagesControllerComponents,
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureSautrNewController.submit(journeyId),
-              form       = CaptureSautrNewForm.form
+              form       = CaptureSautrNewForm.form.fill(storedSautr)
             )
           )
         }

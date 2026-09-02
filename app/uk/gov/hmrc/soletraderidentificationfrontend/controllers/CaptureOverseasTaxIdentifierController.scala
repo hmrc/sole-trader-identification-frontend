@@ -45,14 +45,17 @@ class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerC
   def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(internalId) {
       case Some(authInternalId) =>
-        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+        for {
+          journeyConfig       <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          storedOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
+        } yield {
           implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
           Ok(
             view(
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureOverseasTaxIdentifierController.submit(journeyId),
-              form       = CaptureOverseasTaxIdentifierForm.form
+              form       = storedOverseasTaxId.fold(CaptureOverseasTaxIdentifierForm.form)(id => CaptureOverseasTaxIdentifierForm.form.fill(Some(id)))
             )
           )
         }

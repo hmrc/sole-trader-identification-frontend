@@ -50,6 +50,7 @@ class CaptureDateOfBirthController @Inject() (mcc: MessagesControllerComponents,
           firstName <- soleTraderIdentificationService
                          .retrieveFullName(journeyId)
                          .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          storedDateOfBirth <- soleTraderIdentificationService.retrieveDateOfBirth(journeyId)
         } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
@@ -58,7 +59,7 @@ class CaptureDateOfBirthController @Inject() (mcc: MessagesControllerComponents,
               firstName,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureDateOfBirthController.submit(journeyId),
-              form       = captureDateOfBirthForm()
+              form       = storedDateOfBirth.fold(captureDateOfBirthForm())(captureDateOfBirthForm().fill)
             )
           )
         }

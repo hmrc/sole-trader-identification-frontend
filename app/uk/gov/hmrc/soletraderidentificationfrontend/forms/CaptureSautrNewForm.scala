@@ -52,7 +52,7 @@ object CaptureSautrNewForm {
         case None    => option_no
       }
 
-      Map(key -> stringValue)
+      Map(key -> stringValue) ++ value.map(sautrValueKey -> _)
     }
   }
 

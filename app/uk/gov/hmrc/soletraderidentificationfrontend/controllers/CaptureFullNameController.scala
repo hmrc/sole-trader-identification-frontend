@@ -46,7 +46,10 @@ class CaptureFullNameController @Inject() (mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(internalId) {
       case Some(authInternalId) =>
-        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+        for {
+          journeyConfig  <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          storedFullName <- soleTraderIdentificationService.retrieveFullName(journeyId)
+        } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
 
@@ -54,7 +57,7 @@ class CaptureFullNameController @Inject() (mcc: MessagesControllerComponents,
             view(
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureFullNameController.submit(journeyId),
-              form       = captureFullNameForm.apply(),
+              form       = storedFullName.fold(captureFullNameForm.apply())(captureFullNameForm.apply().fill),
               label      = if (messages.isDefinedAt("optFullNamePageLabel")) messages("optFullNamePageLabel") else messages("full-name.title")
             )
           )

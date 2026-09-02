@@ -47,7 +47,10 @@ class CaptureSaPostcodeController @Inject() (mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(internalId) {
       case Some(authInternalId) =>
-        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+        for {
+          journeyConfig    <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          storedSaPostcode <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
+        } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
           Ok(
@@ -55,7 +58,7 @@ class CaptureSaPostcodeController @Inject() (mcc: MessagesControllerComponents,
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-              form       = CaptureSaPostcodeForm.form
+              form       = storedSaPostcode.fold(CaptureSaPostcodeForm.form)(CaptureSaPostcodeForm.form.fill)
             )
           )
         }

@@ -44,7 +44,10 @@ class CaptureOverseasTaxIdentifierCountryController @Inject() (mcc: MessagesCont
   def show(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(internalId) {
       case Some(authInternalId) =>
-        journeyService.getJourneyConfig(journeyId, authInternalId).map { journeyConfig =>
+        for {
+          journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          storedCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
+        } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
           Ok(
@@ -52,7 +55,7 @@ class CaptureOverseasTaxIdentifierCountryController @Inject() (mcc: MessagesCont
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureOverseasTaxIdentifierCountryController.submit(journeyId),
-              form       = CaptureOverseasTaxIdentifierCountryForm.form,
+              form       = storedCountry.fold(CaptureOverseasTaxIdentifierCountryForm.form)(CaptureOverseasTaxIdentifierCountryForm.form.fill),
               countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
             )
           )

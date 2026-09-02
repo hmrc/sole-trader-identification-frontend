@@ -50,6 +50,7 @@ class CaptureAddressController @Inject() (mcc: MessagesControllerComponents,
           firstName <- soleTraderIdentificationService
                          .retrieveFullName(journeyId)
                          .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          storedAddress <- soleTraderIdentificationService.retrieveAddress(journeyId)
         } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
@@ -59,7 +60,7 @@ class CaptureAddressController @Inject() (mcc: MessagesControllerComponents,
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureAddressController.submit(journeyId),
-              form       = CaptureAddressForm.apply(),
+              form       = storedAddress.fold(CaptureAddressForm.apply())(CaptureAddressForm.apply().fill),
               countries  = config.getOrderedCountryListByLanguage(request.messages.lang.code)
             )
           )

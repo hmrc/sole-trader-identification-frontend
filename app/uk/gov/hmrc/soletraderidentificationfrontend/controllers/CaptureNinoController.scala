@@ -52,6 +52,7 @@ class CaptureNinoController @Inject() (mcc: MessagesControllerComponents,
           firstName <- soleTraderIdentificationService
                          .retrieveFullName(journeyId)
                          .map(optFullName => optFullName.map(_.firstName).getOrElse(throw new IllegalStateException("Full name not found")))
+          storedNino <- soleTraderIdentificationService.retrieveNino(journeyId)
         } yield {
           val remoteMessagesApi = messagesHelper.getRemoteMessagesApi(journeyConfig)
           implicit val messages: Messages = remoteMessagesApi.preferred(request)
@@ -61,7 +62,7 @@ class CaptureNinoController @Inject() (mcc: MessagesControllerComponents,
               journeyId            = journeyId,
               pageConfig           = journeyConfig.pageConfig,
               formAction           = routes.CaptureNinoController.submit(journeyId),
-              form                 = CaptureNinoForm.form,
+              form                 = storedNino.fold(CaptureNinoForm.form)(CaptureNinoForm.form.fill),
               noNinoJourneyEnabled = isEnabled(EnableNoNinoJourney)
             )
           )
