@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations
 
+import play.api.libs.json.{Format, JsError, JsString, JsSuccess, Reads, Writes}
 import scala.language.implicitConversions
 
 object YesNo extends Enumeration {
@@ -26,4 +27,19 @@ object YesNo extends Enumeration {
   val No: Value = Value("No")
 
   implicit def toString(choice: YesNo.Value): String = choice.toString
+
+  private def fromString(s: String): Option[Value] = YesNo.values.collectFirst { case v if v.toString == s => v }
+
+  implicit val yesNoReads: Reads[YesNo.Value] = Reads {
+    case JsString(s) =>
+      fromString(s) match {
+        case Some(value) => JsSuccess(value)
+        case None        => JsError(s"Unknown enum value : $s")
+      }
+    case _ => JsError(s"String value expected")
+  }
+
+  implicit val yesNoWrites: Writes[YesNo.Value] = Writes(v => JsString(v.toString))
+
+  implicit val format: Format[YesNo.Value] = Format(yesNoReads, yesNoWrites)
 }

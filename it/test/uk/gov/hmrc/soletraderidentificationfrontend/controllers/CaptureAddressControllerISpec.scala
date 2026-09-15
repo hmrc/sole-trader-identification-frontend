@@ -39,6 +39,7 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper with CaptureAddr
       )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+      stubRetrieveAddress(testJourneyId)(status = NOT_FOUND)
 
       get(s"/identify-your-sole-trader-business/$testJourneyId/address")
     }
@@ -49,6 +50,33 @@ class CaptureAddressControllerISpec extends ComponentSpecHelper with CaptureAddr
 
     "return a view which" should {
       testCaptureAddressView(result)
+    }
+
+    "return, given there are stored answers, a view which" should {
+
+      lazy val result = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testSoleTraderJourneyConfig
+          )
+        )
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveAddress(testJourneyId)(status = OK, body = testAddressJson)
+
+        get(s"/identify-your-sole-trader-business/$testJourneyId/address")
+      }
+
+      "return OK" in {
+        result.status mustBe OK
+      }
+
+      "return a view which" should {
+        testCaptureAddressView(result, true)
+      }
+
     }
 
     "redirect to sign in page" when {

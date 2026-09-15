@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.forms.CaptureOverseasTaxIdentifierForm
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.services.{JourneyService, SoleTraderIdentificationService}
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.views.html.capture_overseas_tax_identifier_page
@@ -46,8 +47,8 @@ class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerC
     authorised().retrieve(internalId) {
       case Some(authInternalId) =>
         for {
-          journeyConfig       <- journeyService.getJourneyConfig(journeyId, authInternalId)
-          storedOverseasTaxId <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
+          journeyConfig                   <- journeyService.getJourneyConfig(journeyId, authInternalId)
+          optConfirmOverseasTaxIdentifier <- soleTraderIdentificationService.retrieveConfirmOverseasTaxIdentifier(journeyId)
         } yield {
           implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
           Ok(
@@ -55,7 +56,9 @@ class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerC
               journeyId  = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureOverseasTaxIdentifierController.submit(journeyId),
-              form       = storedOverseasTaxId.fold(CaptureOverseasTaxIdentifierForm.form)(id => CaptureOverseasTaxIdentifierForm.form.fill(Some(id)))
+              form = optConfirmOverseasTaxIdentifier.fold(CaptureOverseasTaxIdentifierForm.form)(confirmOverseasTaxIdentifier =>
+                CaptureOverseasTaxIdentifierForm.form.fill(confirmOverseasTaxIdentifier)
+              )
             )
           )
         }
@@ -82,8 +85,23 @@ class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerC
                   )
                 )
               },
-            {
-              case Some(overseasTaxIdentifier) =>
+            confirmOverseasTaxIdentifier =>
+              confirmOverseasTaxIdentifier.hasOverseasTaxIdentifier match {
+                case YesNo.Yes =>
+                  for {
+                    _ <- soleTraderIdentificationService.storeConfirmOverseasTaxIdentifier(journeyId, confirmOverseasTaxIdentifier)
+                  } yield {
+                    Redirect(routes.CaptureOverseasTaxIdentifierCountryController.show(journeyId))
+                  }
+                case YesNo.No =>
+                  for {
+                    _ <- soleTraderIdentificationService.storeConfirmOverseasTaxIdentifier(journeyId, confirmOverseasTaxIdentifier)
+                  } yield {
+                    Redirect(routes.CheckYourAnswersController.show(journeyId))
+                  }
+              }
+
+            /*case Some(overseasTaxIdentifier) =>
                 for {
                   _ <- soleTraderIdentificationService.storeOverseasTaxIdentifier(journeyId, overseasTaxIdentifier)
                 } yield {
@@ -95,8 +113,7 @@ class CaptureOverseasTaxIdentifierController @Inject() (mcc: MessagesControllerC
                   _ <- soleTraderIdentificationService.removeOverseasTaxIdentifierCountry(journeyId)
                 } yield {
                   Redirect(routes.CheckYourAnswersController.show(journeyId))
-                }
-            }
+                }*/
           )
       case None =>
         throw new InternalServerException("Internal ID could not be retrieved from Auth")

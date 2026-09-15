@@ -19,8 +19,8 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureAddress => messages, Header}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureAddress as messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.*
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -54,7 +54,7 @@ trait CaptureAddressViewTests {
 
   }
 
-  def testCaptureAddressView(result: => WSResponse): Unit = {
+  def testCaptureAddressView(result: => WSResponse, formFill: Boolean = false): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -91,6 +91,28 @@ trait CaptureAddressViewTests {
       doc.getLabelElement.get(4).text mustBe messages.line_5
       doc.getLabelElement.get(5).text mustBe messages.country
       doc.getLabelElement.get(6).text mustBe messages.postcode
+    }
+
+    "have the correct values in the input fields" in {
+
+      if(formFill){
+        doc.getElementById("address1").attr("value") mustBe testAddress.line1
+        doc.getElementById("address2").attr("value") mustBe testAddress.line2
+        doc.getElementById("address3").attr("value") mustBe testAddress.line3.get
+        doc.getElementById("address4").attr("value") mustBe testAddress.line4.get
+        doc.getElementById("address5").attr("value") mustBe testAddress.line5.get
+        doc.getElementById("postcode").attr("value") mustBe testAddress.postcode.get
+        doc.select("option[selected]").eachAttr("value") must contain(testAddress.countryCode)
+      } else {
+        doc.getElementById("address1").attr("value") mustBe ""
+        doc.getElementById("address2").attr("value") mustBe ""
+        doc.getElementById("address3").attr("value") mustBe ""
+        doc.getElementById("address4").attr("value") mustBe ""
+        doc.getElementById("address5").attr("value") mustBe ""
+        doc.getElementById("postcode").attr("value") mustBe ""
+        doc.select("option[selected]").eachAttr("value").isEmpty mustBe true
+      }
+
     }
 
     "have postcode field with the correct hint text" in {

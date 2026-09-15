@@ -20,6 +20,7 @@ import play.api.libs.json.{JsObject, JsString, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{NotEnoughInformationToMatch, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -115,12 +116,27 @@ class AuditService @Inject() (appConfig: AppConfig,
             }
 
           val overseasIdentifiersBlock: JsObject =
-            (soleTraderRecord.optOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
-              case (Some(taxIdentifier), Some(country)) =>
-                Json.obj(
-                  "overseasTaxIdentifier"        -> taxIdentifier,
-                  "overseasTaxIdentifierCountry" -> country
-                )
+            (soleTraderRecord.optConfirmOverseasTaxIdentifier, soleTraderRecord.optOverseasTaxIdentifierCountry) match {
+              case (Some(confirmTaxIdentifier), Some(country)) =>
+                confirmTaxIdentifier.hasOverseasTaxIdentifier match {
+                  case YesNo.Yes =>
+                    Json.obj(
+                      "overseasTaxIdentifier"        -> confirmTaxIdentifier.overseasTaxIdentifier.get,
+                      "overseasTaxIdentifierCountry" -> country
+                    )
+                  case YesNo.No =>
+                    throw new InternalServerException(
+                      "Error: Tax identifier country set, but user has declared they don't have an overseas tax identifier"
+                    )
+                }
+              case (Some(confirmTaxIdentifier), None) =>
+                confirmTaxIdentifier.hasOverseasTaxIdentifier match {
+                  case YesNo.No => Json.obj()
+                  case YesNo.Yes =>
+                    throw new InternalServerException(
+                      "Error: Tax identifier country not set, but user has declared they do have an overseas tax identifier"
+                    )
+                }
               case (None, None) => Json.obj()
               case _            => throw new InternalServerException("Error: Invalid tax identifier and country")
             }

@@ -57,10 +57,10 @@ class CheckYourAnswersController @Inject() (mcc: MessagesControllerComponents,
           individualDetails <- soleTraderIdentificationService
                                  .retrieveIndividualDetails(journeyId)
                                  .map(_.getOrElse(throw new InternalServerException(s"Individual details not found for journeyId: $journeyId")))
-          optAddress              <- soleTraderIdentificationService.retrieveAddress(journeyId)
-          optSaPostcode           <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
-          optOverseasTaxId        <- soleTraderIdentificationService.retrieveOverseasTaxIdentifier(journeyId)
-          optOverseasTaxIdCountry <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
+          optAddress                      <- soleTraderIdentificationService.retrieveAddress(journeyId)
+          optSaPostcode                   <- soleTraderIdentificationService.retrieveSaPostcode(journeyId)
+          optConfirmOverseasTaxIdentifier <- soleTraderIdentificationService.retrieveConfirmOverseasTaxIdentifier(journeyId)
+          optOverseasTaxIdCountry         <- soleTraderIdentificationService.retrieveOverseasTaxIdentifierCountry(journeyId)
 
           ukDetailsSummaryRows = rowBuilder.buildUKDetailsSummaryListRows(journeyId,
                                                                           individualDetails,
@@ -71,7 +71,7 @@ class CheckYourAnswersController @Inject() (mcc: MessagesControllerComponents,
           overseasDetailsSummaryRows = rowBuilder.buildOverseasDetailsSummaryListRows(journeyId,
                                                                                       individualDetails,
                                                                                       journeyConfig.pageConfig.enableSautrCheck,
-                                                                                      optOverseasTaxId,
+                                                                                      optConfirmOverseasTaxIdentifier,
                                                                                       optOverseasTaxIdCountry
                                                                                      )
         } yield {

@@ -19,8 +19,8 @@ package uk.gov.hmrc.soletraderidentificationfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureDateOfBirth => messages, Header}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureDateOfBirth as messages}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testDateOfBirth, testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -54,7 +54,7 @@ trait CaptureDateOfBirthViewTests {
 
   }
 
-  def testCaptureDateOfBirthView(result: => WSResponse): Unit = {
+  def testCaptureDateOfBirthView(result: => WSResponse, formFill: Boolean = false): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -85,6 +85,20 @@ trait CaptureDateOfBirthViewTests {
 
     "have the correct hint" in {
       doc.getElementsByClass("govuk-hint").text() mustBe messages.hint
+    }
+
+    "have input text boxes with the correct contents" in {
+
+      if(formFill){
+        doc.getElementById("date-of-birth-day").attr("value") mustBe testDateOfBirth.getDayOfMonth.toString
+        doc.getElementById("date-of-birth-month").attr("value") mustBe testDateOfBirth.getMonth.toString
+        doc.getElementById("date-of-birth-year").attr("value") mustBe testDateOfBirth.getYear.toString
+      } else {
+        doc.getElementById("date-of-birth-day").attr("value") mustBe ""
+        doc.getElementById("date-of-birth-month").attr("value") mustBe ""
+        doc.getElementById("date-of-birth-year").attr("value") mustBe ""
+      }
+
     }
 
     "have a continue button" in {

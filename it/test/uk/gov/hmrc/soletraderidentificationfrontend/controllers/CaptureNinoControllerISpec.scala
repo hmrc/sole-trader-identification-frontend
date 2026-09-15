@@ -40,6 +40,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper with CaptureNinoVie
         )
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveNino(testJourneyId)(status = NOT_FOUND)
         get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
       }
 
@@ -49,6 +50,30 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper with CaptureNinoVie
 
       "return a view which" should {
         testCaptureNinoView(result)
+      }
+
+      "return, given there are stored answers, a view which" should {
+        lazy val result = {
+          await(
+            journeyConfigRepository.insertJourneyConfig(
+              journeyId = testJourneyId,
+              authInternalId = testInternalId,
+              journeyConfig = testIndividualJourneyConfig
+            )
+          )
+          stubAuth(OK, successfulAuthResponse())
+          stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+          stubRetrieveNino(testJourneyId)(status = OK, body = testNino)
+          get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
+        }
+
+        "return OK" in {
+          result.status mustBe OK
+        }
+
+        "return a view which" should {
+          testCaptureNinoView(result, true)
+        }
       }
 
       "redirect to sign in page" when {
@@ -79,6 +104,7 @@ class CaptureNinoControllerISpec extends ComponentSpecHelper with CaptureNinoVie
         enable(EnableNoNinoJourney)
         stubAuth(OK, successfulAuthResponse())
         stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveNino(testJourneyId)(status = NOT_FOUND)
         get(s"/identify-your-sole-trader-business/$testJourneyId/national-insurance-number")
       }
 

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
@@ -39,6 +40,7 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper with CaptureFul
         )
       )
       stubAuth(OK, successfulAuthResponse())
+      stubRetrieveFullName(testJourneyId)(status = NOT_FOUND)
       get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
     }
 
@@ -48,6 +50,29 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper with CaptureFul
 
     "return a view which" should {
       testCaptureFullNameView(result)
+    }
+
+    "return, given there are stored answers, a view which" should {
+
+      lazy val result = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testIndividualJourneyConfig
+          )
+        )
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
+      }
+
+      "have the status OK" in {
+        result.status mustBe OK
+      }
+
+      testCaptureFullNameView(result, true)
+
     }
 
     "return, given a persisted pageConfig with a custom full name page label, a view which" should {
@@ -61,6 +86,7 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper with CaptureFul
           )
         )
         stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(status = NOT_FOUND)
         get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
       }
 

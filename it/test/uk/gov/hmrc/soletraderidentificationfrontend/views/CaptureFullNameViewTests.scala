@@ -55,7 +55,7 @@ trait CaptureFullNameViewTests {
 
   }
 
-  def testCaptureFullNameView(result: => WSResponse): Unit = {
+  def testCaptureFullNameView(result: => WSResponse, formFill: Boolean = false): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -91,6 +91,18 @@ trait CaptureFullNameViewTests {
     "have correct labels in the form" in {
       doc.getLabelElement.first.text() mustBe messages.form_field_1
       doc.getLabelElement.get(1).text() mustBe messages.form_field_2
+    }
+
+    "have the correct text input box contents" in {
+
+      if (formFill) {
+        doc.getElementById("first-name").attr("value") mustBe testFirstName
+        doc.getElementById("last-name").attr("value") mustBe testLastName
+      } else {
+        doc.getElementById("first-name").attr("value") mustBe ""
+        doc.getElementById("last-name").attr("value") mustBe ""
+      }
+
     }
 
     "have a continue button" in {

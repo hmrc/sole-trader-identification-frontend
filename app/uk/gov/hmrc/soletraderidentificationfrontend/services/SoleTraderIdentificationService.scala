@@ -22,13 +22,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.soletraderidentificationfrontend.connectors.SoleTraderIdentificationConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.RemoveSoleTraderDetailsHttpParser.SuccessfullyRemoved
 import uk.gov.hmrc.soletraderidentificationfrontend.httpParsers.SoleTraderIdentificationStorageHttpParser.SuccessfullyStored
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchFailure, SoleTraderDetailsMatchResult}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 import uk.gov.hmrc.soletraderidentificationfrontend.services.SoleTraderIdentificationServiceConstants._
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SoleTraderIdentificationService @Inject() (connector: SoleTraderIdentificationConnector) {
@@ -85,6 +86,11 @@ class SoleTraderIdentificationService @Inject() (connector: SoleTraderIdentifica
   def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
 
+  def storeConfirmOverseasTaxIdentifier(journeyId: String, confirmOverseasTaxIdentifier: ConfirmOverseasTaxIdentifier)(implicit
+    hc: HeaderCarrier
+  ): Future[SuccessfullyStored.type] =
+    connector.storeData[ConfirmOverseasTaxIdentifier](journeyId, ConfirmOverseasTaxIdentifierKey, confirmOverseasTaxIdentifier)
+
   def storeOverseasTaxIdentifiersCountry(journeyId: String, country: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeData[String](journeyId, OverseasCountryKey, country)
 
@@ -136,6 +142,21 @@ class SoleTraderIdentificationService @Inject() (connector: SoleTraderIdentifica
   def retrieveOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, OverseasTaxIdentifierKey)
 
+  /** Note, we temporarily need to handle the case where we are running the updated VER-7155 code which uses ConfirmOverseasTaxIdentifier, but the
+    * journey data has the old overseasTaxIdentifier property.
+    */
+  def retrieveConfirmOverseasTaxIdentifier(
+    journeyId: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ConfirmOverseasTaxIdentifier]] =
+    connector.retrieveSoleTraderDetails[ConfirmOverseasTaxIdentifier](journeyId, ConfirmOverseasTaxIdentifierKey).flatMap {
+      case Some(confirmOverseasTaxIdentifier: ConfirmOverseasTaxIdentifier) => Future.successful(Some(confirmOverseasTaxIdentifier))
+      case None =>
+        retrieveOverseasTaxIdentifier(journeyId).map {
+          case Some(overseasTaxIdentifier) => Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(overseasTaxIdentifier)))
+          case None                        => None
+        }
+    }
+
   def retrieveOverseasTaxIdentifierCountry(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveSoleTraderDetails[String](journeyId, OverseasCountryKey)
 
@@ -186,5 +207,6 @@ object SoleTraderIdentificationServiceConstants {
   val Es20DetailsKey: String = "es20Details"
   val InsightsKey: String = "reputation"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
+  val ConfirmOverseasTaxIdentifierKey: String = "confirmOverseasTaxIdentifier"
   val OverseasCountryKey: String = "country"
 }

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.soletraderidentificationfrontend.controllers
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, JsObject}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants._
@@ -40,6 +40,7 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper with Capture
       )
       stubAuth(OK, successfulAuthResponse())
       stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+      stubRetrieveDob(testJourneyId)(status = NOT_FOUND)
       get(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")
     }
 
@@ -49,6 +50,31 @@ class CaptureDateOfBirthControllerISpec extends ComponentSpecHelper with Capture
 
     "return a view which" should {
       testCaptureDateOfBirthView(result)
+    }
+
+    "return, given there are stored answers, a view which" should {
+      lazy val result = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testIndividualJourneyConfig
+          )
+        )
+        stubAuth(OK, successfulAuthResponse())
+        stubRetrieveFullName(testJourneyId)(OK, Json.toJsObject(FullName(testFirstName, testLastName)))
+        stubRetrieveDob(testJourneyId)(OK, Json.toJson(testDateOfBirth))
+        get(s"/identify-your-sole-trader-business/$testJourneyId/date-of-birth")
+      }
+
+      "return OK" in {
+        result.status mustBe OK
+      }
+
+      "return a view which" should {
+        testCaptureDateOfBirthView(result, true)
+      }
+
     }
 
     "redirect to sign in page" when {

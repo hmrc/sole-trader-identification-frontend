@@ -25,7 +25,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
-import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, IndividualDetails}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.{Address, ConfirmOverseasTaxIdentifier, IndividualDetails}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.formatDate
 
 import javax.inject.{Inject, Singleton}
@@ -122,19 +123,26 @@ class CheckYourAnswersRowBuilder @Inject() () {
   def buildOverseasDetailsSummaryListRows(journeyId: String,
                                           individualDetails: IndividualDetails,
                                           enableSautrCheck: Boolean,
-                                          optOverseasTaxId: Option[String],
+                                          optConfirmOverseasTaxId: Option[ConfirmOverseasTaxIdentifier],
                                           optOverseasTaxIdCountry: Option[String]
                                          )(implicit messages: Messages, config: AppConfig): Seq[Aliases.SummaryListRow] =
     if (individualDetails.optNino.isEmpty && enableSautrCheck) {
-      (optOverseasTaxId, optOverseasTaxIdCountry) match {
 
-        case (Some(overseasTaxId), Some(overseasCountry)) =>
-          Seq(
-            createOverseasTaxIdProvidedRow(journeyId, overseasTaxId),
-            createOverseasTaxIdCountryRow(journeyId, overseasCountry)
-          )
-        case (None, None) => Seq(createOverseasTaxIdNotProvidedRow(journeyId))
-        case _            => throw new InternalServerException("Error: Invalid tax identifier and country")
+      optConfirmOverseasTaxId match {
+        case Some(confirmOverseasTaxId) =>
+          confirmOverseasTaxId.hasOverseasTaxIdentifier match {
+            case YesNo.Yes =>
+              optOverseasTaxIdCountry match {
+                case Some(overseasTaxIdCountry) =>
+                  Seq(
+                    createOverseasTaxIdProvidedRow(journeyId, confirmOverseasTaxId.overseasTaxIdentifier.get),
+                    createOverseasTaxIdCountryRow(journeyId, overseasTaxIdCountry)
+                  )
+                case None => throw new InternalServerException("Error: Overseas tax identifier confirmation found, but country not found")
+              }
+            case YesNo.No => Seq(createOverseasTaxIdNotProvidedRow(journeyId))
+          }
+        case None => throw new InternalServerException("Error: Overseas Tax Identifier confirmation not found")
       }
     } else Seq()
 

@@ -19,7 +19,9 @@ package uk.gov.hmrc.soletraderidentificationfrontend.models
 import play.api.libs.json._
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.ConfirmOverseasTaxIdentifier.format
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{SoleTraderDetailsMatchResult, SuccessfulMatchKey}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 
 import java.time.LocalDate
 
@@ -33,7 +35,7 @@ case class SoleTraderDetails(fullName: FullName,
                              businessVerification: Option[BusinessVerificationStatus],
                              registrationStatus: Option[RegistrationStatus],
                              optTrn: Option[String],
-                             optOverseasTaxIdentifier: Option[String],
+                             optConfirmOverseasTaxIdentifier: Option[ConfirmOverseasTaxIdentifier],
                              optOverseasTaxIdentifierCountry: Option[String],
                              optNinoInsights: Option[JsObject]
                             )
@@ -53,27 +55,32 @@ object SoleTraderDetails {
   private val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
   private val ReputationKey = "reputation"
   private val CorrelationIdKey = "ninoInsightsCorrelationId"
-  private val OverseasTaxIdentifierKey: String = "overseasTaxIdentifiers"
+  private val ConfirmOverseasTaxIdentifierKey: String = "confirmOverseasTaxIdentifier"
+  private val OverseasTaxIdentifiersKey: String = "overseasTaxIdentifiers"
+  private val HasOverseasTaxIdentifierKey = "hasOverseasTaxIdentifier"
+  private val OverseasTaxIdentifierKey = "overseasTaxIdentifier"
   private val OverseasCountryKey: String = "country"
 
   implicit val format: OFormat[SoleTraderDetails] = new OFormat[SoleTraderDetails] {
     override def reads(json: JsValue): JsResult[SoleTraderDetails] =
       for {
-        fullName                <- (json \ FullNameKey).validate[FullName]
-        dateOfBirthKey          <- (json \ DateOfBirthKey).validate[LocalDate]
-        optNino                 <- (json \ NinoKey).validateOpt[String]
-        optAddress              <- (json \ AddressKey).validateOpt[Address]
-        optSaPostcode           <- (json \ SaPostcodeKey).validateOpt[String]
-        optSaUtr                <- (json \ SautrKey).validateOpt[String]
-        identifiersMatch        <- (json \ IdentifiersMatchKey).validate[SoleTraderDetailsMatchResult]
-        businessVerification    <- (json \ BusinessVerificationKey).validateOpt[BusinessVerificationStatus]
-        registrationStatus      <- (json \ RegistrationKey).validateOpt[RegistrationStatus]
-        optTrnKey               <- (json \ TrnKey).validateOpt[String]
-        optOverseasTaxId        <- (json \ OverseasTaxIdentifierKey).validateOpt[String]
-        optOverseasTaxIdCountry <- (json \ OverseasCountryKey).validateOpt[String]
-        reputationKey           <- (json \ ReputationKey).validateOpt[JsObject]
+        fullName                        <- (json \ FullNameKey).validate[FullName]
+        dateOfBirthKey                  <- (json \ DateOfBirthKey).validate[LocalDate]
+        optNino                         <- (json \ NinoKey).validateOpt[String]
+        optAddress                      <- (json \ AddressKey).validateOpt[Address]
+        optSaPostcode                   <- (json \ SaPostcodeKey).validateOpt[String]
+        optSaUtr                        <- (json \ SautrKey).validateOpt[String]
+        identifiersMatch                <- (json \ IdentifiersMatchKey).validate[SoleTraderDetailsMatchResult]
+        businessVerification            <- (json \ BusinessVerificationKey).validateOpt[BusinessVerificationStatus]
+        registrationStatus              <- (json \ RegistrationKey).validateOpt[RegistrationStatus]
+        optTrnKey                       <- (json \ TrnKey).validateOpt[String]
+        optConfirmOverseasTaxIdentifier <- (json \ ConfirmOverseasTaxIdentifierKey).validateOpt[ConfirmOverseasTaxIdentifier]
+        optOverseasTaxId                <- (json \ OverseasTaxIdentifiersKey).validateOpt[String]
+        optOverseasTaxIdCountry         <- (json \ OverseasCountryKey).validateOpt[String]
+        reputationKey                   <- (json \ ReputationKey).validateOpt[JsObject]
       } yield {
-        val (overseasTaxId, overseasTaxIdCountry) = determineOverseasTaxIdentifierDetails(
+        val (confirmOverseasTaxId, overseasTaxIdCountry) = determineOverseasTaxIdentifierDetails(
+          optConfirmOverseasTaxIdentifier,
           optOverseasTaxId,
           optOverseasTaxIdCountry
         )
@@ -88,7 +95,7 @@ object SoleTraderDetails {
           businessVerification,
           registrationStatus,
           optTrnKey,
-          overseasTaxId,
+          confirmOverseasTaxId,
           overseasTaxIdCountry,
           reputationKey
         )
@@ -140,9 +147,19 @@ object SoleTraderDetails {
           case None             => Json.obj()
         }
       } ++ {
-        soleTraderDetails.optOverseasTaxIdentifier match {
-          case Some(overseasTaxId) => Json.obj(OverseasTaxIdentifierKey -> overseasTaxId)
-          case None                => Json.obj()
+        soleTraderDetails.optConfirmOverseasTaxIdentifier match {
+          case Some(confirmOverseasTaxId) =>
+            confirmOverseasTaxId.hasOverseasTaxIdentifier match {
+              case YesNo.Yes =>
+                Json.obj(
+                  ConfirmOverseasTaxIdentifierKey -> Json.obj(
+                    HasOverseasTaxIdentifierKey -> YesNo.Yes.toString,
+                    OverseasTaxIdentifierKey    -> confirmOverseasTaxId.overseasTaxIdentifier.get
+                  )
+                )
+              case YesNo.No => Json.obj(ConfirmOverseasTaxIdentifierKey -> Json.obj(HasOverseasTaxIdentifierKey -> YesNo.No.toString))
+            }
+          case None => Json.obj()
         }
       } ++ {
         soleTraderDetails.optOverseasTaxIdentifierCountry match {
@@ -176,30 +193,54 @@ object SoleTraderDetails {
         case None => Json.obj()
       }
 
-    val overseasTaxIdBlock: JsObject = (soleTraderDetails.optOverseasTaxIdentifier, soleTraderDetails.optOverseasTaxIdentifierCountry) match {
-      case (Some(overseasTaxId), Some(country)) =>
-        Json.obj(
-          "overseas" -> Json.obj(
-            "taxIdentifier" -> overseasTaxId,
-            "country"       -> country
-          )
-        )
+    val overseasTaxIdBlock: JsObject = (soleTraderDetails.optConfirmOverseasTaxIdentifier, soleTraderDetails.optOverseasTaxIdentifierCountry) match {
+      case (Some(confirmOverseasTaxId), Some(country)) =>
+        confirmOverseasTaxId.hasOverseasTaxIdentifier match {
+          case YesNo.Yes =>
+            Json.obj(
+              "overseas" -> Json.obj(
+                "taxIdentifier" -> confirmOverseasTaxId.overseasTaxIdentifier.get,
+                "country"       -> country
+              )
+            )
+          case YesNo.No =>
+            throw new InternalServerException("Error: Tax identifier country set, but user has declared they don't have an overseas tax identifier")
+        }
+      case (Some(confirmOverseasTaxId), None) =>
+        confirmOverseasTaxId.hasOverseasTaxIdentifier match {
+          case YesNo.No => Json.obj()
+          case YesNo.Yes =>
+            throw new InternalServerException("Error: Tax identifier country not set, but user has declared they do have an overseas tax identifier")
+        }
       case (None, None) => Json.obj()
       case _            => throw new InternalServerException("Error: Invalid combination of tax identifier and country")
     }
 
     format.writes(
       soleTraderDetails
-    ) - OverseasTaxIdentifierKey - OverseasCountryKey ++ formattedBusinessVerification ++ formattedIdentifiersMatch ++ formattedNinoInsights ++ overseasTaxIdBlock
+    ) - ConfirmOverseasTaxIdentifierKey - OverseasCountryKey ++ formattedBusinessVerification ++ formattedIdentifiersMatch ++ formattedNinoInsights ++ overseasTaxIdBlock
   }
 
-  private def determineOverseasTaxIdentifierDetails(optOverseasTaxId: Option[String],
+  private def determineOverseasTaxIdentifierDetails(optConfirmOverseasTaxId: Option[ConfirmOverseasTaxIdentifier],
+                                                    optOverseasTaxId: Option[String],
                                                     optOverseasTaxIdCountry: Option[String]
-                                                   ): (Option[String], Option[String]) =
-    (optOverseasTaxId, optOverseasTaxIdCountry) match {
-      case (Some(identifier), Some(country)) => (Some(identifier), Some(country))
-      case (None, None)                      => (None, None)
-      case _                                 => throw new InternalServerException("Error: Invalid combination of tax identifier and country")
+                                                   ): (Option[ConfirmOverseasTaxIdentifier], Option[String]) =
+    (optConfirmOverseasTaxId, optOverseasTaxId, optOverseasTaxIdCountry) match {
+      case (Some(confirmOverseasTaxIdentifier), None, Some(country)) =>
+        confirmOverseasTaxIdentifier.hasOverseasTaxIdentifier match {
+          case YesNo.Yes => (Some(confirmOverseasTaxIdentifier), Some(country))
+          case YesNo.No =>
+            throw new InternalServerException("Error: Tax identifier country set, but user has declared they don't have an overseas tax identifier")
+        }
+      case (Some(confirmOverseasTaxIdentifier), None, None) =>
+        confirmOverseasTaxIdentifier.hasOverseasTaxIdentifier match {
+          case YesNo.No => (Some(confirmOverseasTaxIdentifier), None)
+          case YesNo.Yes =>
+            throw new InternalServerException("Error: Tax identifier country not set, but user has declared they do have an overseas tax identifier")
+        }
+      case (None, Some(identifier), Some(country)) => (Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(identifier))), Some(country))
+      case (None, None, None)                      => (None, None)
+      case _                                       => throw new InternalServerException("Error: Invalid combination of tax identifier and country")
     }
 
 }

@@ -19,6 +19,7 @@ package uk.gov.hmrc.soletraderidentificationfrontend.forms
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.data.{Form, FormError}
+import uk.gov.hmrc.soletraderidentificationfrontend.models.ConfirmOverseasTaxIdentifier
 import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 
 import scala.util.matching.Regex
@@ -35,21 +36,19 @@ object CaptureOverseasTaxIdentifierForm {
   private val overseasTaxIdentifierTooLongErrorMsg: String = "error.invalid_tax_identifiers_length"
   private val overseasTaxIdentifierInvalidCharsErrorMsg: String = "error.invalid_tax_identifiers"
 
-  private val overseasTaxIdentifierFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
+  private val overseasTaxIdentifierFormatter: Formatter[ConfirmOverseasTaxIdentifier] = new Formatter[ConfirmOverseasTaxIdentifier] {
 
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], ConfirmOverseasTaxIdentifier] = {
 
-      val overseasTaxIdentifierChoiceExists: Boolean = data.getOrElse(key, "").nonEmpty
+      val overseasTaxIdentifierChoice: String = data.getOrElse(key, "")
 
-      if (overseasTaxIdentifierChoiceExists) {
+      if (overseasTaxIdentifierChoice == YesNo.Yes.toString) {
 
-        val overseasTaxIdentifierChoice: Option[String] = data.get(key)
+        handleOverseasTaxIdentifier(data)
 
-        if (overseasTaxIdentifierChoice.get == YesNo.Yes.toString) {
-          handleOverseasTaxIdentifier(data)
-        } else {
-          Right(None)
-        }
+      } else if (overseasTaxIdentifierChoice == YesNo.No.toString) {
+
+        Right(ConfirmOverseasTaxIdentifier(YesNo.No))
 
       } else {
 
@@ -59,28 +58,27 @@ object CaptureOverseasTaxIdentifierForm {
 
     }
 
-    override def unbind(key: String, value: Option[String]): Map[String, String] = {
+    override def unbind(key: String, value: ConfirmOverseasTaxIdentifier): Map[String, String] = {
 
-      value match {
-        case Some(overseasTaxIdentifier) =>
-          Map(
-            key                      -> YesNo.Yes.toString,
-            overseasTaxIdentifierKey -> overseasTaxIdentifier
-          )
-        case None => Map(key -> YesNo.No.toString)
-      }
+      val data: Map[String, String] = Map(key -> value.hasOverseasTaxIdentifier)
+
+      if (value.hasOverseasTaxIdentifier == YesNo.Yes)
+        data + (overseasTaxIdentifierKey -> value.overseasTaxIdentifier.get)
+      else
+        data
 
     }
 
-    def handleOverseasTaxIdentifier(data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+    def handleOverseasTaxIdentifier(data: Map[String, String]): Either[Seq[FormError], ConfirmOverseasTaxIdentifier] = {
 
       data.get(overseasTaxIdentifierKey) match {
         case Some(id) => validateOverseasTaxIdentifier(id)
         case None     => Left(Seq(FormError(overseasTaxIdentifierKey, overseasTaxIdentifierNotEnteredErrorMsg)))
       }
+
     }
 
-    def validateOverseasTaxIdentifier(id: String): Either[Seq[FormError], Option[String]] = {
+    def validateOverseasTaxIdentifier(id: String): Either[Seq[FormError], ConfirmOverseasTaxIdentifier] = {
 
       if (validateEntered(id)) {
 
@@ -88,7 +86,7 @@ object CaptureOverseasTaxIdentifierForm {
 
           if (validateCharacters(id)) {
 
-            Right(Some(id))
+            Right(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(id)))
 
           } else {
 
@@ -117,9 +115,9 @@ object CaptureOverseasTaxIdentifierForm {
     def validateCharacters(id: String): Boolean = id matches identifiersRegex.regex
   }
 
-  val form: Form[Option[String]] = {
+  val form: Form[ConfirmOverseasTaxIdentifier] = {
     Form(
-      single(overseasTaxIdentifierRadioKey -> of[Option[String]](overseasTaxIdentifierFormatter))
+      single(overseasTaxIdentifierRadioKey -> of[ConfirmOverseasTaxIdentifier](overseasTaxIdentifierFormatter))
     )
   }
 

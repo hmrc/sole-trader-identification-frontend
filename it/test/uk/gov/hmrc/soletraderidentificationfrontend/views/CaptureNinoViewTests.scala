@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.soletraderidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, CaptureNino => messages, Header}
-import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testTechnicalHelpUrl}
+import uk.gov.hmrc.soletraderidentificationfrontend.assets.TestConstants.{testSignOutUrl, testNino, testTechnicalHelpUrl}
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -28,7 +28,7 @@ import uk.gov.hmrc.soletraderidentificationfrontend.utils.ViewSpecHelper.Element
 trait CaptureNinoViewTests {
   this: ComponentSpecHelper =>
 
-  def testCaptureNinoView(result: => WSResponse): Unit = {
+  def testCaptureNinoView(result: => WSResponse, formFill: Boolean = false): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -61,6 +61,16 @@ trait CaptureNinoViewTests {
       doc.getParagraphs.get(1).text mustBe messages.line_1
       doc.getParagraphs.get(2).text mustBe messages.line_2
       doc.getLabelElement.text mustBe messages.label
+    }
+
+    "have the correct content in the nino input box" in {
+
+      if(formFill) {
+        doc.getElementById("nino").attr("value") mustBe testNino
+      } else {
+        doc.getElementById("nino").attr("value") mustBe ""
+      }
+
     }
 
     "not have a link to skip nino question" in {
