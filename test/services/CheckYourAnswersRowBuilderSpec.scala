@@ -30,6 +30,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.controllers.routes
+import uk.gov.hmrc.soletraderidentificationfrontend.models.ConfirmOverseasTaxIdentifier
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.services.CheckYourAnswersRowBuilder
 import uk.gov.hmrc.soletraderidentificationfrontend.utils.DateHelper.checkYourAnswersFormat
 
@@ -386,7 +388,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           testJourneyId,
           testIndividualDetailsNoNino,
           enableSautrCheck = false,
-          Some(testOverseasIdentifier),
+          Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
           Some(testOverseasIdentifierCountry)
         )
 
@@ -398,7 +400,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           testJourneyId,
           testIndividualDetails,
           enableSautrCheck = false,
-          Some(testOverseasIdentifier),
+          Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
           Some(testOverseasIdentifierCountry)
         )
 
@@ -411,7 +413,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           testJourneyId,
           testIndividualDetails,
           enableSautrCheck = true,
-          Some(testOverseasIdentifier),
+          Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
           Some(testOverseasIdentifierCountry)
         )
 
@@ -422,7 +424,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           testJourneyId,
           testIndividualDetailsNoNino,
           enableSautrCheck = true,
-          Some(testOverseasIdentifier),
+          Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
           Some(testOverseasIdentifierCountry)
         )
 
@@ -434,7 +436,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
           testJourneyId,
           testIndividualDetailsNoNino,
           enableSautrCheck = true,
-          None,
+          Some(ConfirmOverseasTaxIdentifier(YesNo.No)),
           None
         )
 
@@ -446,7 +448,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Mock
             testJourneyId,
             testIndividualDetailsNoNino,
             enableSautrCheck = true,
-            Some(testOverseasIdentifier),
+            Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
             None
           )
         )

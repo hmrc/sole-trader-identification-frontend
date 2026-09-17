@@ -19,6 +19,7 @@ package helpers
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.soletraderidentificationfrontend.models.BusinessVerificationStatus._
+import uk.gov.hmrc.soletraderidentificationfrontend.models.enumerations.YesNo
 import uk.gov.hmrc.soletraderidentificationfrontend.models.SoleTraderDetailsMatching.{DetailsMismatch, KnownFactsNoContent, SuccessfulMatch}
 import uk.gov.hmrc.soletraderidentificationfrontend.models._
 
@@ -51,7 +52,9 @@ object TestConstants {
   val testOverseasAddress: Address = Address("line1", "line2", Some("line3"), Some("line4"), Some("line5"), None, "US")
   val testSaPostcode: String = "AA1 1AA"
   val testOverseasIdentifier: String = "134124532"
+  val testConfirmOverseasTaxIdentifier: ConfirmOverseasTaxIdentifier = ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))
   val testOverseasIdentifierCountry: String = "AL"
+  val testOverseasTaxIdentifierNotConfirmed: ConfirmOverseasTaxIdentifier = ConfirmOverseasTaxIdentifier(YesNo.No, None)
   val testDefaultServiceName: String = "Entity Validation Service"
   val testServiceName: String = "Test Service"
 
@@ -97,6 +100,11 @@ object TestConstants {
   val testRegistrationFailed: String = "fail"
   val testRegistrationNotCalled: String = "not called"
 
+  val testNinoInsights: JsObject = Json.obj(
+    "code"   -> 0,
+    "reason" -> "Score of 0"
+  )
+
   val testInsightsReturnBody: JsObject = Json.obj(
     "ninoInsightsCorrelationId" -> testCorrelationId,
     "code"                      -> 0,
@@ -115,7 +123,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationPass),
       registrationStatus              = Some(Registered(testSafeId)),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = None,
+      optConfirmOverseasTaxIdentifier = None,
       optOverseasTaxIdentifierCountry = None,
       optNinoInsights                 = Some(testInsightsReturnBody)
     )
@@ -132,7 +140,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus              = Some(RegistrationNotCalled),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = None,
+      optConfirmOverseasTaxIdentifier = None,
       optOverseasTaxIdentifierCountry = None,
       optNinoInsights                 = Some(testInsightsReturnBody)
     )
@@ -149,7 +157,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus              = Some(RegistrationNotCalled),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = None,
+      optConfirmOverseasTaxIdentifier = None,
       optOverseasTaxIdentifierCountry = None,
       optNinoInsights                 = Some(testInsightsReturnBody)
     )
@@ -166,7 +174,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus              = Some(RegistrationNotCalled),
       optTrn                          = Some(testTrn),
-      optOverseasTaxIdentifier        = Some(testOverseasIdentifier),
+      optConfirmOverseasTaxIdentifier = Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
       optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
       optNinoInsights                 = None
     )
@@ -183,7 +191,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationNotEnoughInformationToCallBV),
       registrationStatus              = Some(RegistrationNotCalled),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = Some(testOverseasIdentifier),
+      optConfirmOverseasTaxIdentifier = Some(ConfirmOverseasTaxIdentifier(YesNo.Yes, Some(testOverseasIdentifier))),
       optOverseasTaxIdentifierCountry = Some(testOverseasIdentifierCountry),
       optNinoInsights                 = None
     )
@@ -200,7 +208,7 @@ object TestConstants {
       businessVerification            = None,
       registrationStatus              = Some(Registered(testSafeId)),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = None,
+      optConfirmOverseasTaxIdentifier = None,
       optOverseasTaxIdentifierCountry = None,
       optNinoInsights                 = Some(testInsightsReturnBody)
     )
@@ -217,7 +225,7 @@ object TestConstants {
       businessVerification            = Some(BusinessVerificationPass),
       registrationStatus              = Some(RegistrationFailed(testRegistrationFailure)),
       optTrn                          = None,
-      optOverseasTaxIdentifier        = None,
+      optConfirmOverseasTaxIdentifier = None,
       optOverseasTaxIdentifierCountry = None,
       optNinoInsights                 = Some(testInsightsReturnBody)
     )
