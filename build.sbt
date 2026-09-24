@@ -20,7 +20,7 @@ lazy val scoverageSettings = {
   )
   Seq(
     ScoverageKeys.coverageExcludedPackages := exclusionList.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 80, // Reduce threshold owing to changes to Scala compiler
+    ScoverageKeys.coverageMinimumStmtTotal := 83, // Reduce threshold owing to changes to Scala compiler
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true
   )
