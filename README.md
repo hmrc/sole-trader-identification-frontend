@@ -34,12 +34,14 @@ journey page.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+The optional accessibilityUrl overrides the configured accessibility statement. When it is omitted, the footer uses the
+service path configured in `accessibility-statement.service-path` and automatically includes the referring page and
+service navigation parameters.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
 a successful match is found. By default "businessVerificationCheck" will be true.
 
-All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
+All URLs provided must be relative or use an allow-listed host. By default, localhost is allowed.
 
 ```
 {
@@ -48,7 +50,7 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
-    "accessibilityUrl" : "/accessibility-statement/my-service",
+    "accessibilityUrl" : "/accessibility-statement/my-service", // optional; omit to use the configured default
     "optFullNamePageLabel" : "What is the name of the nominated partner?", // deprecated, use labels.en.optFullNamePageLabel 
     "regime" : "VATC",
     "labels" : {
@@ -81,9 +83,11 @@ journey page.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+The optional accessibilityUrl overrides the configured accessibility statement. When it is omitted, the footer uses the
+service path configured in `accessibility-statement.service-path` and automatically includes the referring page and
+service navigation parameters.
 
-All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
+All URLs provided must be relative or use an allow-listed host. By default, localhost is allowed.
 
 ```
 {
@@ -91,7 +95,7 @@ All URLs provided must be relative, apart from locally, where localhost is allow
     "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "deskProServiceId" : "abc",
     "signOutUrl" : "/sign-out",
-    "accessibilityUrl" : "/accessibility-statement/my-service",
+    "accessibilityUrl" : "/accessibility-statement/my-service", // optional; omit to use the configured default
     "optFullNamePageLabel" : "What is the name of the nominated partner?", // deprecated, use labels.en.optFullNamePageLabel 
     "regime" : "VATC",
     "labels" : {
@@ -218,12 +222,14 @@ verified. By default "enableSautrCheck" will be false.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+The optional accessibilityUrl overrides the configured accessibility statement. When it is omitted, the footer uses the
+service path configured in `accessibility-statement.service-path` and automatically includes the referring page and
+service navigation parameters.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
 a successful match is found. By default "businessVerificationCheck" will be true.
 
-All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
+All URLs provided must be relative or use an allow-listed host. By default, localhost is allowed.
 
 ```
 {

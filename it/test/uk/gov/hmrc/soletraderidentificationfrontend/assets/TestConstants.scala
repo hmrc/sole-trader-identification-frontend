@@ -88,7 +88,7 @@ object TestConstants {
 
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"
-  val testAccessibilityUrl: String = "/accessibility"
+  val testAccessibilityUrl: String = "/accessibility-statement/my-service"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?service=grs&useServiceNavigation"
   val testDefaultServiceName: String = "Entity Validation Service"
   val testDefaultWelshServiceName: String = "Gwasanaeth Dilysu Endid"
@@ -108,7 +108,7 @@ object TestConstants {
     deskProServiceId     = testDeskProServiceId,
     signOutUrl           = testSignOutUrl,
     enableSautrCheck     = false,
-    accessibilityUrl     = testAccessibilityUrl,
+    accessibilityUrl     = Some(testAccessibilityUrl),
     optFullNamePageLabel = None,
     labels               = None
   )

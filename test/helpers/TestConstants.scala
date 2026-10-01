@@ -310,7 +310,7 @@ object TestConstants {
       deskProServiceId     = "vrs",
       signOutUrl           = testSignOutUrl,
       enableSautrCheck     = enableSautrCheck,
-      accessibilityUrl     = testAccessibilityUrl,
+      accessibilityUrl     = Some(testAccessibilityUrl),
       optFullNamePageLabel = None
     ),
     testRegime

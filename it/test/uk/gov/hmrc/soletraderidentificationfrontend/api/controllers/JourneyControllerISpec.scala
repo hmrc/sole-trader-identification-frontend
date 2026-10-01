@@ -87,6 +87,23 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     }
 
     "respond with Created " when {
+      "the accessibility URL is omitted" in {
+
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
+          stubAuth(OK, successfulAuthResponse())
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+          val incomingJson = testSoleTraderJourneyConfigJson - "accessibilityUrl"
+          val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
+
+          result.status must be(CREATED)
+          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId))
+            .map(_.pageConfig.accessibilityUrl) mustBe Some(None)
+
+          await(journeyConfigRepository.drop)
+        }
+      }
+
       "incoming json contains a localhost url" in {
 
         forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>

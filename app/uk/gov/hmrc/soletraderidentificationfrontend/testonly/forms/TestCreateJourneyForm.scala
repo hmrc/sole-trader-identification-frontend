@@ -60,13 +60,6 @@ object TestCreateJourneyForm {
     )
   )
 
-  def accessibilityUrlEmpty: Constraint[String] = Constraint("accessibility_url.not_entered")(signOutUrl =>
-    validate(
-      constraint = signOutUrl.isEmpty,
-      errMsg     = "Accessibility Url is not entered"
-    )
-  )
-
   def regimeEmpty: Constraint[String] = Constraint("regime.not_entered")(regime =>
     validate(
       constraint = regime.isEmpty,
@@ -82,7 +75,7 @@ object TestCreateJourneyForm {
         serviceName               -> optText,
         deskProServiceId          -> text.verifying(deskProServiceIdEmpty),
         signOutUrl                -> text.verifying(signOutUrlEmpty),
-        accessibilityUrl          -> text.verifying(signOutUrlEmpty),
+        accessibilityUrl          -> optText,
         fullNamePageLabel         -> optText,
         regime                    -> text.verifying(regimeEmpty),
         welshFullNamePageLabel    -> optText,
@@ -139,7 +132,7 @@ object TestCreateJourneyForm {
         deskProServiceId          -> text.verifying(deskProServiceIdEmpty),
         signOutUrl                -> text.verifying(signOutUrlEmpty),
         enableSautrCheck          -> optText.toBoolean,
-        accessibilityUrl          -> text.verifying(signOutUrlEmpty),
+        accessibilityUrl          -> optText,
         fullNamePageLabel         -> optText,
         regime                    -> text.verifying(regimeEmpty),
         welshFullNamePageLabel    -> optText,

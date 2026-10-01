@@ -42,6 +42,18 @@ trait CaptureFullNameViewTests {
 
   }
 
+  def testCaptureFullNameViewWithDefaultAccessibilityStatement(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "use the configured accessibility statement with a referrer and service navigation" in {
+      val accessibilityStatementUrl = doc.select("a.govuk-footer__link:containsOwn(Accessibility statement)").attr("href")
+
+      accessibilityStatementUrl must include("/accessibility-statement/vat-registration?")
+      accessibilityStatementUrl must include("referrerUrl=")
+      accessibilityStatementUrl must endWith("&useServiceNavigation")
+    }
+  }
+
   def testCaptureFullNameErrorViewWithCustomFullNameLabel(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
@@ -65,6 +77,10 @@ trait CaptureFullNameViewTests {
 
     "have sign out link redirecting to signOutUrl from journey config" in {
       doc.getSignOutLink mustBe testSignOutUrl
+    }
+
+    "have the correct accessibility statement link" in {
+      doc.select(s"""a.govuk-footer__link[href="$testAccessibilityUrl"]""").text mustBe "Accessibility statement"
     }
 
     "have the correct beta banner that redirect to beta feedback" in {

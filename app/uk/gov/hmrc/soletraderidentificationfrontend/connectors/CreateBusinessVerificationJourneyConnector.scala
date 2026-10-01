@@ -52,11 +52,10 @@ class CreateBusinessVerificationJourneyConnector @Inject() (httpClient: HttpClie
             "saUtr" -> sautr
           )
         ),
-        "continueUrl"               -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-        "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-        "pageTitle"                 -> pageTitle,
-        "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId
-      )
+        "continueUrl"        -> routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+        "pageTitle"          -> pageTitle,
+        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId
+      ) ++ journeyConfig.pageConfig.accessibilityUrl.fold(Json.obj())(url => Json.obj("accessibilityStatementUrl" -> url))
 
     httpClient
       .post(url = url"${appConfig.createBusinessVerificationJourneyUrl}")(hc)

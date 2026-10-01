@@ -50,6 +50,22 @@ class CaptureFullNameControllerISpec extends ComponentSpecHelper with CaptureFul
       testCaptureFullNameView(result)
     }
 
+    "return, given no accessibility URL override, a view which" should {
+      lazy val viewWithDefaultAccessibilityStatement: WSResponse = {
+        await(
+          journeyConfigRepository.insertJourneyConfig(
+            journeyId      = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig  = testIndividualJourneyConfig.copy(pageConfig = testIndividualPageConfig.copy(accessibilityUrl = None))
+          )
+        )
+        stubAuth(OK, successfulAuthResponse())
+        get(s"/identify-your-sole-trader-business/$testJourneyId/full-name")
+      }
+
+      testCaptureFullNameViewWithDefaultAccessibilityStatement(result = viewWithDefaultAccessibilityStatement)
+    }
+
     "return, given a persisted pageConfig with a custom full name page label, a view which" should {
       lazy val viewWithCustomFullNamePageLabel: WSResponse = {
         await(

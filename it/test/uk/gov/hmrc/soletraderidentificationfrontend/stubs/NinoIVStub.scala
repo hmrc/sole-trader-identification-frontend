@@ -78,9 +78,8 @@ trait NinoIVStub extends WireMockMethods {
           "nino" -> nino
         )
       ),
-      "continueUrl"               -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
-      "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-      "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId,
+      "continueUrl"        -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
+      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "pageTitle" -> pageTitle
@@ -89,7 +88,7 @@ trait NinoIVStub extends WireMockMethods {
           "pageTitle" -> welshPageTitle
         )
       )
-    )
+    ) ++ journeyConfig.pageConfig.accessibilityUrl.fold(Json.obj())(url => Json.obj("accessibilityStatementUrl" -> url))
     when(method = POST, uri = uriToPostTo, postBody)
       .thenReturn(
         status = status,

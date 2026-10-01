@@ -53,9 +53,8 @@ class CreateNinoIVJourneyConnector @Inject() (httpClient: HttpClientV2, appConfi
             "nino" -> nino
           )
         ),
-        "continueUrl"               -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
-        "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
-        "deskproServiceName"        -> journeyConfig.pageConfig.deskProServiceId,
+        "continueUrl"        -> routes.NinoIVController.retrieveNinoIVResult(journeyId).url,
+        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
         "labels" -> Json.obj(
           "en" -> Json.obj(
             "pageTitle" -> pageTitle
@@ -64,7 +63,7 @@ class CreateNinoIVJourneyConnector @Inject() (httpClient: HttpClientV2, appConfi
             "pageTitle" -> welshPageTitle
           )
         )
-      )
+      ) ++ journeyConfig.pageConfig.accessibilityUrl.fold(Json.obj())(url => Json.obj("accessibilityStatementUrl" -> url))
 
     httpClient
       .post(url = url"${appConfig.createNinoIVJourneyUrl}")(hc)
