@@ -26,7 +26,7 @@ object Utils {
     deskProServiceId     = "vrs",
     signOutUrl           = appConfig.vatRegFeedbackUrl,
     enableSautrCheck     = true,
-    accessibilityUrl     = None,
+    accessibilityUrl     = appConfig.vatRegAccessibilityStatementUrl,
     optFullNamePageLabel = None
   )
 

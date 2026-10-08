@@ -66,10 +66,10 @@ object TestCreateJourneyConnector {
       deskProServiceIdKey          -> journeyConfig.pageConfig.deskProServiceId,
       signOutUrlKey                -> journeyConfig.pageConfig.signOutUrl,
       enableSautrCheckKey          -> journeyConfig.pageConfig.enableSautrCheck,
+      accessibilityUrlKey          -> journeyConfig.pageConfig.accessibilityUrl,
       optFullNamePageLabelKey      -> journeyConfig.pageConfig.optFullNamePageLabel,
       regimeKey                    -> journeyConfig.regime
-    ) ++ journeyConfig.pageConfig.accessibilityUrl.fold(Json.obj())(url => Json.obj(accessibilityUrlKey -> url)) ++
-      labelsAsOptJsObject(journeyConfig.pageConfig.labels)
+    ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.labels)
 
   private def labelsAsOptJsObject(optJourneyLabels: Option[JourneyLabels]): JsObject =
     optJourneyLabels match {

@@ -56,6 +56,14 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
       )
 
     "respond with Bad Request" when {
+      "the accessibility URL is omitted" in {
+        forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
+          val incomingJson = testSoleTraderJourneyConfigJson - "accessibilityUrl"
+
+          post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson).status must be(BAD_REQUEST)
+        }
+      }
+
       "incoming json contains a non relative url" in {
 
         forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
@@ -87,20 +95,37 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with S
     }
 
     "respond with Created " when {
-      "the accessibility URL is omitted" in {
+      "the accessibility URL needs the service navigation parameter normalising" in {
+        val accessibilityUrlScenarios = Tables.Table(
+          ("incomingAccessibilityUrl", "expectedAccessibilityUrl"),
+          (
+            "/accessibility-statement/my-service",
+            "/accessibility-statement/my-service?useServiceNavigation"
+          ),
+          (
+            "/accessibility-statement/my-service?referrerUrl=%2Fstart",
+            "/accessibility-statement/my-service?referrerUrl=%2Fstart&useServiceNavigation"
+          ),
+          (
+            "/accessibility-statement/my-service?referrerUrl=%2Fstart&useServiceNavigation",
+            "/accessibility-statement/my-service?referrerUrl=%2Fstart&useServiceNavigation"
+          )
+        )
 
         forAll(createJourneyApiUrlSuffixScenarios) { (createJourneyApiUrlSuffix: String) =>
-          stubAuth(OK, successfulAuthResponse())
-          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+          forAll(accessibilityUrlScenarios) { (incomingAccessibilityUrl: String, expectedAccessibilityUrl: String) =>
+            stubAuth(OK, successfulAuthResponse())
+            stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
-          val incomingJson = testSoleTraderJourneyConfigJson - "accessibilityUrl"
-          val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
+            val incomingJson = testSoleTraderJourneyConfigJson ++ Json.obj("accessibilityUrl" -> incomingAccessibilityUrl)
+            val result = post(uri = "/sole-trader-identification/api/" + createJourneyApiUrlSuffix, json = incomingJson)
 
-          result.status must be(CREATED)
-          await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId))
-            .map(_.pageConfig.accessibilityUrl) mustBe Some(None)
+            result.status must be(CREATED)
+            await(journeyConfigRepository.findJourneyConfig(testJourneyId, testInternalId))
+              .map(_.pageConfig.accessibilityUrl) mustBe Some(expectedAccessibilityUrl)
 
-          await(journeyConfigRepository.drop)
+            await(journeyConfigRepository.drop)
+          }
         }
       }
 

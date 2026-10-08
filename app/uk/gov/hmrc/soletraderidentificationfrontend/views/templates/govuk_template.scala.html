@@ -63,7 +63,7 @@
     HmrcStandardPageParams(
         serviceURLs = ServiceURLs(
             signOutUrl = Some(pageConfig.signOutUrl),
-            accessibilityStatementUrl = pageConfig.accessibilityUrl
+            accessibilityStatementUrl = Some(pageConfig.accessibilityUrl)
         ),
         banners = Banners(
             phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId)))

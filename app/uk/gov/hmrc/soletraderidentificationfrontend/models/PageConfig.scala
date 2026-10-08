@@ -22,19 +22,14 @@ case class PageConfig(optServiceName: Option[String],
                       deskProServiceId: String,
                       signOutUrl: String,
                       enableSautrCheck: Boolean,
-                      accessibilityUrl: Option[String],
+                      accessibilityUrl: String,
                       optFullNamePageLabel: Option[String],
                       labels: Option[JourneyLabels] = None
                      )
 
 object PageConfig {
 
-  def apply(deskProServiceId: String,
-            signOutUrl: String,
-            enableSautrCheck: Boolean,
-            accessibilityUrl: Option[String],
-            labels: JourneyLabels
-           ): PageConfig = {
+  def apply(deskProServiceId: String, signOutUrl: String, enableSautrCheck: Boolean, accessibilityUrl: String, labels: JourneyLabels): PageConfig = {
 
     val optLabels = if (labels.nonEmpty) Some(labels) else None
 

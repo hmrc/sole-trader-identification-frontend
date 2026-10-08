@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.soletraderidentificationfrontend.testonly
+package testonly
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.soletraderidentificationfrontend.testonly.Utils
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.soletraderidentificationfrontend.testonly.forms.TestCreateJourneyForm
 
@@ -28,30 +29,31 @@ class UtilsSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   "defaultPageConfig" should {
-    "use the configured accessibility statement" in {
-      Utils.defaultPageConfig(appConfig).accessibilityUrl mustBe None
+    "use the VAT Registration accessibility statement" in {
+      Utils.defaultPageConfig(appConfig).accessibilityUrl mustBe
+        "http://localhost:12346/accessibility-statement/vat-registration?useServiceNavigation"
     }
   }
 
   "journeyConfigWriter" should {
-    "omit the accessibility URL when no override is configured" in {
+    "include the accessibility URL" in {
       val pageConfig = Utils.defaultPageConfig(appConfig)
       val journeyConfig = Utils.defaultJourneyConfig(appConfig, pageConfig, regime = "VATC")
 
-      (TestCreateJourneyConnector.journeyConfigWriter.writes(journeyConfig) \ "accessibilityUrl").toOption mustBe None
+      (TestCreateJourneyConnector.journeyConfigWriter.writes(journeyConfig) \ "accessibilityUrl").as[String] mustBe
+        "http://localhost:12346/accessibility-statement/vat-registration?useServiceNavigation"
     }
   }
 
   "test journey form" should {
-    "bind a blank accessibility URL as no override" in {
+    "reject a blank accessibility URL" in {
       val pageConfig = Utils.defaultPageConfig(appConfig)
       val journeyConfig = Utils.defaultJourneyConfig(appConfig, pageConfig, regime = "VATC")
       val form = TestCreateJourneyForm.form(enableSautrCheck = true)
 
       val boundForm = form.bind(form.fill(journeyConfig).data + ("accessibilityUrl" -> ""))
 
-      boundForm.errors mustBe empty
-      boundForm.value.map(_.pageConfig.accessibilityUrl) mustBe Some(None)
+      boundForm("accessibilityUrl").error.map(_.message) mustBe Some("Accessibility Url is not entered")
     }
   }
 }

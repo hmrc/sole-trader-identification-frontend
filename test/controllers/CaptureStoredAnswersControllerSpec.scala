@@ -52,7 +52,7 @@ class CaptureStoredAnswersControllerSpec
     deskProServiceId     = "test-service-id",
     signOutUrl           = testSignOutUrl,
     enableSautrCheck     = true,
-    accessibilityUrl     = Some(testAccessibilityUrl),
+    accessibilityUrl     = testAccessibilityUrl,
     optFullNamePageLabel = None,
     labels               = None
   )

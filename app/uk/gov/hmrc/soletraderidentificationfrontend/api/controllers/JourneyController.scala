@@ -46,7 +46,7 @@ class JourneyController @Inject() (controllerComponents: ControllerComponents,
   val relativeUrlReads: String => Reads[String] = relativeUrlReadsHelper(urlHelper)
   val continueUrlReads: Reads[String] = relativeUrlReads(continueUrlKey)
   val signOutUrlReads: Reads[String] = relativeUrlReads(signOutUrlKey)
-  val accessibilityUrlReads: Reads[Option[String]] = optionalRelativeUrlReadsHelper(urlHelper)(accessibilityUrlKey)
+  val accessibilityUrlReads: Reads[String] = relativeUrlReads(accessibilityUrlKey).map(urlHelper.withUseServiceNavigation)
 
   def createSoleTraderJourney: Action[JourneyConfig] = createJourney(sautrCheckPolicy = SautrCheckEnabled)
 
@@ -121,24 +121,16 @@ object JourneyController {
   val regimeKey = "regime"
   val labelsKey = "labels"
 
-  private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = Reads { json =>
-    (json \ jsPathKeyToBeRead).validate[String].flatMap(validateUrl(urlHelper, jsPathKeyToBeRead, _))
-  }
-
-  private def optionalRelativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[Option[String]] = Reads { json =>
-    (json \ jsPathKeyToBeRead).validateOpt[String].flatMap {
-      case Some(url) => validateUrl(urlHelper, jsPathKeyToBeRead, url).map(Some(_))
-      case None      => JsSuccess(None)
-    }
-  }
-
-  private def validateUrl(urlHelper: UrlHelper, jsPathKeyToBeRead: String, url: String): JsResult[String] =
-    urlHelper.isAValidUrl(urlToBeValidated = url) match {
-      case JourneyConfigUrlAllowed => JsSuccess(url)
-      case JourneyConfigUrlNotAllowed =>
-        JsError(s"$url value for $jsPathKeyToBeRead json key is not relative or accepted urls")
-      case JourneyConfigUrlInvalid =>
-        JsError(s"An unexpected error occurred validating $url for $jsPathKeyToBeRead json key")
+  private def relativeUrlReadsHelper(urlHelper: UrlHelper)(jsPathKeyToBeRead: String): Reads[String] = (JsPath \ jsPathKeyToBeRead)
+    .read[String]
+    .flatMap { someIncomingUrlToBeValidated => (_: JsValue) =>
+      urlHelper.isAValidUrl(urlToBeValidated = someIncomingUrlToBeValidated) match {
+        case JourneyConfigUrlAllowed => JsSuccess(someIncomingUrlToBeValidated)
+        case JourneyConfigUrlNotAllowed =>
+          JsError(s"$someIncomingUrlToBeValidated value for $jsPathKeyToBeRead json key is not relative or accepted urls")
+        case JourneyConfigUrlInvalid =>
+          JsError(s"An unexpected error occurred validating $someIncomingUrlToBeValidated for $jsPathKeyToBeRead json key")
+      }
     }
 
   private def enableSautrCheck(sautrCheckPolicy: SautrCheckPolicy, sautrCheckFromIncomingJson: Option[Boolean]): Boolean = sautrCheckPolicy match {
