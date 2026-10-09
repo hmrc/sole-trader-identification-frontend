@@ -58,10 +58,9 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   private lazy val accessibilityStatementHost: String =
     config.getOptional[String]("platform.frontend.host").getOrElse(servicesConfig.getString("accessibility-statement.host"))
-  private lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.path")
   private lazy val accessibilityStatementServicePath: String = servicesConfig.getString("accessibility-statement.service-path")
   lazy val vatRegAccessibilityStatementUrl: String =
-    s"$accessibilityStatementHost$accessibilityStatementPath$accessibilityStatementServicePath?useServiceNavigation"
+    s"$accessibilityStatementHost/accessibility-statement$accessibilityStatementServicePath?useServiceNavigation"
 
   def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
 
