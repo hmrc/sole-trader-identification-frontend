@@ -46,7 +46,7 @@ class JourneyController @Inject() (controllerComponents: ControllerComponents,
   val relativeUrlReads: String => Reads[String] = relativeUrlReadsHelper(urlHelper)
   val continueUrlReads: Reads[String] = relativeUrlReads(continueUrlKey)
   val signOutUrlReads: Reads[String] = relativeUrlReads(signOutUrlKey)
-  val accessibilityUrlReads: Reads[String] = relativeUrlReads(accessibilityUrlKey)
+  val accessibilityUrlReads: Reads[String] = relativeUrlReads(accessibilityUrlKey).map(urlHelper.withUseServiceNavigation)
 
   def createSoleTraderJourney: Action[JourneyConfig] = createJourney(sautrCheckPolicy = SautrCheckEnabled)
 

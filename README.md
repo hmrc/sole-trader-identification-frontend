@@ -34,7 +34,9 @@ journey page.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+All other fields must be provided. The calling service must set accessibilityUrl to its own accessibility statement so
+that this journey and any downstream verification journeys link to the correct statement.
+The `useServiceNavigation` query parameter is appended when it is not already present.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
 a successful match is found. By default "businessVerificationCheck" will be true.
@@ -81,7 +83,9 @@ journey page.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+All other fields must be provided. The calling service must set accessibilityUrl to its own accessibility statement so
+that this journey and any downstream verification journeys link to the correct statement.
+The `useServiceNavigation` query parameter is appended when it is not already present.
 
 All URLs provided must be relative, apart from locally, where localhost is allowed. All absolute urls will fail.
 
@@ -218,7 +222,9 @@ verified. By default "enableSautrCheck" will be false.
 
 The deskProServiceId is used in the beta feedback url, the Tech Difficulties url uses "grs" as the identifier.
 
-All other fields must be provided.
+All other fields must be provided. The calling service must set accessibilityUrl to its own accessibility statement so
+that this journey and any downstream verification journeys link to the correct statement.
+The `useServiceNavigation` query parameter is appended when it is not already present.
 
 The businessVerificationCheck field allows the calling service to bypass the verification and continue to register where
 a successful match is found. By default "businessVerificationCheck" will be true.
