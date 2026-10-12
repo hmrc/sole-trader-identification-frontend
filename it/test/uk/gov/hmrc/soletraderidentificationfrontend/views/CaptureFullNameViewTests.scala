@@ -67,6 +67,10 @@ trait CaptureFullNameViewTests {
       doc.getSignOutLink mustBe testSignOutUrl
     }
 
+    "have the correct accessibility statement link" in {
+      doc.select(s"""a.govuk-footer__link[href="$testAccessibilityUrl"]""").text mustBe "Accessibility statement"
+    }
+
     "have the correct beta banner that redirect to beta feedback" in {
       doc.getBanner.text mustBe BetaBanner.title
       doc.getBannerLink mustBe config.betaFeedbackUrl("vrs")

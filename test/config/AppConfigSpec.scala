@@ -31,6 +31,11 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AppConfig" should {
 
+    "provide the VAT Registration accessibility statement URL" in {
+      appConfig.vatRegAccessibilityStatementUrl mustBe
+        "http://localhost:12346/accessibility-statement/vat-registration?useServiceNavigation"
+    }
+
     "provide the name of a country identified by a given country code" when {
 
       "the preferred language is english" in {
