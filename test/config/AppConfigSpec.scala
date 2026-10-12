@@ -19,8 +19,10 @@ package config
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Configuration
 
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.soletraderidentificationfrontend.config.AppConfig
 
 class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
@@ -31,9 +33,22 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AppConfig" should {
 
-    "provide the VAT Registration accessibility statement URL" in {
+    "provide an absolute local VAT Registration accessibility statement URL" in {
       appConfig.vatRegAccessibilityStatementUrl mustBe
         "http://localhost:12346/accessibility-statement/vat-registration?useServiceNavigation"
+    }
+
+    "provide a relative VAT Registration accessibility statement URL in deployed environments" in {
+      Seq(
+        "https://www.qa.tax.service.gov.uk",
+        "https://www.staging.tax.service.gov.uk"
+      ).foreach { platformFrontendHost =>
+        val configuration = Configuration("platform.frontend.host" -> platformFrontendHost).withFallback(app.configuration)
+        val deployedAppConfig = new AppConfig(configuration, new ServicesConfig(configuration), app.environment)
+
+        deployedAppConfig.vatRegAccessibilityStatementUrl mustBe
+          "/accessibility-statement/vat-registration?useServiceNavigation"
+      }
     }
 
     "provide the name of a country identified by a given country code" when {
