@@ -39,16 +39,11 @@ class AppConfigSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
     }
 
     "provide a relative VAT Registration accessibility statement URL in deployed environments" in {
-      Seq(
-        "https://www.qa.tax.service.gov.uk",
-        "https://www.staging.tax.service.gov.uk"
-      ).foreach { platformFrontendHost =>
-        val configuration = Configuration("platform.frontend.host" -> platformFrontendHost).withFallback(app.configuration)
-        val deployedAppConfig = new AppConfig(configuration, new ServicesConfig(configuration), app.environment)
+      val configuration = Configuration("relative-urls.enabled" -> true).withFallback(app.configuration)
+      val deployedAppConfig = new AppConfig(configuration, new ServicesConfig(configuration), app.environment)
 
-        deployedAppConfig.vatRegAccessibilityStatementUrl mustBe
-          "/accessibility-statement/vat-registration?useServiceNavigation"
-      }
+      deployedAppConfig.vatRegAccessibilityStatementUrl mustBe
+        "/accessibility-statement/vat-registration?useServiceNavigation"
     }
 
     "provide the name of a country identified by a given country code" when {
